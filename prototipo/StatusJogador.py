@@ -1,4 +1,4 @@
-from AbstractPersonagem import AbstractPersonagem
+from abstractions.AbstractPersonagem import AbstractPersonagem
 
 
 class StatusJogador():

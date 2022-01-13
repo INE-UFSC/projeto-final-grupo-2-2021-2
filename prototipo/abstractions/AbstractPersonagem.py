@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
+from Hitbox import Hitbox
 from Arma import Arma
-# from Terreno import Terreno
 
 
 class AbstractPersonagem(ABC):
@@ -14,14 +14,12 @@ class AbstractPersonagem(ABC):
         self.__defesa = stats['defesa'] if 'defesa' in stats.keys() else 0
         self.__vel = stats['vel'] if 'vel' in stats.keys() else 0
 
-        self.__posicao = posicao
-        self.__tamanho = tamanho
+        self.__hitbox = Hitbox(posicao, tamanho)
 
         dano = stats['arma_dano'] if 'arma_dano' in stats.keys() else 0
         alcance = stats['arma_alcance'] if 'arma_alcance' in stats.keys() else 0
 
         self.__arma = Arma(dano, alcance)
-        # self.__terreno = terreno
 
     @property
     def vida_maxima(self) -> int:
@@ -79,9 +77,8 @@ class AbstractPersonagem(ABC):
             self.__vel = value
 
     @property
-    def posicao(self) -> tuple:
-        """Retorna a posicao atual do personagem, tuple(x,y)"""
-        return self.__posicao
+    def hitbox(self) -> Hitbox:
+        return self.__hitbox
 
     @property
     def arma(self) -> Arma:
@@ -92,18 +89,6 @@ class AbstractPersonagem(ABC):
     def arma(self, arma) -> None:
         if isinstance(arma, Arma):
             self.__arma = arma
-
-    @property
-    def tamanho(self) -> tuple:
-        """Retorna altura e largura do personagem"""
-        return self.__tamanho
-
-    """     
-    @property
-    def terreno(self) -> AbstractTerreno:
-        '''Retorna o terreno que o personagem se encontra'''
-        return self.__terreno
-    """
 
     def tomar_dano(self, dano) -> int:
         """Retorna o quanto de vida foi retirado do personagem"""

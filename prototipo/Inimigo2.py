@@ -1,10 +1,12 @@
-from AbstractPersonagem import AbstractPersonagem
+from abstractions.AbstractInimigo import AbstractInimigo
 from stats import Inimigo2Stats
 
 
-class Inimigo2(AbstractPersonagem):
-    def __init__(self, posicao: tuple, tamanho: tuple) -> None:
-        super().__init__(stats=Inimigo2Stats, posicao=posicao, tamanho=tamanho)
+class Inimigo2(AbstractInimigo):
+    def __init__(self, posicao: tuple) -> None:
+        super().__init__(stats=Inimigo2Stats, posicao=posicao, tamanho=(6, 6))
+        self.__sprite_path = ""
 
-    def mover(self):
-        pass
+    @property
+    def sprite_path(self) -> str:
+        return self.__sprite_path
