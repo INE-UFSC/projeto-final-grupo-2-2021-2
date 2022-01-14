@@ -1,21 +1,23 @@
 import pygame
-from Terreno1 import Terreno1
+from TelaJogo import TelaJogo
 from Jogador import Jogador
+from Opcoes import Dificuldade, Opcoes
+from Comandos import Comandos
+from ControladorJogo import ControladorJogo
+
 
 class Jogo:
-    def __init__(self, terreno, comandos, jogador, opcoes):
-        self.__terreno = terreno
-        self.__comandos = comandos
-        self.__jogador = jogador
-        self.__opcoes = opcoes
+    def __init__(self):
+        self.__tela = TelaJogo()
+        self.__comandos = Comandos()
+        self.__jogador = None
+        self.__controlador = None
+        self.__opcoes = None
 
     def play(self):
-        
-        window = pygame.display.set_mode([1137, 640]) #cria a janela do jogo
-        title = pygame.display.set_caption('The Binding Of Isaac') # nome da janela
-        tela_start = pygame.image.load("imagens/start.png") # imagem da tela inicial
-        window.blit(tela_start,(0,0)) # carrega a tela de start
-        
+        self.__tela.mostrar_fundo()
+        self.__carregar_dados()
+
         loop = True
         while loop:
 
@@ -23,22 +25,38 @@ class Jogo:
                 if events.type == pygame.QUIT:
                     loop = False
                 if events.type == pygame.KEYDOWN:
-                    if events.key == pygame.K_RETURN: #RETURN é o ENTER, dá inicio ao jogo no terreno 1
-                        new_game = self.__terreno
-                        new_game.rodar_jogo(window)
+                    if events.key == pygame.K_RETURN:  # RETURN é o ENTER, dá inicio ao jogo no terreno 1
+                        nova_fase = self.__controlador.proxima_fase()
+                        nova_fase.start(self.__tela)
 
                 pygame.display.update()
+
     def executar_comando(self):
         pass
-    
+
     def mostrar_comando(self):
         pass
 
+    def __escolher_dificuldade(self) -> Dificuldade:
+        return Dificuldade.medio
+
+    def __escolher_nome(self) -> str:
+        return 'Tatakae'
+
+    def __carregar_dados(self) -> None:
+        dificuldade = self.__escolher_dificuldade()
+        self.__opcoes = Opcoes(dificuldade)
+
+        nome = self.__escolher_nome()
+        self.__jogador = Jogador((0, 0), (10, 10), nome)
+
+        self.__controlador = ControladorJogo(self.__jogador, self.__tela.tamanho, self.__opcoes)
+
+
 pygame.init()
 
-terreno = Terreno1(0,0,0) #deixei 0 pois os atributos ainda não estão definidos
 
-jogo = Jogo(terreno,0,0,0)
+jogo = Jogo()
 jogo.play()
 
 pygame.quit()
