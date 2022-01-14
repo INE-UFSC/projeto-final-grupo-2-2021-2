@@ -10,5 +10,9 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         pass
 
     @abstractmethod
-    def sprite_str(self) -> str:
+    def sprite_path(self) -> str:
+        pass
+
+    @abstractmethod
+    def _calibrar_dificuldade(self):
         pass
