@@ -27,7 +27,7 @@ class AbstractPersonagem(ABC):
         return self.__vida_maxima
 
     @vida_maxima.setter
-    def vida_maxima(self, value) -> None:
+    def vida_maxima(self, value: int) -> None:
         """Setter de vida_maxima"""
         if type(value) == int and value > -1:
             self.__vida_maxima = value
@@ -38,7 +38,7 @@ class AbstractPersonagem(ABC):
         return self.__vida
 
     @vida.setter
-    def vida(self, value) -> None:
+    def vida(self, value: int) -> None:
         """Setter de vida"""
         if type(value) == int:
             self.__vida = value
@@ -49,7 +49,7 @@ class AbstractPersonagem(ABC):
         return self.__ataque
 
     @ataque.setter
-    def ataque(self, value) -> None:
+    def ataque(self, value: int) -> None:
         """Setter de ataque"""
         if type(value) == int:
             self.__ataque = value
@@ -60,7 +60,7 @@ class AbstractPersonagem(ABC):
         return self.__defesa
 
     @defesa.setter
-    def defesa(self, value) -> None:
+    def defesa(self, value: int) -> None:
         """Setter de defesa"""
         if type(value) == int:
             self.__defesa = value
@@ -71,7 +71,7 @@ class AbstractPersonagem(ABC):
         return self.__vel
 
     @vel.setter
-    def vel(self, value) -> None:
+    def vel(self, value: int) -> None:
         """Setter de velocidade"""
         if type(value) == int:
             self.__vel = value
@@ -90,12 +90,15 @@ class AbstractPersonagem(ABC):
         if isinstance(arma, Arma):
             self.__arma = arma
 
-    def tomar_dano(self, dano) -> int:
+    def tomar_dano(self, dano: int) -> int:
         """Retorna o quanto de vida foi retirado do personagem"""
-        dano_real = dano - self.__defesa
-        self.__vida -= dano_real
+        if type(dano) == int:
+            dano_real = dano - self.__defesa
+            self.__vida -= dano_real
 
-        return dano_real
+            return dano_real
+        else:
+            return 0
 
     @property
     def dano(self) -> int:
@@ -103,5 +106,5 @@ class AbstractPersonagem(ABC):
         return self.__ataque + self.__arma.dano
 
     @abstractmethod
-    def mover(self) -> tuple:
+    def atacar(self):
         pass
