@@ -10,6 +10,7 @@ class AbstractObstaculo(ABC):
     def hitbox(self) -> Hitbox:
         return self.__hitbox
 
+    @property
     @abstractmethod
     def sprite_path(self) -> str:
         pass

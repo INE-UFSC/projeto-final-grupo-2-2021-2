@@ -14,7 +14,7 @@ class AbstractTerreno(ABC):
         return self.__hitbox
 
     @property
-    def item(self):
+    def itens(self):
         return self.__itens
 
     @property
