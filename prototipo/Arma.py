@@ -2,6 +2,7 @@ class Arma():
     def __init__(self, dano, alcance) -> None:
         self.__dano = dano
         self.__alcance = alcance
+        self.__atacando = False
 
     @property
     def dano(self) -> int:

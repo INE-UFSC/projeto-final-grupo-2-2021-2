@@ -13,17 +13,22 @@ class Terreno1(AbstractTerreno):
         obstaculos.append(Buraco((240, 300), (10, 120)))
 
         super().__init__(inimigos, itens, tamanho_tela, obstaculos)
-        self.__start_logic = []
         self.__sprite_path = "imagens/terreno1.png"
 
     @property
     def sprite_path(self) -> str:
         return self.__sprite_path
 
-    def rodar_jogo(self, tela: TelaJogo):
+    def iniciar_rodada(self, tela: TelaJogo, jogador) -> None:
+        # Atualiza a posição do jogador para o meio do mapa
+        nova_posicao = tuple([x//2 for x in self.hitbox.tamanho])
+        jogador.hitbox.posicao = nova_posicao
+
+        self.desenhar(tela, jogador)
+
+    def desenhar(self, tela: TelaJogo, jogador) -> None:
         mapa1 = pygame.image.load(self.__sprite_path)
         tela.janela.blit(mapa1, (0, 0))
-
         for obstaculo in self.obstaculos:
             posicao = obstaculo.hitbox.posicao
             tamanho = obstaculo.hitbox.tamanho
@@ -38,6 +43,12 @@ class Terreno1(AbstractTerreno):
             rect = pygame.Rect(posicao, tamanho)
             pygame.draw.rect(tela.janela, color, rect)
 
+        tamanho = jogador.hitbox.tamanho
+        posicao = jogador.hitbox.posicao
+        color = (0, 255, 0)
+        rect = pygame.Rect(posicao, tamanho)
+        pygame.draw.rect(tela.janela, color, rect)
+
     def dropar_item():
         pass
 
@@ -47,14 +58,15 @@ class Terreno1(AbstractTerreno):
     def validar_movimento():
         pass
 
-    def iniciar_rodada():
-        pass
-
     def load_inimigos(self, inimigos: list) -> None:
         self.inimigos.extend(inimigos)
 
     def has_ended(self) -> bool:
-        for inimigo in self.inimigos():
+        for inimigo in self.inimigos:
             if inimigo.vida > 0:
                 return False
         return True
+
+    def mover_inimigos(self) -> None:
+        for inimigo in self.inimigos:
+            inimigo.mover()

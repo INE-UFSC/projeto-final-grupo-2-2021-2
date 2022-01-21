@@ -8,16 +8,6 @@ JogadorStats = {
     'arma_alcance': 3
 }
 
-Inimigo1Stats = {
-    'vida': 5,
-    'ataque': 4,
-    'defesa': 1,
-    'vel': 3,
-    'vel_ataque': 1,
-    'arma_dano': 1,
-    'arma_alcance': 1
-}
-
 Inimigo2Stats = {
     'vida': 7,
     'ataque': 2,

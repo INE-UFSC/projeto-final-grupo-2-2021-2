@@ -1,18 +1,18 @@
 import pygame
-from Terreno import Terreno
+from abstractions.AbstractTerreno import AbstractTerreno
 
-class Terreno1(Terreno):
 
-    def __init__(self,personagens,item,hitbox): 
-    
+class Terreno3(AbstractTerreno):
+
+    def __init__(self, personagens, item, hitbox):
+
         self.__personagens = personagens
         self.__item = item
-        self.__hitbox  = hitbox
-        
+        self.__hitbox = hitbox
 
-    def rodar_jogo(self,window):
+    def rodar_jogo(self, window):
         pass
-    
+
     def dropar_item():
         pass
 
