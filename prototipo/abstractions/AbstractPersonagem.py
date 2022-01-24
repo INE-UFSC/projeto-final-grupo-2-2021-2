@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
+
+from pygame import sprite
 from Hitbox import Hitbox
 from Arma import Arma
 from abstractions.AbstractTerreno import AbstractTerreno
 
 
 class AbstractPersonagem(ABC):
-    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: None) -> None:
+    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: None, sprite_paths: list) -> None:
         """Recebe um dicionário com os stats iniciais, tuplas com a posição e tamanho do personagem"""
 
         self.__vida_maxima = stats['vida'] if 'vida' in stats.keys() else 0
@@ -24,6 +26,16 @@ class AbstractPersonagem(ABC):
 
         if isinstance(terreno, AbstractTerreno):
             self.__terreno = terreno
+
+        # O sprite path recebido deve ser uma lista com 4 valores, que será o caminho
+        # para o sprite da 1º Esquerda, 2º Direita, 3º Cima, 4º Baixo
+        self.__sprite_path = None
+        if len(sprite_paths) == 4:
+            self.__sprite_path = sprite_paths[3]  # Inicializa com o sprite para baixo
+            self._sprite_esquerda = sprite_paths[0]
+            self._sprite_direita = sprite_paths[1]
+            self._sprite_cima = sprite_paths[2]
+            self._sprite_baixo = sprite_paths[3]
 
     @property
     def vida_maxima(self) -> int:
@@ -121,3 +133,23 @@ class AbstractPersonagem(ABC):
     def terreno(self, value) -> None:
         if isinstance(value, AbstractTerreno):
             self.__terreno = value
+
+    @property
+    def sprite_path(self) -> str:
+        return self.__sprite_path
+
+    @sprite_path.setter
+    def sprite_path(self, value) -> None:
+        if type(value) == str:
+            self.__sprite_path = value
+
+    def _atualizar_frente(self, esquerda, direita, cima, baixo):
+        """Atualiza o sprite path conforme o personagem anda"""
+        if cima:
+            self.sprite_path = self._sprite_cima
+        elif direita:
+            self.sprite_path = self._sprite_direita
+        elif esquerda:
+            self.sprite_path = self._sprite_esquerda
+        elif baixo:
+            self.sprite_path = self._sprite_baixo

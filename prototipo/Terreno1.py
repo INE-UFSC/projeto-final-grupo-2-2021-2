@@ -13,12 +13,9 @@ class Terreno1(AbstractTerreno):
         obstaculos.append(Parede((500, 500), (230, 10)))
         obstaculos.append(Buraco((240, 300), (10, 120)))
 
-        super().__init__(inimigos, itens, tamanho_tela, obstaculos, jogador)
-        self.__sprite_path = "imagens/terreno1.png"
+        sprite_path = "imagens/terreno1.png"
 
-    @property
-    def sprite_path(self) -> str:
-        return self.__sprite_path
+        super().__init__(inimigos, itens, tamanho_tela, obstaculos, jogador, sprite_path)
 
     def iniciar_rodada(self, tela: TelaJogo, jogador) -> None:
         # Atualiza a posição do jogador para o meio do mapa
@@ -28,7 +25,7 @@ class Terreno1(AbstractTerreno):
         self.desenhar(tela, jogador)
 
     def desenhar(self, tela: TelaJogo, jogador) -> None:
-        mapa1 = pygame.image.load(self.__sprite_path)
+        mapa1 = pygame.image.load(self.sprite_path)
         tela.janela.blit(mapa1, (0, 0))
         for obstaculo in self.obstaculos:
             posicao = obstaculo.hitbox.posicao

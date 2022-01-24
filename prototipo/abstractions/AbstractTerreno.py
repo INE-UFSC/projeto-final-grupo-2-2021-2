@@ -3,12 +3,22 @@ from Hitbox import Hitbox
 
 
 class AbstractTerreno(ABC):
-    def __init__(self, inimigos: list, itens, tamanho_tela: tuple, obstaculos: list, jogador):
+    def __init__(self, inimigos: list, itens, tamanho_tela: tuple, obstaculos: list, jogador, sprite_path: str):
         self.__inimigos = inimigos
         self.__obstaculos = obstaculos
         self.__itens = itens
         self.__hitbox = Hitbox(posicao=(0, 0), tamanho=tamanho_tela)
         self.__jogador = jogador
+        self.__sprite_path = sprite_path
+
+    @property
+    def sprite_path(self) -> str:
+        return self.__sprite_path
+
+    @sprite_path.setter
+    def sprite_path(self, value) -> None:
+        if type(value) == str:
+            self.__sprite_path = value
 
     @property
     def jogador(self):

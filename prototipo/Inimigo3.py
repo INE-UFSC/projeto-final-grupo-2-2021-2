@@ -1,12 +1,17 @@
+from Opcoes import Dificuldade
 from abstractions.AbstractInimigo import AbstractInimigo
+from abstractions.AbstractTerreno import AbstractTerreno
 from stats import Inimigo3Stats
 
 
 class Inimigo3(AbstractInimigo):
-    def __init__(self, posicao: tuple) -> None:
-        super().__init__(stats=Inimigo3Stats, posicao=posicao, tamanho=(3, 3))
-        self.__sprite_path = ""
+    def __init__(self, posicao: tuple, dificuldade: Dificuldade, terreno: AbstractTerreno) -> None:
+        sprite_paths = [
+            "",  # Esquerda
+            "",  # Direita
+            "",  # Cima
+            ""  # Baixo
+        ]
 
-    @property
-    def sprite_path(self) -> str:
-        return self.__sprite_path
+        super().__init__(stats=Inimigo3Stats, posicao=posicao,
+                         tamanho=(3, 3), terreno=terreno, sprite_paths=sprite_paths)

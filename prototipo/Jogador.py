@@ -16,18 +16,21 @@ JogadorStats = {
 
 class Jogador(AbstractPersonagem):
     def __init__(self, posicao: tuple, tamanho: tuple, nome: str, terreno=None) -> None:
-        super().__init__(stats=JogadorStats, posicao=posicao, tamanho=tamanho, terreno=terreno)
+        sprite_paths = [
+            "",  # Esquerda
+            "",  # Direita
+            "",  # Cima
+            ""  # Baixo
+        ]
         self.__nome = nome
         self.__status = StatusJogador(self)
-        self.__sprite_path = ""
+
+        super().__init__(stats=JogadorStats, posicao=posicao,
+                         tamanho=tamanho, terreno=terreno, sprite_paths=sprite_paths)
 
     @property
     def status(self):
         return self.__status
-
-    @property
-    def sprite_path(self) -> str:
-        return self.__sprite_path
 
     @property
     def nome(self):
@@ -37,28 +40,47 @@ class Jogador(AbstractPersonagem):
         self.__mover(keys)
 
     def __mover(self, keys):
-        if keys[pygame.K_a]:
+        tentar_esquerda = keys[pygame.K_a]
+        tentar_cima = keys[pygame.K_w]
+        tentar_direita = keys[pygame.K_d]
+        tentar_baixo = keys[pygame.K_s]
+
+        self._atualizar_frente(esquerda=tentar_esquerda,
+                               direita=tentar_direita,
+                               cima=tentar_cima,
+                               baixo=tentar_baixo)
+
+        # Desativa movimento horizontal caso tente ir para ambos lados
+        if tentar_esquerda and tentar_direita:
+            tentar_esquerda = False
+            tentar_direita = False
+        # Desativa movimento vertical caso tente ir para ambos lados
+        if tentar_cima and tentar_baixo:
+            tentar_cima = False
+            tentar_baixo = False
+
+        if tentar_esquerda:
             novo_x = self.hitbox.x - self.vel
             nova_posicao = (novo_x, self.hitbox.y)
 
             if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
                 self.hitbox.posicao = nova_posicao
 
-        if keys[pygame.K_d]:
+        if tentar_direita:
             novo_x = self.hitbox.x + self.vel
             nova_posicao = (novo_x, self.hitbox.y)
 
             if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
                 self.hitbox.posicao = nova_posicao
 
-        if keys[pygame.K_w]:
+        if tentar_cima:
             novo_y = self.hitbox.y - self.vel
             nova_posicao = (self.hitbox.x, novo_y)
 
             if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
                 self.hitbox.posicao = nova_posicao
 
-        if keys[pygame.K_s]:
+        if tentar_baixo:
             novo_y = self.hitbox.y + self.vel
             nova_posicao = (self.hitbox.x, novo_y)
 
@@ -66,7 +88,4 @@ class Jogador(AbstractPersonagem):
                 self.hitbox.posicao = nova_posicao
 
     def atacar():
-        pass
-
-    def mover():
         pass
