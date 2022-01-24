@@ -1,15 +1,14 @@
-from Terreno1 import Terreno1
 from abstractions.AbstractInimigo import AbstractInimigo
 from Opcoes import Dificuldade
+from abstractions.AbstractTerreno import AbstractTerreno
 
 
 class Inimigo1(AbstractInimigo):
-    def __init__(self, posicao: tuple, dificuldade: Dificuldade) -> None:
+    def __init__(self, posicao: tuple, dificuldade: Dificuldade, terreno: AbstractTerreno) -> None:
         stats = self._calibrar_dificuldade(dificuldade)
-        # self.__terreno: Terreno1()
         self.__sprite_path = ""
 
-        super().__init__(stats=stats, posicao=posicao, tamanho=(30, 30))
+        super().__init__(stats=stats, posicao=posicao, tamanho=(30, 30), terreno=terreno)
 
     @property
     def sprite_path(self) -> str:

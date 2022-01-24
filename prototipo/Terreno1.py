@@ -55,7 +55,8 @@ class Terreno1(AbstractTerreno):
     def remover_inimigo():
         pass
 
-    def validar_movimento():
+    def validar_movimento(self) -> bool:
+        print('Validando Movimento')
         pass
 
     def load_inimigos(self, inimigos: list) -> None:

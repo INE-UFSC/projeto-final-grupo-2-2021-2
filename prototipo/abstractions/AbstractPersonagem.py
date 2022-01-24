@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 from Hitbox import Hitbox
 from Arma import Arma
+from abstractions.AbstractTerreno import AbstractTerreno
 
 
 class AbstractPersonagem(ABC):
-    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple) -> None:
+    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: None) -> None:
         """Recebe um dicionário com os stats iniciais, tuplas com a posição e tamanho do personagem"""
 
         self.__vida_maxima = stats['vida'] if 'vida' in stats.keys() else 0
@@ -20,6 +21,9 @@ class AbstractPersonagem(ABC):
         alcance = stats['arma_alcance'] if 'arma_alcance' in stats.keys() else 0
 
         self.__arma = Arma(dano, alcance)
+
+        if isinstance(terreno, AbstractTerreno):
+            self.__terreno = terreno
 
     @property
     def vida_maxima(self) -> int:
@@ -108,3 +112,12 @@ class AbstractPersonagem(ABC):
     @abstractmethod
     def atacar(self):
         pass
+
+    @property
+    def terreno(self) -> AbstractTerreno:
+        return self.__terreno
+
+    @terreno.setter
+    def terreno(self, value) -> None:
+        if isinstance(value, AbstractTerreno):
+            self.__terreno = value

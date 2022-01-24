@@ -15,8 +15,8 @@ JogadorStats = {
 
 
 class Jogador(AbstractPersonagem):
-    def __init__(self, posicao: tuple, tamanho: tuple, nome: str) -> None:
-        super().__init__(stats=JogadorStats, posicao=posicao, tamanho=tamanho)
+    def __init__(self, posicao: tuple, tamanho: tuple, nome: str, terreno=None) -> None:
+        super().__init__(stats=JogadorStats, posicao=posicao, tamanho=tamanho, terreno=terreno)
         self.__nome = nome
         self.__status = StatusJogador(self)
         self.__sprite_path = ""
@@ -40,25 +40,36 @@ class Jogador(AbstractPersonagem):
         if keys[pygame.K_a]:
             novo_x = self.hitbox.x - self.vel
             nova_posicao = (novo_x, self.hitbox.y)
-            # Validar
+
+            self.terreno.validar_movimento()
+
             if True:
                 self.hitbox.posicao = nova_posicao
 
         if keys[pygame.K_d]:
             novo_x = self.hitbox.x + self.vel
             nova_posicao = (novo_x, self.hitbox.y)
+
+            self.terreno.validar_movimento()
+
             if True:
                 self.hitbox.posicao = nova_posicao
 
         if keys[pygame.K_w]:
             novo_y = self.hitbox.y - self.vel
             nova_posicao = (self.hitbox.x, novo_y)
+
+            self.terreno.validar_movimento()
+
             if True:
                 self.hitbox.posicao = nova_posicao
 
         if keys[pygame.K_s]:
             novo_y = self.hitbox.y + self.vel
             nova_posicao = (self.hitbox.x, novo_y)
+
+            self.terreno.validar_movimento()
+
             if True:
                 self.hitbox.posicao = nova_posicao
 
