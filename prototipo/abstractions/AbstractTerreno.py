@@ -3,11 +3,17 @@ from Hitbox import Hitbox
 
 
 class AbstractTerreno(ABC):
-    def __init__(self, inimigos: list, itens, tamanho_tela: tuple, obstaculos: list):
+    def __init__(self, inimigos: list, itens, tamanho_tela: tuple, obstaculos: list, jogador):
         self.__inimigos = inimigos
         self.__obstaculos = obstaculos
         self.__itens = itens
         self.__hitbox = Hitbox(posicao=(0, 0), tamanho=tamanho_tela)
+        self.__jogador = jogador
+
+    @property
+    def jogador(self):
+        """Retorna a instância do Jogador que está no Terreno"""
+        return self.__jogador
 
     @property
     def hitbox(self) -> Hitbox:

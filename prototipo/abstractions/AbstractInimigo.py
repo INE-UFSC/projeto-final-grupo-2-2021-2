@@ -15,8 +15,8 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             novo_x = self.hitbox.x - self.vel
 
         nova_posicao = (novo_x, self.hitbox.y)
-        self.terreno.validar_movimento()
-        if True:
+
+        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
             self.hitbox.posicao = nova_posicao
 
         if hit_jogador.y > self.hitbox.y:
@@ -25,8 +25,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             novo_y = self.hitbox.y - self.vel
 
         nova_posicao = (self.hitbox.x, novo_y)
-        self.terreno.validar_movimento()
-        if True:
+        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
             self.hitbox.posicao = nova_posicao
 
     @property

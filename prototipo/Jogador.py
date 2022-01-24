@@ -41,36 +41,28 @@ class Jogador(AbstractPersonagem):
             novo_x = self.hitbox.x - self.vel
             nova_posicao = (novo_x, self.hitbox.y)
 
-            self.terreno.validar_movimento()
-
-            if True:
+            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
                 self.hitbox.posicao = nova_posicao
 
         if keys[pygame.K_d]:
             novo_x = self.hitbox.x + self.vel
             nova_posicao = (novo_x, self.hitbox.y)
 
-            self.terreno.validar_movimento()
-
-            if True:
+            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
                 self.hitbox.posicao = nova_posicao
 
         if keys[pygame.K_w]:
             novo_y = self.hitbox.y - self.vel
             nova_posicao = (self.hitbox.x, novo_y)
 
-            self.terreno.validar_movimento()
-
-            if True:
+            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
                 self.hitbox.posicao = nova_posicao
 
         if keys[pygame.K_s]:
             novo_y = self.hitbox.y + self.vel
             nova_posicao = (self.hitbox.x, novo_y)
 
-            self.terreno.validar_movimento()
-
-            if True:
+            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
                 self.hitbox.posicao = nova_posicao
 
     def atacar():
