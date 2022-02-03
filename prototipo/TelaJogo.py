@@ -1,6 +1,6 @@
 import pygame
 
-BACKGROUND_PATH = 'imagens/start.png'
+BACKGROUND_PATH = 'imagens/capa.png'
 GAME_TITLE = 'The Binding of Isaac'
 
 
