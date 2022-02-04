@@ -1,7 +1,8 @@
 import pygame
+from Enums.Enums import ComandosEnum, Dificuldade
 from TelaJogo import TelaJogo
 from Jogador import Jogador
-from Opcoes import Dificuldade, Opcoes
+from Opcoes import Opcoes
 from Comandos import Comandos
 from ControladorJogo import ControladorJogo
 from abstractions.AbstractFase import AbstractFase
@@ -52,25 +53,30 @@ class Jogo:
         menu = MenuPrincipal()
         clock = pygame.time.Clock()
         menu_loop = True
+
         while menu_loop:
-            clock.tick(self.__FPS) 
+            clock.tick(self.__FPS)
             menu.desenhar(self.__tela)
-            acao = menu.desenhar_cursor(self.__tela) 
-            if acao != None:
+
+            comando = menu.get_comando()
+            if comando != None:
                 menu_loop = False
             pygame.display.update()
-        self.executar_comando(acao)
 
-    def opcoes(self):
+        self.executar_comando(comando)
+
+    def __menu_opcoes(self):
         clock = pygame.time.Clock()
         opcoes_loop = True
         while opcoes_loop:
             clock.tick(self.__FPS)
-            acao = self.__opcoes.desenhar_tela_opcoes(self.__tela)
-            if acao != None:
-                opcoes_loop = False            
+            self.__opcoes.desenhar_tela_opcoes(self.__tela)
+            comando = self.__opcoes.get_comando_opcoes()
+
+            if comando != None:
+                opcoes_loop = False
             pygame.display.update()
-        self.executar_comando(acao)
+        self.executar_comando(comando)
 
     def __rodar_fase(self, fase: AbstractFase) -> None:
         self.__fase_atual = fase
@@ -91,16 +97,22 @@ class Jogo:
             self.__fase_atual.ciclo(self.__tela)
             pygame.display.update()
 
-    def executar_comando(self, acao):
-        if acao == "jogar":
+    def executar_comando(self, comando: ComandosEnum):
+        if type(comando) != ComandosEnum:
+            return
+
+        if comando == ComandosEnum.JOGAR:
             self.__carregar_dados()
             nova_fase = self.__controlador.proxima_fase()
             self.__rodar_fase(nova_fase)
-        elif acao == "opcoes":
-            self.opcoes()
-        elif acao == "dificuldade":
+
+        elif comando == ComandosEnum.VER_OPCOES:
+            self.__menu_opcoes()
+
+        elif comando == ComandosEnum.VER_DIFICULDADE:
             self.__escolher_dificuldade()
-        elif acao == "menu principal" :
+
+        elif comando == ComandosEnum.VER_MENU:
             self.menu_principal()
 
     def mostrar_comando(self):
@@ -111,29 +123,22 @@ class Jogo:
         opcoes_loop = True
         while opcoes_loop:
             clock.tick(self.__FPS)
-            dificuldade = self.__opcoes.desenhar_tela_dificuldade(self.__tela)
-            
-            if dificuldade != None:
-                if dificuldade == "facil":
-                    self.__dificuldade = Dificuldade.facil
-                elif dificuldade == "medio":
-                    self.dificuldade = Dificuldade.medio
-                elif dificuldade == "dificil":
-                    self.dificuldade = Dificuldade.dificil
-                elif dificuldade == "voltar":
-                    opcoes_loop = False
-                    self.menu_principal()        
+            self.__opcoes.desenhar_tela_dificuldade(self.__tela)
+            voltar = self.__opcoes.get_comando_dificuldade(self.__tela)
+
             pygame.display.update()
+
+            if voltar:
+                self.__dificuldade = self.__opcoes.dificuldade_escolhida
+                opcoes_loop = False
+                self.__menu_opcoes()
 
     def __escolher_nome(self) -> str:
         return 'Tatakae'
 
     def __carregar_dados(self) -> None:
-        dificuldade = self.dificuldade
-        self.__opcoes = Opcoes(dificuldade)
-
         nome = self.__escolher_nome()
         self.__jogador = Jogador((0, 0), (50, 50), nome)
-        self.__opcoes = Opcoes(dificuldade)
+        self.__opcoes = Opcoes(self.dificuldade)
 
         self.__controlador = ControladorJogo(self.__jogador, self.__tela.tamanho, self.__opcoes)
