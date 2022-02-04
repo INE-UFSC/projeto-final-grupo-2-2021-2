@@ -1,4 +1,4 @@
-from Opcoes import Dificuldade
+from Enums.Enums import Dificuldade
 from abstractions.AbstractInimigo import AbstractInimigo
 from abstractions.AbstractPersonagem import AbstractPersonagem
 from abstractions.AbstractTerreno import AbstractTerreno

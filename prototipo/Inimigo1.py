@@ -1,5 +1,5 @@
 from abstractions.AbstractInimigo import AbstractInimigo
-from Opcoes import Dificuldade
+from Enums.Enums import Dificuldade
 from abstractions.AbstractTerreno import AbstractTerreno
 
 
