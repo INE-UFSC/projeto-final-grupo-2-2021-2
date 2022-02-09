@@ -9,8 +9,8 @@ JogadorStats = {
     'defesa': 2,
     'vel': 4,
     'vel_ataque': 1,
-    'arma_dano': 3,
-    'arma_alcance': 3
+    'arma_dano': 7,  #mudei de 3 para 7 para testar
+    'arma_alcance': 20
 }
 
 
@@ -87,5 +87,14 @@ class Jogador(AbstractPersonagem):
             if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
                 self.hitbox.posicao = nova_posicao
 
-    def atacar():
-        pass
+    def atacar(self):
+        atacar = False
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        atacar = True
+                        return atacar

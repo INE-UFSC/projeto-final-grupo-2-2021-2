@@ -55,3 +55,6 @@ class Fase1(AbstractFase):
         for inimigo in self.__terreno.inimigos:
             inimigo.mover(self.__jogador.hitbox)
         self.__terreno.desenhar(tela, self.__jogador)
+        atacar = self.jogador.atacar()
+        if atacar == True:
+            self.__terreno.ataque()
