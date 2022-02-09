@@ -47,11 +47,27 @@ class Terreno1(AbstractTerreno):
         rect = pygame.Rect(posicao, tamanho)
         pygame.draw.rect(tela.janela, color, rect)
 
+        cor_arma = (255,0,0)
+        x_arma = jogador.hitbox.posicao[0] + jogador.hitbox.tamanho[0]
+        y_arma = jogador.hitbox.posicao[1] + jogador.hitbox.tamanho[1]/4
+        self.posicao_arma = (x_arma,y_arma)
+        self.arma_alcance =(self.jogador.arma.alcance)
+        pygame.draw.circle(tela.janela, cor_arma, self.posicao_arma, self.arma_alcance )
+
+    def ataque(self):
+        arma = pygame.Rect(self.posicao_arma, (self.arma_alcance,self.arma_alcance))
+        for inimigo in self.inimigos:
+            inimigo_rect = pygame.Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
+            if inimigo_rect.colliderect(arma):
+                inimigo.vida-= self.jogador.arma.dano
+                if inimigo.vida == 0:
+                    self.remover_inimigo(inimigo)
+
     def dropar_item():
         pass
 
-    def remover_inimigo():
-        pass
+    def remover_inimigo(self,inimigo):
+        self.inimigos.remove(inimigo)
 
     def validar_movimento(self, personagem: AbstractPersonagem, posicao: tuple) -> bool:
         if not isinstance(personagem, AbstractPersonagem):
