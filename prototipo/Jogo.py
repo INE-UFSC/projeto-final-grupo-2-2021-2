@@ -95,6 +95,18 @@ class Jogo:
                     main_loop = False
 
             self.__fase_atual.ciclo(self.__tela)
+            if self.__jogador.verificar_ataque(keys_pressed):
+                self.__fase_atual.terreno.executar_ataque(self.__tela, self.__jogador)
+
+            if self.__fase_atual.has_ended():
+                main_loop = False
+                proxima_fase = self.__controlador.proxima_fase()
+                if proxima_fase != None:
+                    print('Proxima fase')
+                    self.__rodar_fase(proxima_fase)
+                else:
+                    print('Você venceu :3')
+
             pygame.display.update()
 
     def executar_comando(self, comando: ComandosEnum):

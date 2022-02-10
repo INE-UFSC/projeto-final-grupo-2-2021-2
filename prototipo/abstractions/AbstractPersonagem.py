@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
-
-from pygame import sprite
+import pygame
 from Hitbox import Hitbox
 from Arma import Arma
 from abstractions.AbstractTerreno import AbstractTerreno
@@ -36,6 +35,31 @@ class AbstractPersonagem(ABC):
             self._sprite_direita = sprite_paths[1]
             self._sprite_cima = sprite_paths[2]
             self._sprite_baixo = sprite_paths[3]
+
+        self.__direction = pygame.K_UP
+
+    @property
+    def posicao_frente(self):
+        posicao = self.__hitbox.posicao
+        tamanho = self.__hitbox.tamanho
+
+        rect = pygame.Rect(posicao, tamanho)
+        if self.__direction == pygame.K_UP:
+            return rect.midtop
+        elif self.__direction == pygame.K_LEFT:
+            return rect.midleft
+        elif self.__direction == pygame.K_RIGHT:
+            return rect.midright
+        else:
+            return rect.midbottom
+
+    @property
+    def rect_arma(self) -> pygame.Rect:
+        posicao_frente = self.posicao_frente
+
+        rect = pygame.Rect(posicao_frente, (self.arma.alcance, self.arma.alcance))
+        rect.center = posicao_frente
+        return rect
 
     @property
     def vida_maxima(self) -> int:
@@ -147,9 +171,13 @@ class AbstractPersonagem(ABC):
         """Atualiza o sprite path conforme o personagem anda"""
         if cima:
             self.sprite_path = self._sprite_cima
+            self.__direction = pygame.K_UP
         elif direita:
             self.sprite_path = self._sprite_direita
+            self.__direction = pygame.K_RIGHT
         elif esquerda:
             self.sprite_path = self._sprite_esquerda
+            self.__direction = pygame.K_LEFT
         elif baixo:
             self.sprite_path = self._sprite_baixo
+            self.__direction = pygame.K_DOWN

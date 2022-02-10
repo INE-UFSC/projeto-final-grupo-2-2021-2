@@ -9,8 +9,8 @@ JogadorStats = {
     'defesa': 2,
     'vel': 4,
     'vel_ataque': 1,
-    'arma_dano': 7, #mudei de 3 para 7 pra testar
-    'arma_alcance': 20 
+    'arma_dano': 3,
+    'arma_alcance': 20
 }
 
 
@@ -38,6 +38,19 @@ class Jogador(AbstractPersonagem):
 
     def lidar_inputs(self, keys) -> None:
         self.__mover(keys)
+
+    def update(self):
+        self.arma.update()
+
+    def verificar_ataque(self, keys) -> bool:
+        if keys[pygame.K_j]:
+            if self.arma.atacar():
+                return True
+
+        return False
+
+    def atacar():
+        pass
 
     def __mover(self, keys):
         tentar_esquerda = keys[pygame.K_a]
@@ -86,15 +99,3 @@ class Jogador(AbstractPersonagem):
 
             if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
                 self.hitbox.posicao = nova_posicao
-
-    def atacar(self):
-        atacar = False
-        for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        atacar = True
-                        return atacar

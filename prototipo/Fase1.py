@@ -54,7 +54,6 @@ class Fase1(AbstractFase):
         """Função para ser executada em todo ciclo do main loop"""
         for inimigo in self.__terreno.inimigos:
             inimigo.mover(self.__jogador.hitbox)
+            inimigo.update()  # Em primeira instancia, vai atualizar o timer de ataque
+        self.__jogador.update()  # Em primeira instancia, vai atualizar o timer de ataque
         self.__terreno.desenhar(tela, self.__jogador)
-        atacar = self.jogador.atacar()
-        if atacar == True:
-            self.__terreno.ataque()

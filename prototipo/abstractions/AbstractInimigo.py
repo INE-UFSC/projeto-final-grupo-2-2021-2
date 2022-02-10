@@ -45,3 +45,6 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     @abstractmethod
     def _calibrar_dificuldade(self):
         pass
+
+    def update(self):
+        pass

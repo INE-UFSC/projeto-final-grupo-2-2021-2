@@ -41,32 +41,22 @@ class Terreno1(AbstractTerreno):
             rect = pygame.Rect(posicao, tamanho)
             pygame.draw.rect(tela.janela, color, rect)
 
+            if inimigo.arma.desenhando_ataque:
+                self.desenhar_ataque(tela, inimigo)
+
+        if jogador.arma.desenhando_ataque:
+            self.desenhar_ataque(tela, jogador)
+
         tamanho = jogador.hitbox.tamanho
         posicao = jogador.hitbox.posicao
         color = (0, 255, 0)
         rect = pygame.Rect(posicao, tamanho)
         pygame.draw.rect(tela.janela, color, rect)
 
-        cor_arma = (255,0,0)
-        x_arma = jogador.hitbox.posicao[0] + jogador.hitbox.tamanho[0]
-        y_arma = jogador.hitbox.posicao[1] + jogador.hitbox.tamanho[1]/4
-        self.posicao_arma = (x_arma,y_arma)
-        self.arma_alcance =(self.jogador.arma.alcance)
-        pygame.draw.circle(tela.janela, cor_arma, self.posicao_arma, self.arma_alcance )
-
-    def ataque(self):
-        arma = pygame.Rect(self.posicao_arma, (self.arma_alcance,self.arma_alcance))
-        for inimigo in self.inimigos:
-            inimigo_rect = pygame.Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
-            if inimigo_rect.colliderect(arma):
-                inimigo.vida-= self.jogador.arma.dano
-                if inimigo.vida == 0:
-                    self.remover_inimigo(inimigo)
-
     def dropar_item():
         pass
 
-    def remover_inimigo(self,inimigo):
+    def remover_inimigo(self, inimigo):
         self.inimigos.remove(inimigo)
 
     def validar_movimento(self, personagem: AbstractPersonagem, posicao: tuple) -> bool:
@@ -108,6 +98,27 @@ class Terreno1(AbstractTerreno):
                 return False
 
         return True
+
+    def desenhar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
+        rect_arma = personagem.rect_arma
+        alcance = personagem.arma.alcance
+
+        color = (255, 255, 255)
+        pygame.draw.circle(tela.janela, color, rect_arma.center, alcance)
+
+    def executar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
+        self.desenhar_ataque(tela, personagem)
+
+        rect_arma = personagem.rect_arma
+        for inimigo in self.inimigos:
+            rect_inimigo = pygame.Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
+
+            if rect_arma.colliderect(rect_inimigo):
+                dano = personagem.dano
+                dano_causado = inimigo.tomar_dano(dano)
+
+                if inimigo.vida < 1:
+                    self.remover_inimigo(inimigo)
 
     def load_inimigos(self, inimigos: list) -> None:
         self.inimigos.extend(inimigos)
