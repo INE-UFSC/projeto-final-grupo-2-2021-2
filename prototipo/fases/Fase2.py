@@ -53,8 +53,16 @@ class Fase2(AbstractFase):
 
     def ciclo(self, tela) -> None:
         """Função para ser executada em todo ciclo do main loop"""
+        self.__jogador.lidar_inputs()
+        if self.__jogador.verificar_ataque():
+            self.__terreno.executar_ataque(tela, self.__jogador)
+
         for inimigo in self.__terreno.inimigos:
             inimigo.mover(self.__jogador.hitbox)
-            inimigo.update()  # Em primeira instancia, vai atualizar o timer de ataque
-        self.__jogador.update()  # Em primeira instancia, vai atualizar o timer de ataque
+            if inimigo.verificar_ataque(self.__jogador.hitbox):
+                pass
+
+            inimigo.update()
+
+        self.__jogador.update()
         self.__terreno.desenhar(tela, self.__jogador)
