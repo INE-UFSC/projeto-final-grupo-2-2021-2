@@ -36,13 +36,15 @@ class Jogador(AbstractPersonagem):
     def nome(self):
         return self.__nome
 
-    def lidar_inputs(self, keys) -> None:
+    def lidar_inputs(self) -> None:
+        keys = pygame.key.get_pressed()
         self.__mover(keys)
 
     def update(self):
         self.arma.update()
 
-    def verificar_ataque(self, keys) -> bool:
+    def verificar_ataque(self) -> bool:
+        keys = pygame.key.get_pressed()
         if keys[pygame.K_j]:
             if self.arma.atacar():
                 return True

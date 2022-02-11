@@ -87,22 +87,16 @@ class Jogo:
         main_loop = True
         while main_loop:
             clock.tick(self.__FPS)
-            keys_pressed = pygame.key.get_pressed()
-            self.__jogador.lidar_inputs(keys_pressed)
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     main_loop = False
 
             self.__fase_atual.ciclo(self.__tela)
-            if self.__jogador.verificar_ataque(keys_pressed):
-                self.__fase_atual.terreno.executar_ataque(self.__tela, self.__jogador)
 
             if self.__fase_atual.has_ended():
                 main_loop = False
                 proxima_fase = self.__controlador.proxima_fase()
                 if proxima_fase != None:
-                    print('Proxima fase')
                     self.__rodar_fase(proxima_fase)
                 else:
                     print('Você venceu :3')
