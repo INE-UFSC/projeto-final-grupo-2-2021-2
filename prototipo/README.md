@@ -1,8 +1,6 @@
 Nesse diretório está o protótipo do jogo.
 
-Para executar o jogo é necessário
-- Rodar main.py
+Para executar o jogo é necessário executar o comando
+python main.py
 
-Nesse diretório, o grupo irá trabalhar em cima do primeiro protótipo do jogo.
-
-A ideia do protótipo não é que ele seja uma versão demo do jogo completo, mas sim que o principal mecanismo do jogo esteja implementado com certo grau de sucesso. Exemplo: em um jogo do tipo plataforma 2D, basta mostrar um retângulo colidindo com objetos e saltando/destruindo com alguma comando do usuário. A interface gráfica (com sprites) é opcional nessa etapa.
+Atualmente, o jogo possui se resume a inimigos seguindo você e tentando te matar, você pode usar o botão J para fazer um ataque para frente. Existem 3 fases e se você terminar de matar os inimigos das 3 fases você ganha o jogo :3
