@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod
 from Hitbox import Hitbox
 from obstaculos.Buraco import Buraco
 from obstaculos.Parede import Parede
+from Jogador import Jogador
+from Opcoes import tamanho_tela
 
 
 class AbstractTerreno(ABC):
-    def __init__(self, inimigos: list, itens, tamanho_tela: tuple, jogador, sprite_path: str):
+    def __init__(self, inimigos: list, itens, jogador, sprite_path: str):
         self.__inimigos = inimigos
         self.__obstaculos = []
         self.__itens = itens
@@ -35,7 +37,7 @@ class AbstractTerreno(ABC):
                     self.__jogador.hitbox.posicao = nova_posicao
 
     @property
-    def jogador(self):
+    def jogador(self) -> Jogador:
         """Retorna a instância do Jogador que está no Terreno"""
         return self.__jogador
 

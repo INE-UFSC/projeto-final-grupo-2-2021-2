@@ -7,10 +7,10 @@ from abstractions.AbstractTerreno import AbstractTerreno
 
 class Terreno3(AbstractTerreno):
 
-    def __init__(self, inimigos: list, itens: list, tamanho_tela: tuple, jogador):
+    def __init__(self, inimigos: list, itens: list, jogador):
         sprite_path = "imagens/terreno1.png"
 
-        super().__init__(inimigos, itens, tamanho_tela, jogador, sprite_path)
+        super().__init__(inimigos, itens, jogador, sprite_path)
         super()._setup_mapa(matriz_terreno3)
 
     def iniciar_rodada(self, tela: TelaJogo, jogador) -> None:

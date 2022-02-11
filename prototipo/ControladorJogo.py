@@ -7,11 +7,11 @@ from abstractions.AbstractFase import AbstractFase
 
 
 class ControladorJogo():
-    def __init__(self, jogador: Jogador, tamanho_tela: tuple, opcoes: Opcoes) -> None:
+    def __init__(self, jogador: Jogador, opcoes: Opcoes) -> None:
         self.__fases = []
-        self.__fases.append(Fase1(jogador, tamanho_tela, opcoes))
-        self.__fases.append(Fase2(jogador, tamanho_tela, opcoes))
-        self.__fases.append(Fase3(jogador, tamanho_tela, opcoes))
+        self.__fases.append(Fase1(jogador, opcoes))
+        self.__fases.append(Fase2(jogador, opcoes))
+        self.__fases.append(Fase3(jogador, opcoes))
 
     def proxima_fase(self) -> AbstractFase:
         if len(self.__fases) > 0:

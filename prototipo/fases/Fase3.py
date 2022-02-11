@@ -7,9 +7,8 @@ from abstractions.AbstractFase import AbstractFase
 
 
 class Fase3(AbstractFase):
-    def __init__(self, jogador: Jogador, tamanho_tela: tuple, opcoes: Opcoes) -> None:
+    def __init__(self, jogador: Jogador, opcoes: Opcoes) -> None:
         self.__dificuldade = opcoes.dificuldade
-        self.__tamanho_tela = tamanho_tela
         self.__jogador = jogador
         self.__INIMIGO_POS = []
 
@@ -24,8 +23,7 @@ class Fase3(AbstractFase):
         return self.__terreno
 
     def load(self) -> None:
-        self.__terreno = Terreno3(inimigos=[], itens=[],
-                                  tamanho_tela=self.__tamanho_tela, jogador=self.__jogador)
+        self.__terreno = Terreno3(inimigos=[], itens=[], jogador=self.__jogador)
 
         inimigos = []
         for x in range(len(self.__INIMIGO_POS)):
@@ -47,11 +45,11 @@ class Fase3(AbstractFase):
 
         elif dificuldade == Dificuldade.medio:
             self.__INIMIGO_POS = [(200, 200), (350, 200), (900, 200),
-                                  (200, 600), (450,600) , (900, 600)]
+                                  (200, 600), (450, 600), (900, 600)]
         else:
             self.__INIMIGO_POS = [(200, 200), (350, 200), (900, 200),
-                                  (200, 600), (450,600) , (900, 600), 
-                                  (150,680), (350,300)]
+                                  (200, 600), (450, 600), (900, 600),
+                                  (150, 680), (350, 300)]
 
     def ciclo(self, tela) -> None:
         """Função para ser executada em todo ciclo do main loop"""

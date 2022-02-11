@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import pygame
 from Hitbox import Hitbox
 from Arma import Arma
-from abstractions.AbstractTerreno import AbstractTerreno
 
 
 class AbstractPersonagem(ABC):
@@ -23,8 +22,7 @@ class AbstractPersonagem(ABC):
 
         self.__arma = Arma(dano, alcance)
 
-        if isinstance(terreno, AbstractTerreno):
-            self.__terreno = terreno
+        self.__terreno = terreno
 
         # O sprite path recebido deve ser uma lista com 4 valores, que será o caminho
         # para o sprite da 1º Esquerda, 2º Direita, 3º Cima, 4º Baixo
@@ -150,13 +148,12 @@ class AbstractPersonagem(ABC):
         pass
 
     @property
-    def terreno(self) -> AbstractTerreno:
+    def terreno(self):
         return self.__terreno
 
     @terreno.setter
     def terreno(self, value) -> None:
-        if isinstance(value, AbstractTerreno):
-            self.__terreno = value
+        self.__terreno = value
 
     @property
     def sprite_path(self) -> str:

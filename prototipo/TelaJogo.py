@@ -1,4 +1,5 @@
 import pygame
+from Opcoes import tamanho_tela
 
 BACKGROUND_PATH = 'imagens/capa.png'
 GAME_TITLE = 'The Binding of Isaac'
@@ -6,7 +7,7 @@ GAME_TITLE = 'The Binding of Isaac'
 
 class TelaJogo():
     def __init__(self) -> None:
-        self.__tamanho = (1120, 768)
+        self.__tamanho = tamanho_tela
         self.__janela = pygame.display.set_mode(self.__tamanho)
 
         imagem_fundo = pygame.image.load(BACKGROUND_PATH)

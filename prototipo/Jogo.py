@@ -153,4 +153,4 @@ class Jogo:
         self.__jogador = Jogador((0, 0), (50, 50), nome)
         self.__opcoes = Opcoes(self.dificuldade)
 
-        self.__controlador = ControladorJogo(self.__jogador, self.__tela.tamanho, self.__opcoes)
+        self.__controlador = ControladorJogo(self.__jogador, self.__opcoes)

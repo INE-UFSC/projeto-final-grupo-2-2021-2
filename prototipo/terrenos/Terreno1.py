@@ -7,10 +7,10 @@ from abstractions.AbstractTerreno import AbstractTerreno
 
 class Terreno1(AbstractTerreno):
 
-    def __init__(self, inimigos: list, itens: list, tamanho_tela: tuple, jogador):
+    def __init__(self, inimigos: list, itens: list, jogador):
         sprite_path = "imagens/terreno1.png"
 
-        super().__init__(inimigos, itens, tamanho_tela, jogador, sprite_path)
+        super().__init__(inimigos, itens, jogador, sprite_path)
         super()._setup_mapa(matriz_terreno1)
 
     def iniciar_rodada(self, tela: TelaJogo, jogador) -> None:
@@ -44,6 +44,9 @@ class Terreno1(AbstractTerreno):
         color = (0, 255, 0)
         rect = pygame.Rect(posicao, tamanho)
         pygame.draw.rect(tela.janela, color, rect)
+
+        surface = self.jogador.status.vida()
+        tela.janela.blit(surface, (0, 0))
 
     def dropar_item():
         pass

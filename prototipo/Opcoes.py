@@ -2,7 +2,8 @@ from Enums.Enums import Dificuldade
 import pygame
 from Botao import Botao
 from Enums.Enums import ComandosEnum
-from TelaJogo import TelaJogo
+
+tamanho_tela = (1120, 768)
 
 
 class Opcoes():
@@ -83,7 +84,7 @@ class Opcoes():
     def cursor(self, cursor) -> None:
         self.__cursor = cursor
 
-    def desenhar_tela_opcoes(self, tela: TelaJogo) -> None:
+    def desenhar_tela_opcoes(self, tela) -> None:
         fundo_menu = pygame.image.load(self.sprite_fundo)
         tela.janela.blit(fundo_menu, (0, 0))
         lista_posicoes = []
@@ -116,7 +117,7 @@ class Opcoes():
                 elif event.key == pygame.K_RETURN:
                     return self.__determinar_comando_opcoes()
 
-    def desenhar_tela_dificuldade(self, tela: TelaJogo) -> None:
+    def desenhar_tela_dificuldade(self, tela) -> None:
         fundo_menu = pygame.image.load(self.sprite_fundo)
         tela.janela.blit(fundo_menu, (0, 0))
         lista_posicoes = []
