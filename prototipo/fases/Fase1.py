@@ -1,8 +1,8 @@
 from Jogador import Jogador
 from Opcoes import Opcoes, Dificuldade
 from TelaJogo import TelaJogo
-from Terreno1 import Terreno1
-from Inimigo1 import Inimigo1
+from terrenos.Terreno1 import Terreno1
+from inimigos.Inimigo1 import Inimigo1
 from abstractions.AbstractFase import AbstractFase
 
 
@@ -42,16 +42,16 @@ class Fase1(AbstractFase):
 
     def __determinar_inimigos(self, dificuldade: Dificuldade) -> None:
         if dificuldade == Dificuldade.facil:
-            self.__INIMIGO_POS = [(250, 100), (350, 50), (150, 100),
-                                  (500, 50), (250, 50)]
+            self.__INIMIGO_POS = [(200, 200), (350, 200), (900, 200),
+                                  (200, 600), (1000, 600)]
 
         elif dificuldade == Dificuldade.medio:
-            self.__INIMIGO_POS = [(250, 100), (350, 50), (150, 100),
-                                  (500, 50), (250, 50), (250, 250)]
+            self.__INIMIGO_POS = [(200, 200), (350, 200), (900, 200),
+                                  (200, 600), (400,600) , (1000, 600)]
         else:
-            self.__INIMIGO_POS = [(250, 150), (350, 50), (150, 100),
-                                  (500, 50), (250, 50), (250, 100),
-                                  (100, 50), (450, 50)]
+            self.__INIMIGO_POS = [(200, 200), (350, 200), (900, 200),
+                                  (200, 600), (400,600) , (1000, 600), 
+                                  (150,600), (350,300)]
 
     def ciclo(self, tela) -> None:
         """Função para ser executada em todo ciclo do main loop"""

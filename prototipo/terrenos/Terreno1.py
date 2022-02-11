@@ -1,4 +1,4 @@
-from mapas.terrenos import matrix_terreno1
+from mapas.terrenos import matriz_terreno1
 import pygame
 from TelaJogo import TelaJogo
 from abstractions.AbstractPersonagem import AbstractPersonagem
@@ -11,14 +11,14 @@ class Terreno1(AbstractTerreno):
         sprite_path = "imagens/terreno1.png"
 
         super().__init__(inimigos, itens, tamanho_tela, jogador, sprite_path)
-        super()._setup_mapa(matrix_terreno1)
+        super()._setup_mapa(matriz_terreno1)
 
     def iniciar_rodada(self, tela: TelaJogo, jogador) -> None:
         self.desenhar(tela, jogador)
 
     def desenhar(self, tela: TelaJogo, jogador) -> None:
         mapa1 = pygame.image.load(self.sprite_path)
-        tela.janela.blit(mapa1, (0, 0))
+        tela.janela.blit(mapa1, (0, 127))
         for obstaculo in self.obstaculos:
             posicao = obstaculo.hitbox.posicao
             tamanho = obstaculo.hitbox.tamanho
