@@ -14,6 +14,12 @@ class Fase2(AbstractFase):
 
         self.__determinar_inimigos(opcoes.dificuldade)
 
+    def is_player_dead(self) -> bool:
+        if self.__jogador.vida <= 0:
+            return True
+        else:
+            return False
+
     @property
     def jogador(self) -> Jogador:
         return self.__jogador

@@ -19,7 +19,7 @@ class Inimigo1(AbstractInimigo):
     def _calibrar_dificuldade(self, dificuldade: Dificuldade) -> dict:
         if dificuldade.medio:
             return {
-                'vida': 7, 'ataque': 5, 'defesa': 2,
+                'vida': 7, 'ataque': 2, 'defesa': 2,
                 'vel': 2, 'vel_ataque': 1, 'arma_dano': 2,
                 'arma_alcance': 6
             }
@@ -31,10 +31,7 @@ class Inimigo1(AbstractInimigo):
             }
         else:  # Facil
             return {
-                'vida': 5, 'ataque': 4, 'defesa': 1,
+                'vida': 5, 'ataque': 3, 'defesa': 1,
                 'vel': 2, 'vel_ataque': 1, 'arma_dano': 1,
                 'arma_alcance': 6
             }
-
-    def atacar():
-        pass

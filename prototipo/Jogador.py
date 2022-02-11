@@ -40,19 +40,18 @@ class Jogador(AbstractPersonagem):
         keys = pygame.key.get_pressed()
         self.__mover(keys)
 
-    def update(self):
-        self.arma.update()
-
     def verificar_ataque(self) -> bool:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_j]:
-            if self.arma.atacar():
-                return True
+            return self.atacar()
+        else:
+            return False
 
-        return False
-
-    def atacar():
-        pass
+    def atacar(self) -> bool:
+        if self.arma.atacar():
+            return True
+        else:
+            return False
 
     def __mover(self, keys):
         tentar_esquerda = keys[pygame.K_a]

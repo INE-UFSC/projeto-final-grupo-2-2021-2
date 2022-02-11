@@ -93,6 +93,10 @@ class Jogo:
 
             self.__fase_atual.ciclo(self.__tela)
 
+            if self.__fase_atual.is_player_dead():
+                main_loop = False
+                print('Você perdeu :/')
+            
             if self.__fase_atual.has_ended():
                 main_loop = False
                 proxima_fase = self.__controlador.proxima_fase()

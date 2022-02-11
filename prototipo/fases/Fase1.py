@@ -14,6 +14,12 @@ class Fase1(AbstractFase):
 
         self.__determinar_inimigos(opcoes.dificuldade)
 
+    def is_player_dead(self) -> bool:
+        if self.__jogador.vida <= 0:
+            return True
+        else:
+            return False
+
     @property
     def jogador(self) -> Jogador:
         return self.__jogador
@@ -60,7 +66,8 @@ class Fase1(AbstractFase):
         for inimigo in self.__terreno.inimigos:
             inimigo.mover(self.__jogador.hitbox)
             if inimigo.verificar_ataque(self.__jogador.hitbox):
-                pass
+                if inimigo.atacar():
+                    self.__terreno.executar_ataque_inimigo(tela, inimigo)
 
             inimigo.update()
 

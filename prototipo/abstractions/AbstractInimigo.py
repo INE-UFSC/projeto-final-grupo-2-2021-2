@@ -43,6 +43,12 @@ class AbstractInimigo(AbstractPersonagem, ABC):
                                cima=tentar_cima,
                                baixo=tentar_baixo)
 
+    def atacar(self):
+        if self.arma.atacar():
+            return True
+        else:
+            return False
+
     def verificar_ataque(self, hit_jogador: Hitbox):
         distancia = self.__calcular_distancia(hit_jogador)
 
@@ -87,7 +93,4 @@ class AbstractInimigo(AbstractPersonagem, ABC):
 
     @abstractmethod
     def _calibrar_dificuldade(self):
-        pass
-
-    def update(self):
         pass

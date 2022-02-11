@@ -140,7 +140,6 @@ class AbstractPersonagem(ABC):
 
     @property
     def dano(self) -> int:
-        """Retorna o dano causado por um ataque do personagem"""
         return self.__ataque + self.__arma.dano
 
     @abstractmethod
@@ -178,3 +177,6 @@ class AbstractPersonagem(ABC):
         elif baixo:
             self.sprite_path = self._sprite_baixo
             self.__direction = pygame.K_DOWN
+
+    def update(self):
+        self.__arma.update()
