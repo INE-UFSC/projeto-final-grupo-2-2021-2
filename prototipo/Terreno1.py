@@ -1,27 +1,19 @@
+from mapas.terrenos import matrix_terreno1
 import pygame
 from TelaJogo import TelaJogo
 from abstractions.AbstractPersonagem import AbstractPersonagem
 from abstractions.AbstractTerreno import AbstractTerreno
-from obstaculos.Buraco import Buraco
-from obstaculos.Parede import Parede
 
 
 class Terreno1(AbstractTerreno):
 
     def __init__(self, inimigos: list, itens: list, tamanho_tela: tuple, jogador):
-        obstaculos = []
-        obstaculos.append(Parede((500, 500), (230, 10)))
-        obstaculos.append(Buraco((240, 300), (10, 120)))
-
         sprite_path = "imagens/terreno1.png"
 
-        super().__init__(inimigos, itens, tamanho_tela, obstaculos, jogador, sprite_path)
+        super().__init__(inimigos, itens, tamanho_tela, jogador, sprite_path)
+        super()._setup_mapa(matrix_terreno1)
 
     def iniciar_rodada(self, tela: TelaJogo, jogador) -> None:
-        # Atualiza a posição do jogador para o meio do mapa
-        nova_posicao = tuple([x//2 for x in self.hitbox.tamanho])
-        jogador.hitbox.posicao = nova_posicao
-
         self.desenhar(tela, jogador)
 
     def desenhar(self, tela: TelaJogo, jogador) -> None:
@@ -30,7 +22,7 @@ class Terreno1(AbstractTerreno):
         for obstaculo in self.obstaculos:
             posicao = obstaculo.hitbox.posicao
             tamanho = obstaculo.hitbox.tamanho
-            color = (0, 0, 0)
+            color = (125, 0, 0)
             rect = pygame.Rect(posicao, tamanho)
             pygame.draw.rect(tela.janela, color, rect)
 

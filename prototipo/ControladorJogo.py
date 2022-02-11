@@ -8,6 +8,7 @@ class ControladorJogo():
     def __init__(self, jogador: Jogador, tamanho_tela: tuple, opcoes: Opcoes) -> None:
         self.__fases = []
         self.__fases.append(Fase1(jogador, tamanho_tela, opcoes))
+        self.__fases.append(Fase1(jogador, tamanho_tela, opcoes))
 
     def proxima_fase(self) -> AbstractFase:
         if len(self.__fases) > 0:

@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 from Hitbox import Hitbox
+from obstaculos.Buraco import Buraco
+from obstaculos.Parede import Parede
 
 
 class AbstractTerreno(ABC):
-    def __init__(self, inimigos: list, itens, tamanho_tela: tuple, obstaculos: list, jogador, sprite_path: str):
+    def __init__(self, inimigos: list, itens, tamanho_tela: tuple, jogador, sprite_path: str):
         self.__inimigos = inimigos
-        self.__obstaculos = obstaculos
+        self.__obstaculos = []
         self.__itens = itens
         self.__hitbox = Hitbox(posicao=(0, 0), tamanho=tamanho_tela)
         self.__jogador = jogador
@@ -19,6 +21,18 @@ class AbstractTerreno(ABC):
     def sprite_path(self, value) -> None:
         if type(value) == str:
             self.__sprite_path = value
+
+    def _setup_mapa(self, matriz_terreno: list) -> None:
+        print('Setup Mapa')
+        for index_row, row in enumerate(matriz_terreno):
+            for index_column, cell in enumerate(row):
+                if cell == 'B':  # Buraco
+                    self.__obstaculos.append(Buraco((index_column, index_row)))
+                elif cell == 'P':  # Parede
+                    self.__obstaculos.append(Parede((index_column, index_row)))
+                elif cell == 'J':  # Jogador
+                    nova_posicao = (index_column * 32, index_row * 32)
+                    self.__jogador.hitbox.posicao = nova_posicao
 
     @property
     def jogador(self):

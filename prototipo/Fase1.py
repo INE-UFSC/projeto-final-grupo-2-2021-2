@@ -8,8 +8,8 @@ from abstractions.AbstractFase import AbstractFase
 
 class Fase1(AbstractFase):
     def __init__(self, jogador: Jogador, tamanho_tela: tuple, opcoes: Opcoes) -> None:
-        self.__terreno = Terreno1(inimigos=[], itens=[], tamanho_tela=tamanho_tela, jogador=jogador)
         self.__dificuldade = opcoes.dificuldade
+        self.__tamanho_tela = tamanho_tela
         self.__jogador = jogador
         self.__INIMIGO_POS = []
 
@@ -24,6 +24,9 @@ class Fase1(AbstractFase):
         return self.__terreno
 
     def load(self) -> None:
+        self.__terreno = Terreno1(inimigos=[], itens=[],
+                                  tamanho_tela=self.__tamanho_tela, jogador=self.__jogador)
+
         inimigos = []
         for x in range(len(self.__INIMIGO_POS)):
             inimigo = Inimigo1(self.__INIMIGO_POS[x], self.__dificuldade, self.__terreno)
