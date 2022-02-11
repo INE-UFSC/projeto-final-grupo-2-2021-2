@@ -112,6 +112,16 @@ class Terreno2(AbstractTerreno):
                 if inimigo.vida < 1:
                     self.remover_inimigo(inimigo)
 
+    def executar_ataque_inimigo(self, tela: TelaJogo, personagem: AbstractPersonagem):
+        self.desenhar_ataque(tela, personagem)
+
+        rect_arma = personagem.rect_arma
+        rect_jogador = pygame.Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
+
+        if rect_arma.colliderect(rect_jogador):
+            dano = personagem.dano
+            dano_causado = self.jogador.tomar_dano(dano)
+
     def load_inimigos(self, inimigos: list) -> None:
         self.inimigos.extend(inimigos)
 

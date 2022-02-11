@@ -66,7 +66,8 @@ class Fase2(AbstractFase):
         for inimigo in self.__terreno.inimigos:
             inimigo.mover(self.__jogador.hitbox)
             if inimigo.verificar_ataque(self.__jogador.hitbox):
-                pass
+                if inimigo.atacar():
+                    self.__terreno.executar_ataque_inimigo(tela, inimigo)
 
             inimigo.update()
 

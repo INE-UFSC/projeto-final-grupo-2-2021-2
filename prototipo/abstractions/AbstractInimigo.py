@@ -15,7 +15,10 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         tentar_cima = False
         tentar_baixo = False
 
-        if hit_jogador.x > self.hitbox.x:
+        rect_jogador = pygame.Rect(hit_jogador.posicao, hit_jogador.tamanho)
+        center_jogador = rect_jogador.center
+
+        if center_jogador[0] > self.hitbox.x:
             novo_x = self.hitbox.x + self.vel
             tentar_direita = True
         else:
@@ -27,7 +30,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
             self.hitbox.posicao = nova_posicao
 
-        if hit_jogador.y > self.hitbox.y:
+        if center_jogador[1] > self.hitbox.y:
             novo_y = self.hitbox.y + self.vel
             tentar_baixo = True
         else:
