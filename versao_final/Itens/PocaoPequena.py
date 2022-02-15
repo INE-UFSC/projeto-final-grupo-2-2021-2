@@ -1,4 +1,4 @@
-from abstractions.AbstractItem import AbstractItem
+from Abstractions.AbstractItem import AbstractItem
 
 
 class PocaoPequena(AbstractItem):

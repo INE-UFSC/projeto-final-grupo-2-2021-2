@@ -93,6 +93,11 @@ class Jogador(AbstractPersonagem):
                                 cima=tentar_cima,
                                 baixo=tentar_baixo)
 
+        self._atualizar_sprite(esquerda=tentar_esquerda,
+                               direita=tentar_direita,
+                               cima=tentar_cima,
+                               baixo=tentar_baixo)
+
         # Desativa movimento horizontal caso tente ir para ambos lados
         if tentar_esquerda and tentar_direita:
             tentar_esquerda = False

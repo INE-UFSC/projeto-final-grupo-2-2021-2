@@ -123,16 +123,6 @@ class AbstractPersonagem(ABC):
         if isinstance(arma, Arma):
             self.__arma = arma
 
-    def tomar_dano(self, dano: int) -> int:
-        """Retorna o quanto de vida foi retirado do personagem"""
-        if type(dano) == int:
-            dano_real = dano - self.__defesa
-            self.__vida -= dano_real
-
-            return dano_real
-        else:
-            return 0
-
     @property
     def dano(self) -> int:
         return self.__ataque + self.__arma.dano
@@ -158,7 +148,17 @@ class AbstractPersonagem(ABC):
         if type(value) == str:
             self.__sprite_path = value
 
-    def _atualizar_frente(self, esquerda, direita, cima, baixo):
+    def tomar_dano(self, dano: int) -> int:
+        """Retorna o quanto de vida foi retirado do personagem"""
+        if type(dano) == int:
+            dano_real = dano - self.__defesa
+            self.__vida -= dano_real
+
+            return dano_real
+        else:
+            return 0
+
+    def _atualizar_sprite(self, esquerda, direita, cima, baixo):
         """Atualiza o sprite path conforme o personagem anda"""
         if cima:
             self.sprite_path = self._sprite_cima

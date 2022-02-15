@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
 from Utils.Hitbox import Hitbox
 from Abstractions.AbstractPersonagem import AbstractPersonagem
+from Enums.Enums import Direction
 from Abstractions.AbstractTerreno import AbstractTerreno
 import pygame
 
 
 class AbstractInimigo(AbstractPersonagem, ABC):
     def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: AbstractTerreno, sprite_paths) -> None:
+        self.__direction = Direction.MEIO_BAIXO
         super().__init__(stats, posicao, tamanho, terreno, sprite_paths)
 
     def mover(self, hit_jogador: Hitbox) -> None:
@@ -41,16 +43,15 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
             self.hitbox.posicao = nova_posicao
 
-        self._atualizar_frente(esquerda=tentar_esquerda,
+        self._atualizar_sprite(esquerda=tentar_esquerda,
                                direita=tentar_direita,
                                cima=tentar_cima,
                                baixo=tentar_baixo)
 
-    def atacar(self):
-        if self.arma.atacar():
-            return True
-        else:
-            return False
+        self.__atualizar_frente(esquerda=tentar_esquerda,
+                                direita=tentar_direita,
+                                cima=tentar_cima,
+                                baixo=tentar_baixo)
 
     def verificar_ataque(self, hit_jogador: Hitbox):
         distancia = self.__calcular_distancia(hit_jogador)
@@ -59,6 +60,39 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             return True
         else:
             return False
+
+    def get_rect_arma(self) -> pygame.Rect:
+        posicao_frente = self.__determinar_posicao_frente()
+
+        rect = pygame.Rect(posicao_frente, (self.alcance, self.alcance))
+        rect.center = posicao_frente
+        return rect
+
+    def atacar(self):
+        if self.arma.atacar():
+            return True
+        else:
+            return False
+
+    def __atualizar_frente(self, esquerda, direita, cima, baixo):
+        if esquerda:
+            if cima:
+                self.__direction = Direction.ESQUERDA_CIMA
+            elif baixo:
+                self.__direction = Direction.ESQUERDA_BAIXO
+            else:
+                self.__direction = Direction.ESQUERDA_MEIO
+        elif direita:
+            if cima:
+                self.__direction = Direction.DIREITA_CIMA
+            elif baixo:
+                self.__direction = Direction.DIREITA_BAIXO
+            else:
+                self.__direction = Direction.DIREITA_MEIO
+        elif baixo:
+            self.__direction = Direction.MEIO_BAIXO
+        elif cima:
+            self.__direction = Direction.MEIO_CIMA
 
     def __calcular_distancia(self, outro_hitbox: Hitbox):
         posicao1, posicao2 = self.__determinar_posicoes_mais_proximas(outro_hitbox)
@@ -94,12 +128,27 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         else:  # Abaixo
             return rect.midbottom, outro_rect.midtop
 
-    def get_rect_arma(self) -> pygame.Rect:
-        posicao_frente = self.posicao_frente
+    def __determinar_posicao_frente(self):
+        rect = pygame.Rect(self.hitbox.posicao, self.hitbox.tamanho)
 
-        rect = pygame.Rect(posicao_frente, (self.arma.alcance, self.arma.alcance))
-        rect.center = posicao_frente
-        return rect
+        if self.__direction == Direction.DIREITA_BAIXO:
+            return rect.bottomright
+        elif self.__direction == Direction.DIREITA_MEIO:
+            return rect.midright
+        elif self.__direction == Direction.DIREITA_CIMA:
+            return rect.topright
+        elif self.__direction == Direction.ESQUERDA_BAIXO:
+            return rect.bottomleft
+        elif self.__direction == Direction.ESQUERDA_MEIO:
+            return rect.midleft
+        elif self.__direction == Direction.ESQUERDA_CIMA:
+            return rect.topleft
+        elif self.__direction == Direction.MEIO_BAIXO:
+            return rect.midbottom
+        elif self.__direction == Direction.MEIO_CIMA:
+            return rect.midtop
+        else:
+            return rect.midtop
 
     @abstractmethod
     def _calibrar_dificuldade(self):

@@ -49,7 +49,6 @@ class AbstractTerreno(ABC):
         return self.__obstaculos
 
     def _setup_mapa(self, matriz_terreno: list) -> None:
-        print('Setup Mapa')
         for index_row, row in enumerate(matriz_terreno):
             for index_column, cell in enumerate(row):
                 if cell == 'B':  # Buraco
