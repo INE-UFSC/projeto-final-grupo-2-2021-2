@@ -80,10 +80,10 @@ class AbstractTerreno(ABC):
             rect = pygame.Rect(posicao, tamanho)
             pygame.draw.rect(tela.janela, color, rect)
 
-            if inimigo.arma.desenhando_ataque:
+            if inimigo.checar_atacando():
                 self.desenhar_ataque(tela, inimigo)
 
-        if jogador.arma.desenhando_ataque:
+        if jogador.checar_atacando():
             self.desenhar_ataque(tela, jogador)
 
         tamanho = jogador.hitbox.tamanho
@@ -139,8 +139,8 @@ class AbstractTerreno(ABC):
         self.__inimigos.append(inimigos)
 
     def desenhar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
-        rect_arma = personagem.rect_arma
-        alcance = personagem.arma.alcance
+        rect_arma = personagem.get_rect_arma()
+        alcance = personagem.alcance
 
         color = (255, 255, 255)
         pygame.draw.circle(tela.janela, color, rect_arma.center, alcance)
@@ -148,7 +148,7 @@ class AbstractTerreno(ABC):
     def executar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
         self.desenhar_ataque(tela, personagem)
 
-        rect_arma = personagem.rect_arma
+        rect_arma = personagem.get_rect_arma()
         for inimigo in self.inimigos:
             rect_inimigo = pygame.Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
 
@@ -162,7 +162,7 @@ class AbstractTerreno(ABC):
     def executar_ataque_inimigo(self, tela: TelaJogo, personagem: AbstractPersonagem):
         self.desenhar_ataque(tela, personagem)
 
-        rect_arma = personagem.rect_arma
+        rect_arma = personagem.get_rect_arma()
         rect_jogador = pygame.Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
 
         if rect_arma.colliderect(rect_jogador):

@@ -1,5 +1,6 @@
 import pygame
 from Abstractions.AbstractPersonagem import AbstractPersonagem
+from Enums.Enums import Direction
 from Personagens.Jogador.StatusJogador import StatusJogador
 
 
@@ -24,6 +25,7 @@ class Jogador(AbstractPersonagem):
         ]
         self.__nome = nome
         self.__status = StatusJogador(self)
+        self.__direction = Direction.MEIO_CIMA
 
         super().__init__(stats=JogadorStats, posicao=posicao,
                          tamanho=tamanho, terreno=terreno, sprite_paths=sprite_paths)
@@ -53,16 +55,43 @@ class Jogador(AbstractPersonagem):
         else:
             return False
 
+    def get_rect_arma(self) -> pygame.Rect:
+        posicao_frente = self.__posicao_frente()
+
+        rect = pygame.Rect(posicao_frente, (self.alcance, self.alcance))
+        rect.center = posicao_frente
+        return rect
+
+    def __atualizar_frente(self, esquerda, direita, cima, baixo):
+        if esquerda:
+            if cima:
+                self.__direction = Direction.ESQUERDA_CIMA
+            elif baixo:
+                self.__direction = Direction.ESQUERDA_BAIXO
+            else:
+                self.__direction = Direction.ESQUERDA_MEIO
+        elif direita:
+            if cima:
+                self.__direction = Direction.DIREITA_CIMA
+            elif baixo:
+                self.__direction = Direction.DIREITA_BAIXO
+            else:
+                self.__direction = Direction.DIREITA_MEIO
+        elif baixo:
+            self.__direction = Direction.MEIO_BAIXO
+        elif cima:
+            self.__direction = Direction.MEIO_CIMA
+
     def __mover(self, keys):
         tentar_esquerda = keys[pygame.K_a]
         tentar_cima = keys[pygame.K_w]
         tentar_direita = keys[pygame.K_d]
         tentar_baixo = keys[pygame.K_s]
 
-        self._atualizar_frente(esquerda=tentar_esquerda,
-                               direita=tentar_direita,
-                               cima=tentar_cima,
-                               baixo=tentar_baixo)
+        self.__atualizar_frente(esquerda=tentar_esquerda,
+                                direita=tentar_direita,
+                                cima=tentar_cima,
+                                baixo=tentar_baixo)
 
         # Desativa movimento horizontal caso tente ir para ambos lados
         if tentar_esquerda and tentar_direita:
@@ -100,3 +129,25 @@ class Jogador(AbstractPersonagem):
 
             if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
                 self.hitbox.posicao = nova_posicao
+
+    def __posicao_frente(self):
+        rect = pygame.Rect(self.hitbox.posicao, self.hitbox.tamanho)
+
+        if self.__direction == Direction.DIREITA_BAIXO:
+            return rect.bottomright
+        elif self.__direction == Direction.DIREITA_MEIO:
+            return rect.midright
+        elif self.__direction == Direction.DIREITA_CIMA:
+            return rect.topright
+        elif self.__direction == Direction.ESQUERDA_BAIXO:
+            return rect.bottomleft
+        elif self.__direction == Direction.ESQUERDA_MEIO:
+            return rect.midleft
+        elif self.__direction == Direction.ESQUERDA_CIMA:
+            return rect.topleft
+        elif self.__direction == Direction.MEIO_BAIXO:
+            return rect.midbottom
+        elif self.__direction == Direction.MEIO_CIMA:
+            return rect.midtop
+        else:
+            return rect.midtop

@@ -94,6 +94,13 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         else:  # Abaixo
             return rect.midbottom, outro_rect.midtop
 
+    def get_rect_arma(self) -> pygame.Rect:
+        posicao_frente = self.posicao_frente
+
+        rect = pygame.Rect(posicao_frente, (self.arma.alcance, self.arma.alcance))
+        rect.center = posicao_frente
+        return rect
+
     @abstractmethod
     def _calibrar_dificuldade(self):
         pass

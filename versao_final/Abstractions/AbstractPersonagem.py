@@ -51,8 +51,7 @@ class AbstractPersonagem(ABC):
         else:
             return rect.midbottom
 
-    @property
-    def rect_arma(self) -> pygame.Rect:
+    def get_rect_arma(self) -> pygame.Rect:
         posicao_frente = self.posicao_frente
 
         rect = pygame.Rect(posicao_frente, (self.arma.alcance, self.arma.alcance))
@@ -60,57 +59,54 @@ class AbstractPersonagem(ABC):
         return rect
 
     @property
+    def alcance(self) -> int:
+        return self.__arma.alcance
+
+    def checar_atacando(self) -> bool:
+        return self.__arma.desenhando_ataque
+
+    @property
     def vida_maxima(self) -> int:
-        """Retorna a vida máxima do personagem"""
         return self.__vida_maxima
 
     @vida_maxima.setter
     def vida_maxima(self, value: int) -> None:
-        """Setter de vida_maxima"""
         if type(value) == int and value > -1:
             self.__vida_maxima = value
 
     @property
     def vida(self) -> int:
-        """Retorna a vida atual do personagem"""
         return self.__vida
 
     @vida.setter
     def vida(self, value: int) -> None:
-        """Setter de vida"""
         if type(value) == int:
             self.__vida = value
 
     @property
     def ataque(self) -> int:
-        """Retorna o valor de ataque do personagem"""
         return self.__ataque
 
     @ataque.setter
     def ataque(self, value: int) -> None:
-        """Setter de ataque"""
         if type(value) == int:
             self.__ataque = value
 
     @property
     def defesa(self) -> int:
-        """Retorna o valor de defesa do personagem"""
         return self.__defesa
 
     @defesa.setter
     def defesa(self, value: int) -> None:
-        """Setter de defesa"""
         if type(value) == int:
             self.__defesa = value
 
     @property
     def vel(self) -> int:
-        """Retorna a velocidade do personagem"""
         return self.__vel
 
     @vel.setter
     def vel(self, value: int) -> None:
-        """Setter de velocidade"""
         if type(value) == int:
             self.__vel = value
 
@@ -120,7 +116,6 @@ class AbstractPersonagem(ABC):
 
     @property
     def arma(self) -> Arma:
-        """Retorna a arma que esse personagem possui"""
         return self.__arma
 
     @arma.setter
