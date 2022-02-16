@@ -8,8 +8,9 @@ class PocaoMedia(AbstractItem):
         self.__pronto = False
 
     def adicionar_status(self, status: Status) -> None:
-        status.vida += self.__potencia
-        self.__pronto = True
+        if not self.__pronto:
+            status.vida += self.__potencia
+            self.__pronto = True
 
     def check_aplicado(self) -> bool:
         return self.__pronto

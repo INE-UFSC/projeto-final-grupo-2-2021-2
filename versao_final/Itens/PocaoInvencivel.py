@@ -6,11 +6,14 @@ class PocaoInvencivel(AbstractItem):
     def __init__(self) -> None:
         self.__status: Status = None
         self.__pronto = False
+        self.__aplicado = False
         self.__BUFF_TIMER = 80
 
     def modificar_status(self, status: Status) -> None:
-        self.__status = status
-        status.invencibilidade = True
+        if not self.__aplicado:
+            self.__status = status
+            self.__aplicado = True
+            status.invencibilidade = True
 
     def check_aplicado(self) -> bool:
         self.__update_timer()

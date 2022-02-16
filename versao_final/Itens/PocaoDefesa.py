@@ -7,11 +7,13 @@ class PocaoDefesa(AbstractItem):
         self.__status: Status = None
         self.__potencia = 3
         self.__pronto = False
+        self.__aplicado = False
         self.__BUFF_TIMER = 200
 
     def modificar_status(self, status: Status) -> None:
-        self.__status = status
-        status.defesa += self.__potencia
+        if not self.__aplicado:
+            status.defesa += self.__potencia
+            self.__aplicado = True
 
     def check_aplicado(self) -> bool:
         self.__update_timer()
