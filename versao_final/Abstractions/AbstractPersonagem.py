@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-import pygame
 from Utils.Hitbox import Hitbox
 from Personagens.Arma import Arma
+import pygame
 
 
 class AbstractPersonagem(ABC):
@@ -36,34 +36,34 @@ class AbstractPersonagem(ABC):
 
         self.__direction = pygame.K_UP
 
-    @property
-    def posicao_frente(self):
-        posicao = self.__hitbox.posicao
-        tamanho = self.__hitbox.tamanho
+    def tomar_dano(self, dano: int) -> int:
+        if type(dano) == int:
+            dano_real = dano - self.__defesa
+            self.__vida -= dano_real
 
-        rect = pygame.Rect(posicao, tamanho)
-        if self.__direction == pygame.K_UP:
-            return rect.midtop
-        elif self.__direction == pygame.K_LEFT:
-            return rect.midleft
-        elif self.__direction == pygame.K_RIGHT:
-            return rect.midright
+            return dano_real
         else:
-            return rect.midbottom
+            return 0
 
-    def get_rect_arma(self) -> pygame.Rect:
-        posicao_frente = self.posicao_frente
+    def _atualizar_sprite(self, esquerda, direita, cima, baixo):
+        if cima:
+            self.sprite_path = self._sprite_cima
+        elif direita:
+            self.sprite_path = self._sprite_direita
+        elif esquerda:
+            self.sprite_path = self._sprite_esquerda
+        elif baixo:
+            self.sprite_path = self._sprite_baixo
 
-        rect = pygame.Rect(posicao_frente, (self.arma.alcance, self.arma.alcance))
-        rect.center = posicao_frente
-        return rect
+    def update(self):
+        self.__arma.update()
+
+    def checar_atacando(self) -> bool:
+        return self.__arma.desenhando_ataque
 
     @property
     def alcance(self) -> int:
         return self.__arma.alcance
-
-    def checar_atacando(self) -> bool:
-        return self.__arma.desenhando_ataque
 
     @property
     def vida_maxima(self) -> int:
@@ -82,24 +82,6 @@ class AbstractPersonagem(ABC):
     def vida(self, value: int) -> None:
         if type(value) == int:
             self.__vida = value
-
-    @property
-    def ataque(self) -> int:
-        return self.__ataque
-
-    @ataque.setter
-    def ataque(self, value: int) -> None:
-        if type(value) == int:
-            self.__ataque = value
-
-    @property
-    def defesa(self) -> int:
-        return self.__defesa
-
-    @defesa.setter
-    def defesa(self, value: int) -> None:
-        if type(value) == int:
-            self.__defesa = value
 
     @property
     def vel(self) -> int:
@@ -127,10 +109,6 @@ class AbstractPersonagem(ABC):
     def dano(self) -> int:
         return self.__ataque + self.__arma.dano
 
-    @abstractmethod
-    def atacar(self):
-        pass
-
     @property
     def terreno(self):
         return self.__terreno
@@ -148,30 +126,6 @@ class AbstractPersonagem(ABC):
         if type(value) == str:
             self.__sprite_path = value
 
-    def tomar_dano(self, dano: int) -> int:
-        """Retorna o quanto de vida foi retirado do personagem"""
-        if type(dano) == int:
-            dano_real = dano - self.__defesa
-            self.__vida -= dano_real
-
-            return dano_real
-        else:
-            return 0
-
-    def _atualizar_sprite(self, esquerda, direita, cima, baixo):
-        """Atualiza o sprite path conforme o personagem anda"""
-        if cima:
-            self.sprite_path = self._sprite_cima
-            self.__direction = pygame.K_UP
-        elif direita:
-            self.sprite_path = self._sprite_direita
-            self.__direction = pygame.K_RIGHT
-        elif esquerda:
-            self.sprite_path = self._sprite_esquerda
-            self.__direction = pygame.K_LEFT
-        elif baixo:
-            self.sprite_path = self._sprite_baixo
-            self.__direction = pygame.K_DOWN
-
-    def update(self):
-        self.__arma.update()
+    @abstractmethod
+    def atacar(self):
+        pass
