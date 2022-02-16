@@ -5,8 +5,8 @@ from Obstaculos.Parede import Parede
 from Personagens.Jogador.Jogador import Jogador
 from Config.Config import TAMANHO_TELA
 from Views.TelaJogo import TelaJogo
-import pygame
 from Abstractions.AbstractPersonagem import AbstractPersonagem
+import pygame
 
 
 class AbstractTerreno(ABC):

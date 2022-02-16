@@ -1,5 +1,7 @@
+from typing import List
 import pygame
 from Abstractions.AbstractPersonagem import AbstractPersonagem
+from Abstractions.AbstractItem import AbstractItem
 from Enums.Enums import Direction
 from Personagens.Jogador.StatusJogador import StatusJogador
 
@@ -23,6 +25,7 @@ class Jogador(AbstractPersonagem):
             "",  # Cima
             ""  # Baixo
         ]
+        self.__itens: List[AbstractItem] = []
         self.__nome = nome
         self.__status = StatusJogador(self)
         self.__direction = Direction.MEIO_CIMA
@@ -33,10 +36,6 @@ class Jogador(AbstractPersonagem):
     @property
     def status(self):
         return self.__status
-
-    @property
-    def nome(self):
-        return self.__nome
 
     def lidar_inputs(self) -> None:
         keys = pygame.key.get_pressed()
@@ -61,6 +60,13 @@ class Jogador(AbstractPersonagem):
         rect = pygame.Rect(posicao_frente, (self.alcance, self.alcance))
         rect.center = posicao_frente
         return rect
+
+    def receber_item(self, item: AbstractItem) -> None:
+        item.modificar_status(self.__status)
+
+    def update(self) -> None:
+        for item in self.__itens:
+            pass
 
     def __atualizar_frente(self, esquerda, direita, cima, baixo):
         if esquerda:

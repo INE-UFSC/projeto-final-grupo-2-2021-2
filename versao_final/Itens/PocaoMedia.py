@@ -2,9 +2,9 @@ from Abstractions.AbstractItem import AbstractItem
 from Personagens.Status import Status
 
 
-class PocaoPequena(AbstractItem):
+class PocaoMedia(AbstractItem):
     def __init__(self) -> None:
-        self.__potencia = 3
+        self.__potencia = 5
         self.__pronto = False
 
     def adicionar_status(self, status: Status) -> None:
