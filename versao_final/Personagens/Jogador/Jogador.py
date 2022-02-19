@@ -65,6 +65,7 @@ class Jogador(AbstractPersonagem):
         item.modificar_status(self.__status)
 
     def update(self) -> None:
+        self.arma.update()
         for item in self.__itens:
             pass
 
