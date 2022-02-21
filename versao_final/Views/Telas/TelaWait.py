@@ -1,5 +1,5 @@
 import pygame
-from Views.TelaJogo import TelaJogo
+from Config.TelaJogo import TelaJogo
 
 
 class TelaWait():

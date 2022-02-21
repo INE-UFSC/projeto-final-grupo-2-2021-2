@@ -5,7 +5,7 @@ from Enums.Enums import ComandosEnum
 from Views.Components.Imagem import Imagem
 from Abstractions.AbstractTela import AbstractTela
 from Views.Components.Texto import Texto
-from Views.TelaJogo import TelaJogo
+from Config.TelaJogo import TelaJogo
 import pygame
 
 X_OFFSET = 100

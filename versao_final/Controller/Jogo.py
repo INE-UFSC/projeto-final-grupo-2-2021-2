@@ -1,5 +1,5 @@
 import pygame
-from Views.TelaJogo import TelaJogo
+from Config.TelaJogo import TelaJogo
 from Personagens.Jogador.Jogador import Jogador
 from Config.Opcoes import Opcoes
 from Controller.ControladorFases import ControladorFases

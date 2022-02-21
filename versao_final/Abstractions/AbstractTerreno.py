@@ -4,7 +4,7 @@ from Obstaculos.Buraco import Buraco
 from Obstaculos.Parede import Parede
 from Personagens.Jogador.Jogador import Jogador
 from Config.Config import TAMANHO_TELA
-from Views.TelaJogo import TelaJogo
+from Config.TelaJogo import TelaJogo
 from Abstractions.AbstractPersonagem import AbstractPersonagem
 import pygame
 

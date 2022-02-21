@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from Enums.Enums import Dificuldade
 from Personagens.Jogador.Jogador import Jogador
-from Views.TelaJogo import TelaJogo
+from Config.TelaJogo import TelaJogo
 from Config.Opcoes import Opcoes
 from Abstractions.AbstractTerreno import AbstractTerreno
 

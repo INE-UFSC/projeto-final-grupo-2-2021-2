@@ -4,7 +4,7 @@ from Views.Components.Imagem import Imagem
 from Views.Components.Texto import Texto
 from Enums.Enums import ComandosEnum
 from Abstractions.AbstractTela import AbstractTela
-from Views.TelaJogo import TelaJogo
+from Config.TelaJogo import TelaJogo
 import pygame
 
 X_OFFSET = 100
@@ -14,7 +14,7 @@ TAM_BOTAO = (150, 50)
 TAM_TEXTO = (400, 100)
 
 
-class MenuPrincipal(AbstractTela):
+class TelaJogar(AbstractTela):
     def __init__(self, comandos: dict):
         self.__comandos = comandos
         self.__tela = TelaJogo()
@@ -84,14 +84,13 @@ class MenuPrincipal(AbstractTela):
         self.__textos.append(Texto(POS_TEXTO[0], TAM_TEXTO, 'The Binding of Isaac', 60, branco))
 
     def __criar_botoes(self):
-        funcTelaJogar = self.__comandos[ComandosEnum.TELA_JOGAR]
-        funcTelaOpcoes = self.__comandos[ComandosEnum.TELA_OPCOES]
-        funcSair = self.__comandos[ComandosEnum.SAIR]
-        print(POS_BOTOES)
+        funcNew = self.__comandos[ComandosEnum.NEW_GAME]
+        funcLoad = self.__comandos[ComandosEnum.LOAD_GAME]
+        funcVoltar = self.__comandos[ComandosEnum.VOLTAR]
 
-        self.__botoes.append(Botao(POS_BOTOES[0], TAM_BOTAO, 'Jogar', funcTelaJogar))
-        self.__botoes.append(Botao(POS_BOTOES[1], TAM_BOTAO, 'Opções', funcTelaOpcoes))
-        self.__botoes.append(Botao(POS_BOTOES[2], TAM_BOTAO, 'Sair', funcSair))
+        self.__botoes.append(Botao(POS_BOTOES[0], TAM_BOTAO, 'New', funcNew))
+        self.__botoes.append(Botao(POS_BOTOES[1], TAM_BOTAO, 'Load', funcLoad))
+        self.__botoes.append(Botao(POS_BOTOES[2], TAM_BOTAO, 'Voltar', funcVoltar))
 
     def __criar_cursor(self):
         self.__cursor = Imagem(POS_BOTOES[0], (50, 40), 'imagens/seta.png')

@@ -2,10 +2,11 @@ import pygame
 import sys
 from Config.Opcoes import Opcoes
 from Enums.Enums import ComandosEnum, Dificuldade
-from Views.MenuPrincipal import MenuPrincipal
-from Views.TelaJogo import TelaJogo
-from Views.TelaOpcoes import TelaOpcoes
-from Views.TelaWait import TelaWait
+from Config.TelaJogo import TelaJogo
+from Views.Telas.TelaJogar import TelaJogar
+from Views.Telas.TelaMenu import TelaMenuPrincipal
+from Views.Telas.TelaOpcoes import TelaOpcoes
+from Views.Telas.TelaWait import TelaWait
 from Controller.Jogo import Jogo
 
 
@@ -13,13 +14,6 @@ class ControladorJogo():
     def __init__(self):
         self.__tela = TelaJogo()
         self.__MENU_FPS = 40
-
-        opcoes = Opcoes()
-        print(opcoes.dificuldade)
-        opcoes.dificuldade = Dificuldade.dificil
-        print(opcoes.dificuldade)
-        opcoes = Opcoes()
-        print(opcoes.dificuldade)
 
     def start(self):
         self.__tela.mostrar_fundo()
@@ -32,7 +26,7 @@ class ControladorJogo():
         telaWait.run()
 
     def __invoke_menu(self):
-        telaMenu = MenuPrincipal({
+        telaMenu = TelaMenuPrincipal({
             ComandosEnum.TELA_JOGAR: self.__invoke_tela_jogar,
             ComandosEnum.TELA_OPCOES: self.__invoke_opcoes,
             ComandosEnum.SAIR: self.__end_game
@@ -53,7 +47,12 @@ class ControladorJogo():
         telaOptions.run()
 
     def __invoke_tela_jogar(self):
-        print('Invoke Tela Jogar')
+        telaJogar = TelaJogar({
+            ComandosEnum.NEW_GAME: self.__invoke_new_game,
+            ComandosEnum.LOAD_GAME: self.__invoke_saves,
+            ComandosEnum.VOLTAR: self.__invoke_menu
+        })
+        telaJogar.run()
 
     def __end_game(self):
         pygame.quit()
