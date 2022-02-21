@@ -10,7 +10,7 @@ class Fase3(AbstractFase):
         super().__init__(jogador)
 
         self.__INIMIGO_POS = []
-        self.__determinar_inimigos(self.opcoes.dificuldade)
+        self.__determinar_inimigos(self.dificuldade)
 
     def load(self) -> None:
         self.terreno = Terreno3(inimigos=[], itens=[], jogador=self.jogador)

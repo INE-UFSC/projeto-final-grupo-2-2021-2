@@ -1,7 +1,7 @@
 from typing import List
 from Config.Opcoes import Opcoes
 from Views.Components.Botao import Botao
-from Enums.Enums import ComandosEnum
+from Enums.Enums import ComandosEnum, Dificuldade
 from Views.Components.Imagem import Imagem
 from Abstractions.AbstractTela import AbstractTela
 from Views.Components.Texto import Texto
@@ -93,17 +93,16 @@ class TelaOpcoes(AbstractTela):
         botao_escolhido.execute()
 
     def __criar_botoes(self):
-        funcSetFacil = self.__comandos[ComandosEnum.SET_DIFICULDADE_FACIL]
-        funcSetMedio = self.__comandos[ComandosEnum.SET_DIFICULDADE_MEDIO]
-        funcSetDificil = self.__comandos[ComandosEnum.SET_DIFICULDADE_DIFICIL]
+        funcNível = self.__comandos[ComandosEnum.SET_DIFICULDADE]
         funcToggleMusica = self.__comandos[ComandosEnum.TOGGLE_MUSICA]
         funcVoltar = self.__comandos[ComandosEnum.VOLTAR]
 
         status = 'On' if self.__opcoes.tocar_musica else 'Off'
 
-        self.__botoes.append(Botao(POS_BOTOES[0], TAM_BOTAO, 'Fácil', funcSetFacil))
-        self.__botoes.append(Botao(POS_BOTOES[1], TAM_BOTAO, 'Médio', funcSetMedio))
-        self.__botoes.append(Botao(POS_BOTOES[2], TAM_BOTAO, 'Difícil', funcSetDificil))
+        self.__botoes.append(Botao(POS_BOTOES[0], TAM_BOTAO, 'Fácil', funcNível, Dificuldade.facil))
+        self.__botoes.append(Botao(POS_BOTOES[1], TAM_BOTAO, 'Médio', funcNível, Dificuldade.medio))
+        self.__botoes.append(Botao(POS_BOTOES[2], TAM_BOTAO,
+                             'Difícil', funcNível, Dificuldade.dificil))
         self.__botoes.append(Botao(POS_BOTOES[3], TAM_BOTAO, f'Música: {status}', funcToggleMusica))
         self.__botoes.append(Botao(POS_BOTOES[4], TAM_BOTAO, 'Voltar', funcVoltar))
 

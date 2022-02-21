@@ -5,6 +5,7 @@ from Enums.Enums import ComandosEnum, Dificuldade
 from Config.TelaJogo import TelaJogo
 from Views.Telas.TelaJogar import TelaJogar
 from Views.Telas.TelaMenu import TelaMenuPrincipal
+from Views.Telas.TelaNew import TelaNewGame
 from Views.Telas.TelaOpcoes import TelaOpcoes
 from Views.Telas.TelaWait import TelaWait
 from Controller.Jogo import Jogo
@@ -21,11 +22,11 @@ class ControladorJogo():
         self.__invoke_tela_wait()
         self.__invoke_menu()
 
-    def __invoke_tela_wait(self):
+    def __invoke_tela_wait(self, *args, **kwargs):
         telaWait = TelaWait()
         telaWait.run()
 
-    def __invoke_menu(self):
+    def __invoke_menu(self, *args, **kwargs):
         telaMenu = TelaMenuPrincipal({
             ComandosEnum.TELA_JOGAR: self.__invoke_tela_jogar,
             ComandosEnum.TELA_OPCOES: self.__invoke_opcoes,
@@ -33,20 +34,18 @@ class ControladorJogo():
         })
         telaMenu.run()
 
-    def __invoke_opcoes(self):
+    def __invoke_opcoes(self, *args, **kwargs):
         telaOptions = TelaOpcoes(
             {ComandosEnum.TELA_JOGAR: self.__invoke_game,
              ComandosEnum.SAIR: self.__end_game,
              ComandosEnum.VOLTAR: self.__invoke_menu,
-             ComandosEnum.SET_DIFICULDADE_FACIL: self.__set_dificuldade_facil,
-             ComandosEnum.SET_DIFICULDADE_MEDIO: self.__set_dificuldade_medio,
-             ComandosEnum.SET_DIFICULDADE_DIFICIL: self.__set_dificuldade_dificil,
+             ComandosEnum.SET_DIFICULDADE: self.__set_dificuldade,
              ComandosEnum.TOGGLE_MUSICA: self.__toggle_musica
 
              })
         telaOptions.run()
 
-    def __invoke_tela_jogar(self):
+    def __invoke_tela_jogar(self, *args, **kwargs):
         telaJogar = TelaJogar({
             ComandosEnum.NEW_GAME: self.__invoke_new_game,
             ComandosEnum.LOAD_GAME: self.__invoke_saves,
@@ -54,33 +53,29 @@ class ControladorJogo():
         })
         telaJogar.run()
 
-    def __end_game(self):
+    def __end_game(self, *args, **kwargs):
         pygame.quit()
         sys.exit()
 
-    def __invoke_game(self):
-        opcoes = Opcoes()
-        self.__jogo = Jogo(opcoes)
+    def __invoke_game(self, *args, **kwargs):
+        self.__jogo = Jogo()
         self.__jogo.start()
 
-    def __invoke_saves(self):
+    def __invoke_saves(self, *args, **kwargs):
         pass
 
-    def __invoke_new_game(self):
-        pass
+    def __invoke_new_game(self, *args, **kwargs):
+        telaNew = TelaNewGame({
+            ComandosEnum.NEW_GAME: self.__invoke_game,
+            ComandosEnum.VOLTAR: self.__invoke_tela_jogar
+        })
+        telaNew.run()
 
-    def __set_dificuldade_facil(self):
+    def __set_dificuldade(self, *args, **kwargs):
+        dificuldade = args[0]
         options = Opcoes()
-        options.dificuldade = Dificuldade.facil
+        options.dificuldade = dificuldade
 
-    def __set_dificuldade_medio(self):
-        options = Opcoes()
-        options.dificuldade = Dificuldade.medio
-
-    def __set_dificuldade_dificil(self):
-        options = Opcoes()
-        options.dificuldade = Dificuldade.dificil
-
-    def __toggle_musica(self):
+    def __toggle_musica(self, *args, **kwargs):
         opcoes = Opcoes()
         opcoes.tocar_musica = not opcoes.tocar_musica

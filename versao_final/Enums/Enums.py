@@ -11,10 +11,8 @@ class ComandosEnum(Enum):
     TELA_NEW_GAME = 7
     TELA_MENU = 8
     TELA_JOGAR = 9
-    SET_DIFICULDADE_FACIL = 10
-    SET_DIFICULDADE_MEDIO = 11
-    SET_DIFICULDADE_DIFICIL = 12
-    TOGGLE_MUSICA = 13
+    SET_DIFICULDADE = 10
+    TOGGLE_MUSICA = 11
 
 
 class Dificuldade(Enum):

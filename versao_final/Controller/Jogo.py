@@ -7,34 +7,19 @@ from Abstractions.AbstractFase import AbstractFase
 
 
 class Jogo:
-    def __init__(self, opcoes: Opcoes):
+    def __init__(self):
         self.__tela = TelaJogo()
-        self.__opcoes = opcoes
-        self.__carregar_dados()
+        self.__opcoes = Opcoes()
         self.__jogador = None
         self.__controlador = None
         self.__fase_atual = None
 
+        self.__carregar_dados()
         self.__FPS = 40
 
     def start(self):
-        clock = pygame.time.Clock()
-        loop = True
-        while loop:
-            clock.tick(self.__FPS)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    loop = False
-
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        self.__rodar_fase()
-                        loop = False
-
-                pygame.display.update()
-
-    def __wait(self):
-        pass
+        primeira_fase = self.__controlador.proxima_fase()
+        self.__rodar_fase(primeira_fase)
 
     def __rodar_fase(self, fase: AbstractFase) -> None:
         self.__fase_atual = fase

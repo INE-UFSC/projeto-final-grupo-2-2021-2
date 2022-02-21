@@ -1,4 +1,3 @@
-from tkinter import Menu
 import pygame
 from Controller.ControladorJogo import ControladorJogo
 
