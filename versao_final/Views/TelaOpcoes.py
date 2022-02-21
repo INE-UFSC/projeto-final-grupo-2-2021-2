@@ -1,10 +1,20 @@
 from typing import List
+from Config.Opcoes import Opcoes
 from Views.Components.Botao import Botao
 from Enums.Enums import ComandosEnum
 from Views.Components.Imagem import Imagem
 from Abstractions.AbstractTela import AbstractTela
+from Views.Components.Texto import Texto
 from Views.TelaJogo import TelaJogo
 import pygame
+
+X_OFFSET = 100
+POS_TITULO = (550, 50)
+POS_DIFICULDADE = (250, 200)
+POS_BOTOES = [(250, 250), (250, 320), (250, 390), (700, 250), (700, 390)]
+TAM_BOTAO = (150, 50)
+TAM_TITULO = (400, 100)
+TAM_DIFICULDADE = (100, 100)
 
 
 class TelaOpcoes(AbstractTela):
@@ -14,9 +24,14 @@ class TelaOpcoes(AbstractTela):
         self.__tela = TelaJogo()
         self.__botoes: List[Botao] = []
         self.__sprite_fundo = 'imagens/FundoFloresta.png'
+        self.__opcoes = Opcoes()
 
+        self.__botoes: List[Botao] = []
+        self.__textos: List[Texto] = []
+        self.__cursor: Imagem = None
         self.__criar_botoes()
         self.__criar_cursor()
+        self.__criar_textos()
 
     def run(self):
         clock = pygame.time.Clock()
@@ -24,6 +39,7 @@ class TelaOpcoes(AbstractTela):
         running = True
         while running:
             clock.tick(self.__FPS)
+            self.__update()
             self.__desenhar()
 
             for event in pygame.event.get():
@@ -36,6 +52,10 @@ class TelaOpcoes(AbstractTela):
                         self.__subir_cursor()
                     elif event.key == pygame.K_DOWN:  # Descer
                         self.__descer_cursor()
+                    elif event.key == pygame.K_RIGHT:  # Direita
+                        self.__direita_cursor()
+                    elif event.key == pygame.K_LEFT:  # Esquerda
+                        self.__esquerda_cursor()
                     elif event.key == pygame.K_RETURN:  # Enter
                         self.__executar_comando()
 
@@ -46,19 +66,27 @@ class TelaOpcoes(AbstractTela):
         fundo = pygame.transform.scale(fundo, self.__tela.tamanho)
         self.__tela.janela.blit(fundo, (0, 0))
 
+        self.__desenhar_elementos()
+
+    def __update(self):
+        botao_musica = self.__botoes[3]
+        status = 'On' if self.__opcoes.tocar_musica else 'Off'
+        botao_musica.mudar_texto(f'Música: {status}')
+
+    def __desenhar_elementos(self) -> None:
         for botao in self.__botoes:
-            tecla = pygame.image.load(botao.imagem)
-            self.__tela.janela.blit(tecla, botao.posicao)
+            botao.desenhar(self.__tela)
 
-        self.__desenhar_cursor()
+        for texto in self.__textos:
+            texto.desenhar(self.__tela)
 
-    def __desenhar_cursor(self):
         botao_selecionado = self.__botoes[self.__pos_cursor]
-        x_cursor = botao_selecionado.posicao[0] - 100
-        y_cursor = botao_selecionado.posicao[1]
+        pos_x = botao_selecionado.hitbox.posicao[0] - X_OFFSET
+        pos_y = botao_selecionado.hitbox.posicao[1]
+        nova_posicao = (pos_x, pos_y)
 
-        seta = pygame.image.load(self.__cursor.imagem)
-        self.__tela.janela.blit(seta, (x_cursor, y_cursor))
+        self.__cursor.hitbox.posicao = nova_posicao
+        self.__cursor.desenhar(self.__tela)
 
     def __executar_comando(self):
         botao_escolhido = self.__botoes[self.__pos_cursor]
@@ -70,16 +98,23 @@ class TelaOpcoes(AbstractTela):
         funcSetDificil = self.__comandos[ComandosEnum.SET_DIFICULDADE_DIFICIL]
         funcToggleMusica = self.__comandos[ComandosEnum.TOGGLE_MUSICA]
         funcVoltar = self.__comandos[ComandosEnum.VOLTAR]
-        self.__botoes.append(Botao((487, 300), (230, 55), 'imagens/dificuldade.png', funcSetFacil))
-        self.__botoes.append(Botao((587, 300), (230, 55), 'imagens/dificuldade.png', funcSetMedio))
-        self.__botoes.append(
-            Botao((687, 300), (230, 55), 'imagens/dificuldade.png', funcSetDificil))
-        self.__botoes.append(
-            Botao((657, 300), (230, 55), 'imagens/dificuldade.png', funcToggleMusica))
-        self.__botoes.append(Botao((837, 360), (133, 55), 'imagens/voltar.png', funcVoltar))
+
+        status = 'On' if self.__opcoes.tocar_musica else 'Off'
+
+        self.__botoes.append(Botao(POS_BOTOES[0], TAM_BOTAO, 'Fácil', funcSetFacil))
+        self.__botoes.append(Botao(POS_BOTOES[1], TAM_BOTAO, 'Médio', funcSetMedio))
+        self.__botoes.append(Botao(POS_BOTOES[2], TAM_BOTAO, 'Difícil', funcSetDificil))
+        self.__botoes.append(Botao(POS_BOTOES[3], TAM_BOTAO, f'Música: {status}', funcToggleMusica))
+        self.__botoes.append(Botao(POS_BOTOES[4], TAM_BOTAO, 'Voltar', funcVoltar))
+
+    def __criar_textos(self):
+        branco = (255, 255, 255)
+        preto = (0, 0, 0)
+        self.__textos.append(Texto(POS_TITULO, TAM_TITULO, 'The Binding of Isaac', 60, branco))
+        self.__textos.append(Texto(POS_DIFICULDADE, TAM_DIFICULDADE, 'Dificuldade: ', 30, preto))
 
     def __criar_cursor(self):
-        self.__cursor = Imagem((), (80, 37), 'imagens/seta.png')
+        self.__cursor = Imagem(POS_BOTOES[0], (50, 40), 'imagens/seta.png')
         self.__pos_cursor = 0
 
     def __subir_cursor(self):
@@ -93,3 +128,9 @@ class TelaOpcoes(AbstractTela):
             self.__pos_cursor = 0
         else:
             self.__pos_cursor += 1
+
+    def __direita_cursor(self):
+        pass
+
+    def __esquerda_cursor(self):
+        pass

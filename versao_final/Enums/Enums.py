@@ -4,11 +4,17 @@ from enum import Enum
 class ComandosEnum(Enum):
     SAIR = 1
     VOLTAR = 2
-    JOGAR = 3
-    VER_DIFICULDADE = 4
-    VER_OPCOES = 5
-    VER_MENU = 6
-    NAVEGAR = 7
+    LOAD_GAME = 3
+    NEW_GAME = 4
+    TELA_OPCOES = 5
+    TELA_SAVES = 6
+    TELA_NEW_GAME = 7
+    TELA_MENU = 8
+    TELA_JOGAR = 9
+    SET_DIFICULDADE_FACIL = 10
+    SET_DIFICULDADE_MEDIO = 11
+    SET_DIFICULDADE_DIFICIL = 12
+    TOGGLE_MUSICA = 13
 
 
 class Dificuldade(Enum):

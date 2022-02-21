@@ -2,14 +2,15 @@ from abc import ABC, abstractmethod
 from Enums.Enums import Dificuldade
 from Personagens.Jogador.Jogador import Jogador
 from Views.TelaJogo import TelaJogo
-from Views.Opcoes import Opcoes
+from Config.Opcoes import Opcoes
 from Abstractions.AbstractTerreno import AbstractTerreno
 
 
 class AbstractFase(ABC):
-    def __init__(self, jogador, opcoes: Opcoes) -> None:
+    def __init__(self, jogador) -> None:
         self.__jogador = jogador
-        self.__dificuldade = opcoes.dificuldade
+        self.__opcoes = Opcoes()
+        self.__dificuldade = self.__opcoes.dificuldade
         self.__terreno = None
 
     def is_player_dead(self) -> bool:

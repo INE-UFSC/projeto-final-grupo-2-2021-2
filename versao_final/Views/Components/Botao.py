@@ -11,7 +11,7 @@ class Botao(Imagem):
         self.__font = pygame.font.SysFont('cambria', 27)
         self.__color = (0, 0, 0)
 
-        self.__text = self.__font.render(self.__input_text, True, self.__color)
+        self.__renderizar_texto()
         self.__text_rect = self.__text.get_rect(center=self.hitbox.posicao)
         self.__function = function
 
@@ -21,3 +21,11 @@ class Botao(Imagem):
 
     def execute(self):
         self.__function()
+
+    def mudar_texto(self, texto):
+        if type(texto) == str:
+            self.__input_text = texto
+            self.__renderizar_texto()
+
+    def __renderizar_texto(self):
+        self.__text = self.__font.render(self.__input_text, True, self.__color)

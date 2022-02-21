@@ -80,7 +80,8 @@ class MenuPrincipal(AbstractTela):
         botao_selecionado.execute()
 
     def __criar_textos(self):
-        self.__textos.append(Texto(POS_TEXTO[0], TAM_TEXTO, 'The Binding of Isaac'))
+        branco = (255, 255, 255)
+        self.__textos.append(Texto(POS_TEXTO[0], TAM_TEXTO, 'The Binding of Isaac', 60, branco))
 
     def __criar_botoes(self):
         funcTelaJogar = self.__comandos[ComandosEnum.TELA_JOGAR]
