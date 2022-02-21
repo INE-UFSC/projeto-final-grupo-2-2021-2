@@ -1,92 +1,100 @@
-import pygame
-from Views.Botao import Botao
+from typing import List
+from Views.Components.Botao import Botao
+from Views.Components.Imagem import Imagem
+from Views.Components.Texto import Texto
 from Enums.Enums import ComandosEnum
+from Abstractions.AbstractTela import AbstractTela
 from Views.TelaJogo import TelaJogo
+import pygame
+
+X_OFFSET = 100
+POS_TEXTO = [(550, 50)]
+POS_BOTOES = [(550, 300), (550, 370), (550, 440)]
+TAM_BOTAO = (150, 50)
+TAM_TEXTO = (400, 100)
 
 
-class MenuPrincipal():
-    def __init__(self, botoes: list = []):
-        self.__botoes = botoes
+class MenuPrincipal(AbstractTela):
+    def __init__(self, comandos: dict):
+        self.__comandos = comandos
+        self.__tela = TelaJogo()
+        self.__sprite_fundo = 'imagens/FundoFloresta.png'
 
-        self.__sprite_fundo = 'imagens/Menu_principal.png'
-        botao1 = Botao((487, 300), (163, 55), 'imagens/jogar.png', ComandosEnum.JOGAR)
-        botao2 = Botao((487, 360), (163, 55), 'imagens/opcoes.png', ComandosEnum.VER_OPCOES)
-        botao3 = Botao((487, 420), (163, 55), 'imagens/sair.png', ComandosEnum.SAIR)
-        self.__cursor = Botao((), (80, 37), 'imagens/seta.png', ComandosEnum.NAVEGAR)
-        self.__botoes.append(botao1)
-        self.__botoes.append(botao2)
-        self.__botoes.append(botao3)
-        self.__pos_cursor = 0
+        self.__MENU_FPS = 40
 
-    @property
-    def botoes(self) -> list:
-        return self.__botoes
+        self.__botoes: List[Botao] = []
+        self.__textos: List[Texto] = []
+        self.__cursor: Imagem = None
+        self.__criar_botoes()
+        self.__criar_textos()
+        self.__criar_cursor()
 
-    @botoes.setter
-    def botoes(self, botoes: list) -> None:
-        if type(botoes) == list:
-            self.__botoes = botoes
+    def run(self):
+        clock = pygame.time.Clock()
 
-    @property
-    def cursor(self):
-        return self.__cursor
+        menu_loop = True
+        while menu_loop:
+            clock.tick(self.__MENU_FPS)
+            self.__desenhar()
 
-    @cursor.setter
-    def cursor(self, cursor) -> None:
-        self.__cursor = cursor
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
 
-    @property
-    def pos_cursor(self):
-        return self.__pos_cursor
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:  # Subir
+                        self.__subir_cursor()
+                    elif event.key == pygame.K_DOWN:  # Descer
+                        self.__descer_cursor()
+                    elif event.key == pygame.K_RETURN:  # Enter
+                        self.__executar_comando()
 
-    @pos_cursor.setter
-    def pos_cursor(self, pos_cursor):
-        self.__pos_cursor = pos_cursor
+                pygame.display.update()
 
-    @property
-    def sprite_fundo(self) -> str:
-        return self.__sprite_fundo
+    def __desenhar(self) -> None:
+        fundo = pygame.image.load(self.__sprite_fundo)
+        fundo = pygame.transform.scale(fundo, self.__tela.tamanho)
+        self.__tela.janela.blit(fundo, (0, 0))
 
-    @sprite_fundo.setter
-    def sprite_fundo(self, fundo) -> None:
-        if type(fundo) == str:
-            self.__sprite_fundo = fundo
+        self.__desenhar_elementos()
 
-    def desenhar(self, tela: TelaJogo) -> None:
-        fundo_menu = pygame.image.load(self.sprite_fundo)
-        tela.janela.blit(fundo_menu, (0, 0))
-
+    def __desenhar_elementos(self):
         for botao in self.__botoes:
-            imagem = botao.imagem
-            tecla = pygame.image.load(imagem)
-            posicao = botao.posicao
-            tela.janela.blit(tecla, posicao)
+            botao.desenhar(self.__tela)
 
-        self.__desenhar_cursor(tela)
+        for texto in self.__textos:
+            texto.desenhar(self.__tela)
 
-    def __desenhar_cursor(self, tela: TelaJogo) -> None:
+        botao_atual = self.__botoes[self.__pos_cursor]
+        posicao_y = botao_atual.hitbox.y
+        posicao_x = botao_atual.hitbox.x - X_OFFSET
+
+        nova_posicao = (posicao_x, posicao_y)
+
+        self.__cursor.hitbox.posicao = nova_posicao
+        self.__cursor.desenhar(self.__tela)
+
+    def __executar_comando(self):
         botao_selecionado = self.__botoes[self.__pos_cursor]
-        x_cursor = botao_selecionado.posicao[0] - 100
-        y_cursor = botao_selecionado.posicao[1]
+        botao_selecionado.execute()
 
-        seta = pygame.image.load(self.cursor.imagem)
-        tela.janela.blit(seta, (x_cursor, y_cursor))
+    def __criar_textos(self):
+        self.__textos.append(Texto(POS_TEXTO[0], TAM_TEXTO, 'The Binding of Isaac'))
 
-    def get_comando(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+    def __criar_botoes(self):
+        funcTelaJogar = self.__comandos[ComandosEnum.TELA_JOGAR]
+        funcTelaOpcoes = self.__comandos[ComandosEnum.TELA_OPCOES]
+        funcSair = self.__comandos[ComandosEnum.SAIR]
+        print(POS_BOTOES)
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:  # Subir
-                    self.__subir_cursor()
-                elif event.key == pygame.K_DOWN:  # Descer
-                    self.__descer_cursor()
-                elif event.key == pygame.K_RETURN:  # Enter
-                    return self.__determinar_comando()
+        self.__botoes.append(Botao(POS_BOTOES[0], TAM_BOTAO, 'Jogar', funcTelaJogar))
+        self.__botoes.append(Botao(POS_BOTOES[1], TAM_BOTAO, 'Opções', funcTelaOpcoes))
+        self.__botoes.append(Botao(POS_BOTOES[2], TAM_BOTAO, 'Sair', funcSair))
 
-            pygame.display.update()
+    def __criar_cursor(self):
+        self.__cursor = Imagem(POS_BOTOES[0], (50, 40), 'imagens/seta.png')
+        self.__pos_cursor = 0
 
     def __subir_cursor(self):
         if self.__pos_cursor <= 0:
@@ -99,7 +107,3 @@ class MenuPrincipal():
             self.__pos_cursor = 0
         else:
             self.__pos_cursor += 1
-
-    def __determinar_comando(self):
-        botao_selecionado = self.__botoes[self.__pos_cursor]
-        return botao_selecionado.comando

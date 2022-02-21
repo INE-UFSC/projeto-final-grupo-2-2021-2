@@ -1,7 +1,7 @@
 import pygame
 from Config.Config import TAMANHO_TELA
 
-BACKGROUND_PATH = 'imagens/capa.png'
+BACKGROUND_PATH = 'imagens/FundoFloresta.png'
 GAME_TITLE = 'The Binding of Isaac'
 
 
@@ -29,4 +29,4 @@ class TelaJogo():
         return self.__janela
 
     def mostrar_fundo(self) -> None:
-        return self.janela.blit(self.__plano_fundo, (0, 0))
+        return self.__janela.blit(self.__plano_fundo, (0, 0))
