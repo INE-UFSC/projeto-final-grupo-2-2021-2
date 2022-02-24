@@ -69,24 +69,24 @@ class Jogador(AbstractPersonagem):
         for item in self.__itens:
             pass
 
-    def __atualizar_frente(self, esquerda, direita, cima, baixo):
-        if esquerda:
-            if cima:
+    def __atualizar_frente(self, x_movement, y_movement):
+        if x_movement < 0:
+            if y_movement < 0:
                 self.__direction = Direction.ESQUERDA_CIMA
-            elif baixo:
+            elif y_movement > 0:
                 self.__direction = Direction.ESQUERDA_BAIXO
             else:
                 self.__direction = Direction.ESQUERDA_MEIO
-        elif direita:
-            if cima:
+        elif x_movement > 0:
+            if y_movement < 0:
                 self.__direction = Direction.DIREITA_CIMA
-            elif baixo:
+            elif y_movement > 0:
                 self.__direction = Direction.DIREITA_BAIXO
             else:
                 self.__direction = Direction.DIREITA_MEIO
-        elif baixo:
+        elif y_movement > 0:
             self.__direction = Direction.MEIO_BAIXO
-        elif cima:
+        elif y_movement < 0:
             self.__direction = Direction.MEIO_CIMA
 
     def __mover(self, keys):
@@ -94,16 +94,6 @@ class Jogador(AbstractPersonagem):
         tentar_cima = keys[pygame.K_w]
         tentar_direita = keys[pygame.K_d]
         tentar_baixo = keys[pygame.K_s]
-
-        self.__atualizar_frente(esquerda=tentar_esquerda,
-                                direita=tentar_direita,
-                                cima=tentar_cima,
-                                baixo=tentar_baixo)
-
-        self._atualizar_sprite(esquerda=tentar_esquerda,
-                               direita=tentar_direita,
-                               cima=tentar_cima,
-                               baixo=tentar_baixo)
 
         # Desativa movimento horizontal caso tente ir para ambos lados
         if tentar_esquerda and tentar_direita:
@@ -115,32 +105,29 @@ class Jogador(AbstractPersonagem):
             tentar_baixo = False
 
         if tentar_esquerda:
-            novo_x = self.hitbox.x - self.vel
-            nova_posicao = (novo_x, self.hitbox.y)
-
-            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
-                self.hitbox.posicao = nova_posicao
-
-        if tentar_direita:
-            novo_x = self.hitbox.x + self.vel
-            nova_posicao = (novo_x, self.hitbox.y)
-
-            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
-                self.hitbox.posicao = nova_posicao
+            x_movement = - self.vel
+        elif tentar_direita:
+            x_movement = self.vel
+        else:
+            x_movement = 0
 
         if tentar_cima:
-            novo_y = self.hitbox.y - self.vel
-            nova_posicao = (self.hitbox.x, novo_y)
+            y_movement = - self.vel
+        elif tentar_baixo:
+            y_movement = self.vel
+        else:
+            y_movement = 0
 
-            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
-                self.hitbox.posicao = nova_posicao
+        nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
+        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
+            self.hitbox.posicao = nova_posicao_x
 
-        if tentar_baixo:
-            novo_y = self.hitbox.y + self.vel
-            nova_posicao = (self.hitbox.x, novo_y)
+        nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
+        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
+            self.hitbox.posicao = nova_posicao_y
 
-            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
-                self.hitbox.posicao = nova_posicao
+        self.__atualizar_frente(x_movement, y_movement)
+        self._atualizar_sprite(x_movement, y_movement)
 
     def __posicao_frente(self):
         rect = pygame.Rect(self.hitbox.posicao, self.hitbox.tamanho)

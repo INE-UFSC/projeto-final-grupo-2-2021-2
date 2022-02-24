@@ -35,14 +35,14 @@ class AbstractPersonagem(ABC):
         else:
             return 0
 
-    def _atualizar_sprite(self, esquerda, direita, cima, baixo):
-        if cima:
+    def _atualizar_sprite(self, x_movement, y_movement):
+        if y_movement < 0:
             self.sprite_path = self._sprite_cima
-        elif direita:
+        elif x_movement > 0:
             self.sprite_path = self._sprite_direita
-        elif esquerda:
+        elif x_movement < 0:
             self.sprite_path = self._sprite_esquerda
-        elif baixo:
+        elif y_movement > 0:
             self.sprite_path = self._sprite_baixo
 
     def update(self):

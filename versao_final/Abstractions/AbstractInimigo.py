@@ -15,87 +15,54 @@ class AbstractInimigo(AbstractPersonagem, ABC):
 
         super().__init__(stats, posicao, tamanho, terreno, sprite_paths)
 
-    def update(self, hit_jogador: Hitbox):
+    def update_visao(self, hit_jogador: Hitbox) -> None:
         if self.__em_repouso:
             if self.__esta_vendo_jogador(hit_jogador):
                 self.__em_repouso = False
-        super().update()
 
     def mover(self, hit_jogador: Hitbox) -> None:
         if self.__em_repouso:
             return None
 
-        if self.__destino != None:
-            self.__mover_destino()
-            return
+        if self.__destino is None:
+            self.__destino = self.terreno.get_destino(self.hitbox.posicao, hit_jogador.posicao)
+
+        if self.__destino is None:
+            rect_jogador = pygame.Rect(hit_jogador.posicao, hit_jogador.tamanho)
+            center_jogador = rect_jogador.center
+
+            self.__dumb_movement(hit_jogador)
         else:
-            destino = self.terreno.get_destino(self.hitbox.posicao, hit_jogador.posicao)
-            if destino != None:
-                self.__destino = destino
-                self.__mover_destino()
-                return
+            self.__mover_destino()
 
-        tentar_esquerda = False
-        tentar_direita = False
-        tentar_cima = False
-        tentar_baixo = False
-
+    def __dumb_movement(self, hit_jogador: Hitbox) -> None:
         rect_jogador = pygame.Rect(hit_jogador.posicao, hit_jogador.tamanho)
         center_jogador = rect_jogador.center
 
         if center_jogador[0] > self.hitbox.x:
-            novo_x = self.hitbox.x + self.vel
-            tentar_direita = True
-        else:
-            novo_x = self.hitbox.x - self.vel
-            tentar_esquerda = True
-
-        nova_posicao = (novo_x, self.hitbox.y)
-
-        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
-            self.hitbox.posicao = nova_posicao
-
-        if center_jogador[1] > self.hitbox.y:
-            novo_y = self.hitbox.y + self.vel
-            tentar_baixo = True
-        else:
-            novo_y = self.hitbox.y - self.vel
-            tentar_cima = True
-
-        nova_posicao = (self.hitbox.x, novo_y)
-        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao):
-            self.hitbox.posicao = nova_posicao
-
-        self._atualizar_sprite(esquerda=tentar_esquerda,
-                               direita=tentar_direita,
-                               cima=tentar_cima,
-                               baixo=tentar_baixo)
-
-        self.__atualizar_frente(esquerda=tentar_esquerda,
-                                direita=tentar_direita,
-                                cima=tentar_cima,
-                                baixo=tentar_baixo)
-
-    def __mover_destino(self):
-        if self.__destino[0] > self.hitbox.x:
             x_movement = self.vel
-        elif self.__destino[0] < self.hitbox.x:
-            x_movement = -self.vel
+        elif center_jogador[0] < self.hitbox.x:
+            x_movement = - self.vel
         else:
             x_movement = 0
 
-        if self.__destino[1] > self.hitbox.y:
+        if center_jogador[1] > self.hitbox.y:
             y_movement = self.vel
-        elif self.__destino[1] < self.hitbox.y:
-            y_movement = -self.vel
+        elif center_jogador[1] < self.hitbox.y:
+            y_movement = - self.vel
         else:
             y_movement = 0
 
-        nova_posicao = (self.hitbox.x + x_movement, self.hitbox.y + y_movement)
-        self.hitbox.posicao = nova_posicao
+        nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
+        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
+            self.hitbox.posicao = nova_posicao_x
 
-        if self.__destino == self.hitbox.posicao:
-            self.__destino = None
+        nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
+        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
+            self.hitbox.posicao = nova_posicao_y
+
+        self._atualizar_sprite(x_movement, y_movement)
+        self.__atualizar_frente(x_movement, y_movement)
 
     def verificar_ataque(self, hit_jogador: Hitbox):
         distancia = self.__calcular_distancia(hit_jogador)
@@ -129,24 +96,48 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         else:
             return False
 
-    def __atualizar_frente(self, esquerda, direita, cima, baixo):
-        if esquerda:
-            if cima:
+    def __mover_destino(self):
+        if self.__destino[0] > self.hitbox.x:
+            x_movement = self.vel
+        elif self.__destino[0] < self.hitbox.x:
+            x_movement = -self.vel
+        else:
+            x_movement = 0
+
+        if self.__destino[1] > self.hitbox.y:
+            y_movement = self.vel
+        elif self.__destino[1] < self.hitbox.y:
+            y_movement = -self.vel
+        else:
+            y_movement = 0
+
+        nova_posicao = (self.hitbox.x + x_movement, self.hitbox.y + y_movement)
+        self.hitbox.posicao = nova_posicao
+
+        if self.__destino == self.hitbox.posicao:
+            self.__destino = None
+
+        self._atualizar_sprite(x_movement, y_movement)
+        self.__atualizar_frente(x_movement, y_movement)
+
+    def __atualizar_frente(self, x_movement, y_movement):
+        if x_movement < 0:
+            if y_movement < 0:
                 self.__direction = Direction.ESQUERDA_CIMA
-            elif baixo:
+            elif y_movement > 0:
                 self.__direction = Direction.ESQUERDA_BAIXO
             else:
                 self.__direction = Direction.ESQUERDA_MEIO
-        elif direita:
-            if cima:
+        elif x_movement > 0:
+            if y_movement < 0:
                 self.__direction = Direction.DIREITA_CIMA
-            elif baixo:
+            elif y_movement > 0:
                 self.__direction = Direction.DIREITA_BAIXO
             else:
                 self.__direction = Direction.DIREITA_MEIO
-        elif baixo:
+        elif y_movement > 0:
             self.__direction = Direction.MEIO_BAIXO
-        elif cima:
+        elif y_movement < 0:
             self.__direction = Direction.MEIO_CIMA
 
     def __calcular_distancia(self, outro_hitbox: Hitbox):

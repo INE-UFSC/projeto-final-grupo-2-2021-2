@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 from Utils.Hitbox import Hitbox
 from Obstaculos.Buraco import Buraco
 from Obstaculos.Parede import Parede
@@ -8,11 +9,12 @@ from Config.TelaJogo import TelaJogo
 from Abstractions.AbstractPersonagem import AbstractPersonagem
 from Utils.Movement import AStar, gerar_equação_vetorial_reta
 import pygame
+import time
 
 
 class AbstractTerreno(ABC):
     def __init__(self, inimigos: list, itens, jogador, sprite_path: str):
-        self.__inimigos = inimigos
+        self.__inimigos: List[AbstractPersonagem] = inimigos
         self.__obstaculos = []
         self.__itens = itens
         self.__matrix = []
@@ -24,7 +26,7 @@ class AbstractTerreno(ABC):
 
     def _setup_mapa(self, matriz_terreno: list) -> None:
         self.__matrix = matriz_terreno
-        self.__AStar = AStar(self.__matrix, valid_points=[' ', 'J'])
+        self.__AStar = AStar(self.__matrix, empty_points=[' ', 'J'])
 
         for index_row, row in enumerate(matriz_terreno):
             for index_column, cell in enumerate(row):
@@ -123,7 +125,7 @@ class AbstractTerreno(ABC):
             ponto = equação_vetorial(x)
             ponto = self.__inverter_ponto(ponto)
 
-            if self.__validate_ponto(ponto):
+            if not self.__validate_ponto(ponto):
                 return False
 
             x += step
@@ -144,7 +146,29 @@ class AbstractTerreno(ABC):
 
         return None
 
-    def executar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
+    def mover_inimigos(self) -> None:
+        for inimigo in self.inimigos:
+            inimigo.mover(self.__jogador.hitbox)
+
+    def update(self):
+        self.__jogador.update()
+        for inimigo in self.__inimigos:
+            inimigo.update()
+            inimigo.update_visao(self.__jogador.hitbox)
+
+    def lidar_ataques(self, tela: TelaJogo) -> None:
+        if self.__jogador.verificar_ataque():
+            self.__executar_ataque(tela, self.__jogador)
+
+        for inimigo in self.__inimigos:
+            if inimigo.verificar_ataque(self.__jogador.hitbox):
+                if inimigo.atacar():
+                    self.__executar_ataque_inimigo(tela, inimigo)
+
+    def load_inimigos(self, inimigos: list) -> None:
+        self.inimigos.extend(inimigos)
+
+    def __executar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
         self.__desenhar_ataque(tela, personagem)
 
         rect_arma = personagem.get_rect_arma()
@@ -158,7 +182,7 @@ class AbstractTerreno(ABC):
                 if inimigo.vida < 1:
                     self.__remover_inimigo(inimigo)
 
-    def executar_ataque_inimigo(self, tela: TelaJogo, personagem: AbstractPersonagem):
+    def __executar_ataque_inimigo(self, tela: TelaJogo, personagem: AbstractPersonagem):
         self.__desenhar_ataque(tela, personagem)
 
         rect_arma = personagem.get_rect_arma()
@@ -167,13 +191,6 @@ class AbstractTerreno(ABC):
         if rect_arma.colliderect(rect_jogador):
             dano = personagem.dano
             dano_causado = self.jogador.tomar_dano(dano)
-
-    def mover_inimigos(self) -> None:
-        for inimigo in self.inimigos:
-            inimigo.mover()
-
-    def load_inimigos(self, inimigos: list) -> None:
-        self.inimigos.extend(inimigos)
 
     def __remover_inimigo(self, inimigo):
         self.inimigos.remove(inimigo)
@@ -201,7 +218,14 @@ class AbstractTerreno(ABC):
         return (ponto[1], ponto[0])
 
     def __validate_ponto(self, ponto: tuple) -> bool:
-        cell = self.__matrix[ponto[0]][ponto[1]]
+        x = int(ponto[0])
+        y = int(ponto[1])
+        try:
+            cell = self.__matrix[x][y]
+        except IndexError:
+            print(f'Acesso indevido a matriz em [{x}][{y}]')
+            return False
+
         if cell != ' ' and cell != 'J':
             return False
         else:

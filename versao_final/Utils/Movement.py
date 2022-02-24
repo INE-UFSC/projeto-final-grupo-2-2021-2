@@ -138,7 +138,7 @@ class Node:
             else:
                 return self.f > x.f
         else:
-            print('Invalid Type')
+            print(f'Invalid Type GT: {type(self)}-{type(x)}')
             return False
 
     def __lt__(self, x) -> bool:
@@ -148,7 +148,7 @@ class Node:
             else:
                 return self.f < x.f
         else:
-            print('Invalid Type')
+            print(f'Invalid Type LT: {type(self)}-{type(x)}')
             return False
 
     def __le__(self, x) -> bool:
@@ -158,7 +158,7 @@ class Node:
             else:
                 return self.f <= x.f
         else:
-            print('Invalid Type')
+            print(f'Invalid Type LE: {type(self)}-{type(x)}')
             return False
 
     def __ge__(self, x) -> bool:
@@ -168,21 +168,25 @@ class Node:
             else:
                 return self.f >= x.f
         else:
-            print('Invalid Type')
+            print(f'Invalid Type GE: {type(self)}-{type(x)}')
             return False
 
     def __eq__(self, x) -> bool:
         if type(x) == type(self):
             return self.position == x.position
+        elif type(x) == tuple:
+            return self.position == x
+        elif x is None:
+            return False
         else:
-            print('Invalid Type')
+            print(f'Invalid Type EQ: {type(self)}-{type(x)}')
             return False
 
     def __ne__(self, x) -> bool:
         if type(x) == type(self):
             return self.position != x.position
         else:
-            print('Invalid Type')
+            print(f'Invalid Type NE: {type(self)}-{type(x)}')
             return False
 
 
