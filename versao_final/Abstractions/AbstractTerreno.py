@@ -6,7 +6,7 @@ from Personagens.Jogador.Jogador import Jogador
 from Config.Opcoes import Opcoes
 from Config.TelaJogo import TelaJogo
 from Abstractions.AbstractPersonagem import AbstractPersonagem
-from Utils.Movement import gerar_equação_vetorial_reta
+from Utils.Movement import AStar, gerar_equação_vetorial_reta
 import pygame
 
 
@@ -24,6 +24,7 @@ class AbstractTerreno(ABC):
 
     def _setup_mapa(self, matriz_terreno: list) -> None:
         self.__matrix = matriz_terreno
+        self.__AStar = AStar(self.__matrix, valid_points=[' ', 'J'])
 
         for index_row, row in enumerate(matriz_terreno):
             for index_column, cell in enumerate(row):
@@ -177,6 +178,35 @@ class AbstractTerreno(ABC):
             x += step
 
         return True
+
+    def get_destino(self, p1: tuple, p2: tuple) -> list:
+        p1 = self.__reduzir_ponto(p1)
+        p2 = self.__reduzir_ponto(p2)
+
+        # Inverto os pontos para adaptar a grid do pygame para o AStar
+        p1 = (p1[1], p1[0])
+        p2 = (p2[1], p2[0])
+
+        caminho = self.__AStar.search_path(p1, p2, False)
+        if len(caminho) > 0:
+            ponto_destino = caminho[0]
+            # Inverte o ponto para a grid do pygame
+            ponto_destino = (ponto_destino[1], ponto_destino[0])
+            ponto_destino = self.__aumentar_ponto(ponto_destino)
+            return ponto_destino
+        return None
+
+    def __reduzir_ponto(self, ponto: tuple) -> tuple:
+        x = ponto[0] // self.__opcoes.MENOR_UNIDADE
+        y = ponto[1] // self.__opcoes.MENOR_UNIDADE
+
+        return (x, y)
+
+    def __aumentar_ponto(self, ponto: tuple) -> tuple:
+        x = ponto[0] * self.__opcoes.MENOR_UNIDADE
+        y = ponto[1] * self.__opcoes.MENOR_UNIDADE
+
+        return (x, y)
 
     @property
     def jogador(self) -> Jogador:

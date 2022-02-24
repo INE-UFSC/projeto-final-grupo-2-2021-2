@@ -10,6 +10,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: AbstractTerreno, sprite_paths) -> None:
         self.__direction = Direction.MEIO_BAIXO
         self.__em_repouso = True
+        self.__destino = None
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 15
 
         super().__init__(stats, posicao, tamanho, terreno, sprite_paths)
@@ -23,6 +24,16 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def mover(self, hit_jogador: Hitbox) -> None:
         if self.__em_repouso:
             return None
+
+        if self.__destino != None:
+            self.__mover_destino()
+            return
+        else:
+            destino = self.terreno.get_destino(self.hitbox.posicao, hit_jogador.posicao)
+            if destino != None:
+                self.__destino = destino
+                self.__mover_destino()
+                return
 
         tentar_esquerda = False
         tentar_direita = False
@@ -64,6 +75,27 @@ class AbstractInimigo(AbstractPersonagem, ABC):
                                 direita=tentar_direita,
                                 cima=tentar_cima,
                                 baixo=tentar_baixo)
+
+    def __mover_destino(self):
+        if self.__destino[0] > self.hitbox.x:
+            x_movement = self.vel
+        elif self.__destino[0] < self.hitbox.x:
+            x_movement = -self.vel
+        else:
+            x_movement = 0
+
+        if self.__destino[1] > self.hitbox.y:
+            y_movement = self.vel
+        elif self.__destino[1] < self.hitbox.y:
+            y_movement = -self.vel
+        else:
+            y_movement = 0
+
+        nova_posicao = (self.hitbox.x + x_movement, self.hitbox.y + y_movement)
+        self.hitbox.posicao = nova_posicao
+
+        if self.__destino == self.hitbox.posicao:
+            self.__destino = None
 
     def verificar_ataque(self, hit_jogador: Hitbox):
         distancia = self.__calcular_distancia(hit_jogador)
