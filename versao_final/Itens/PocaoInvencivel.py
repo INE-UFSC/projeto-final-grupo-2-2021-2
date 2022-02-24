@@ -1,6 +1,6 @@
 from Abstractions.AbstractItem import AbstractItem
 from Personagens.Status import Status
-
+import pygame
 
 class PocaoInvencivel(AbstractItem):
     def __init__(self) -> None:
@@ -8,6 +8,27 @@ class PocaoInvencivel(AbstractItem):
         self.__pronto = False
         self.__aplicado = False
         self.__BUFF_TIMER = 80
+        self.__imagem = pygame.image.load('imagens/pocao.png')
+        self.__posicao = ()
+    
+    @property
+    def imagem(self):
+        return self.__imagem
+    
+    @imagem.setter
+    def imagem(self, imagem):
+        self.__imagem = imagem
+    
+    @property
+    def posicao(self):
+        return self.__posicao
+    
+    @posicao.setter
+    def posicao(self, posicao):
+        self.__posicao = posicao
+
+    def adicionar_status(self, status: Status) -> None:
+        pass
 
     def modificar_status(self, status: Status) -> None:
         if not self.__aplicado:

@@ -42,6 +42,7 @@ class AbstractFase(ABC):
 
         self.__jogador.update()
         self.__terreno.desenhar(tela, self.__jogador)
+        self.__terreno.dropar_item()
 
     @property
     def jogador(self) -> Jogador:
