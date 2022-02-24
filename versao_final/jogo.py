@@ -1,7 +1,7 @@
 import pygame
-from Controller.Jogo import Jogo
+from Controller.ControladorJogo import ControladorJogo
 
 pygame.init()
-jogo = Jogo()
+jogo = ControladorJogo()
 jogo.start()
 pygame.quit()

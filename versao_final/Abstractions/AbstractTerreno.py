@@ -3,9 +3,10 @@ from Utils.Hitbox import Hitbox
 from Obstaculos.Buraco import Buraco
 from Obstaculos.Parede import Parede
 from Personagens.Jogador.Jogador import Jogador
-from Config.Config import TAMANHO_TELA
-from Views.TelaJogo import TelaJogo
+from Config.Opcoes import Opcoes
+from Config.TelaJogo import TelaJogo
 from Abstractions.AbstractPersonagem import AbstractPersonagem
+from Utils.Movement import gerar_equação_vetorial_reta
 import pygame
 
 
@@ -14,41 +15,16 @@ class AbstractTerreno(ABC):
         self.__inimigos = inimigos
         self.__obstaculos = []
         self.__itens = itens
-        self.__hitbox = Hitbox(posicao=(0, 0), tamanho=TAMANHO_TELA)
+        self.__matrix = []
+
+        self.__opcoes = Opcoes()
+        self.__hitbox = Hitbox(posicao=(0, 0), tamanho=self.__opcoes.TAMANHO_TELA)
         self.__jogador = jogador
         self.__sprite_path = sprite_path
 
-    @property
-    def sprite_path(self) -> str:
-        return self.__sprite_path
-
-    @sprite_path.setter
-    def sprite_path(self, value) -> None:
-        if type(value) == str:
-            self.__sprite_path = value
-
-    @property
-    def jogador(self) -> Jogador:
-        """Retorna a instância do Jogador que está no Terreno"""
-        return self.__jogador
-
-    @property
-    def hitbox(self) -> Hitbox:
-        return self.__hitbox
-
-    @property
-    def itens(self):
-        return self.__itens
-
-    @property
-    def inimigos(self) -> list:
-        return self.__inimigos
-
-    @property
-    def obstaculos(self) -> list:
-        return self.__obstaculos
-
     def _setup_mapa(self, matriz_terreno: list) -> None:
+        self.__matrix = matriz_terreno
+
         for index_row, row in enumerate(matriz_terreno):
             for index_column, cell in enumerate(row):
                 if cell == 'B':  # Buraco
@@ -63,7 +39,7 @@ class AbstractTerreno(ABC):
         self.desenhar(tela, jogador)
 
     def desenhar(self, tela: TelaJogo, jogador) -> None:
-        mapa1 = pygame.image.load(self.sprite_path)
+        mapa1 = pygame.image.load(self.__sprite_path)
         tela.janela.blit(mapa1, (0, 127))
         for obstaculo in self.obstaculos:
             posicao = obstaculo.hitbox.posicao
@@ -177,6 +153,51 @@ class AbstractTerreno(ABC):
 
     def load_inimigos(self, inimigos: list) -> None:
         self.inimigos.extend(inimigos)
+
+    def is_line_of_sight_clear(self, p1, p2) -> bool:
+        x1 = p1[0] // self.__opcoes.MENOR_UNIDADE
+        y1 = p1[1] // self.__opcoes.MENOR_UNIDADE
+
+        x2 = p2[0] // self.__opcoes.MENOR_UNIDADE
+        y2 = p2[1] // self.__opcoes.MENOR_UNIDADE
+
+        func = gerar_equação_vetorial_reta((x1, y1), (x2, y2))
+
+        x = 0
+        step = 0.05
+        while x < 1:
+            ponto = func(x)
+
+            ponto = (int(ponto[0]), int(ponto[1]))
+
+            cell = self.__matrix[ponto[1]][ponto[0]]
+            if cell != ' ' and cell != 'J':
+                return False
+
+            x += step
+
+        return True
+
+    @property
+    def jogador(self) -> Jogador:
+        """Retorna a instância do Jogador que está no Terreno"""
+        return self.__jogador
+
+    @property
+    def hitbox(self) -> Hitbox:
+        return self.__hitbox
+
+    @property
+    def itens(self):
+        return self.__itens
+
+    @property
+    def inimigos(self) -> list:
+        return self.__inimigos
+
+    @property
+    def obstaculos(self) -> list:
+        return self.__obstaculos
 
     @abstractmethod
     def dropar_item():

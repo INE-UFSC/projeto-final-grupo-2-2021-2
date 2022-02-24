@@ -1,16 +1,16 @@
 from Personagens.Jogador.Jogador import Jogador
-from Views.Opcoes import Opcoes, Dificuldade
+from Config.Opcoes import Dificuldade
 from Terrenos.Terreno3 import Terreno3
 from Personagens.Inimigos.Inimigo3 import Inimigo3
 from Abstractions.AbstractFase import AbstractFase
 
 
 class Fase3(AbstractFase):
-    def __init__(self, jogador: Jogador, opcoes: Opcoes) -> None:
-        super().__init__(jogador, opcoes)
+    def __init__(self, jogador: Jogador) -> None:
+        super().__init__(jogador)
 
         self.__INIMIGO_POS = []
-        self.__determinar_inimigos(opcoes.dificuldade)
+        self.__determinar_inimigos(self.dificuldade)
 
     def load(self) -> None:
         self.terreno = Terreno3(inimigos=[], itens=[], jogador=self.jogador)
