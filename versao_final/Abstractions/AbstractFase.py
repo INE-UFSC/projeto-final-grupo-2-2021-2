@@ -38,7 +38,7 @@ class AbstractFase(ABC):
                 if inimigo.atacar():
                     self.__terreno.executar_ataque_inimigo(tela, inimigo)
 
-            inimigo.update()
+            inimigo.update(self.__jogador.hitbox)
 
         self.__jogador.update()
         self.__terreno.desenhar(tela, self.__jogador)

@@ -9,9 +9,21 @@ import pygame
 class AbstractInimigo(AbstractPersonagem, ABC):
     def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: AbstractTerreno, sprite_paths) -> None:
         self.__direction = Direction.MEIO_BAIXO
+        self.__em_repouso = True
+        self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 15
+
         super().__init__(stats, posicao, tamanho, terreno, sprite_paths)
 
+    def update(self, hit_jogador: Hitbox):
+        if self.__em_repouso:
+            if self.__esta_vendo_jogador(hit_jogador):
+                self.__em_repouso = False
+        super().update()
+
     def mover(self, hit_jogador: Hitbox) -> None:
+        if self.__em_repouso:
+            return None
+
         tentar_esquerda = False
         tentar_direita = False
         tentar_cima = False
@@ -70,6 +82,17 @@ class AbstractInimigo(AbstractPersonagem, ABC):
 
     def atacar(self):
         if self.arma.atacar():
+            return True
+        else:
+            return False
+
+    def __esta_vendo_jogador(self, hit_jogador: Hitbox) -> bool:
+        distancia = self.__calcular_distancia(hit_jogador)
+        if distancia > self.__view_distance:
+            return False
+
+        esta_vendo = self.terreno.is_line_of_sight_clear(self.hitbox.posicao, hit_jogador.posicao)
+        if esta_vendo:
             return True
         else:
             return False

@@ -1,19 +1,19 @@
 import pygame
-from Config.Config import TAMANHO_TELA
+from Config.Opcoes import Opcoes
 
 BACKGROUND_PATH = 'imagens/FundoFloresta.png'
-GAME_TITLE = 'The Binding of Isaac'
 
 
 class TelaJogo():
     def __init__(self) -> None:
-        self.__tamanho = TAMANHO_TELA
+        opcoes = Opcoes()
+        self.__tamanho = opcoes.TAMANHO_TELA
         self.__janela = pygame.display.set_mode(self.__tamanho)
 
         imagem_fundo = pygame.image.load(BACKGROUND_PATH)
         self.__plano_fundo = pygame.transform.scale(imagem_fundo, self.__tamanho)
 
-        pygame.display.set_caption(GAME_TITLE)
+        pygame.display.set_caption(opcoes.GAME_TITLE)
 
     @property
     def tamanho(self) -> int:

@@ -1,10 +1,12 @@
 from abc import ABC
 from Utils.Hitbox import Hitbox
-from Config.Config import MENOR_UNIDADE
+from Config.Opcoes import Opcoes
 
 
 class AbstractObstaculo(ABC):
     def __init__(self, posicao: tuple, sprite_path: str) -> None:
+        config = Opcoes()
+        MENOR_UNIDADE = config.MENOR_UNIDADE
         nova_position = (posicao[0]*MENOR_UNIDADE, posicao[1]*MENOR_UNIDADE)
         novo_tamanho = (MENOR_UNIDADE, MENOR_UNIDADE)
 

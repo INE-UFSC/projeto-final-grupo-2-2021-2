@@ -9,6 +9,9 @@ class Opcoes(Singleton):
             self.__dificuldade = Dificuldade.medio
             self.__nome = 'Tatakae'
             self.__tocar_musica = True
+            self.__menor_unidade = 32
+            self.__tamanho_tela = (1120, 768)
+            self.__GAME_TITLE = 'The Binding of Isaac'
 
     @property
     def tocar_musica(self) -> bool:
@@ -36,3 +39,15 @@ class Opcoes(Singleton):
     def nome(self, value) -> None:
         if type(value) == str:
             self.__nome = value
+
+    @property
+    def TAMANHO_TELA(self) -> tuple:
+        return self.__tamanho_tela
+
+    @property
+    def MENOR_UNIDADE(self) -> int:
+        return self.__menor_unidade
+
+    @property
+    def GAME_TITLE(self) -> str:
+        return self.__GAME_TITLE
