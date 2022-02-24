@@ -187,14 +187,14 @@ class Node:
 
 
 class AStar:
-    def __init__(self, matrix: list, valid_points: list) -> None:
+    def __init__(self, matrix: list, empty_points: list) -> None:
         self.__matrix = matrix
         self.__x = len(matrix)
         self.__y = len(matrix[0])
         self.__end = ()
         self.__open_list = MinHeap([])
         self.__closed_nodes = []
-        self.__valid_points = valid_points
+        self.__empty_points = empty_points
 
     def search_path(self, start_position: tuple, end_position: tuple, diagonal=False) -> list:
         if not self.__validate_positions([start_position, end_position]):
@@ -339,7 +339,7 @@ class AStar:
         if position[1] < 0 or position[1] > self.__y - 1:
             return False
 
-        if self.__matrix[position[0]][position[1]] not in self.__valid_points:
+        if self.__matrix[position[0]][position[1]] not in self.__empty_points:
             return False
 
         return True

@@ -57,10 +57,10 @@ class AbstractTerreno(ABC):
             pygame.draw.rect(tela.janela, color, rect)
 
             if inimigo.checar_atacando():
-                self.desenhar_ataque(tela, inimigo)
+                self.__desenhar_ataque(tela, inimigo)
 
         if jogador.checar_atacando():
-            self.desenhar_ataque(tela, jogador)
+            self.__desenhar_ataque(tela, jogador)
 
         tamanho = jogador.hitbox.tamanho
         posicao = jogador.hitbox.posicao
@@ -111,18 +111,41 @@ class AbstractTerreno(ABC):
 
         return True
 
-    def load_inimigos(self, inimigos: list) -> None:
-        self.__inimigos.append(inimigos)
+    def is_line_of_sight_clear(self, p1, p2) -> bool:
+        p1 = self.__reduzir_ponto(p1)
+        p2 = self.__reduzir_ponto(p2)
 
-    def desenhar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
-        rect_arma = personagem.get_rect_arma()
-        alcance = personagem.alcance
+        equação_vetorial = gerar_equação_vetorial_reta(p1, p2)
 
-        color = (255, 255, 255)
-        pygame.draw.circle(tela.janela, color, rect_arma.center, alcance)
+        x = 0.05
+        step = 0.05
+        while x < 1:
+            ponto = equação_vetorial(x)
+            ponto = self.__inverter_ponto(ponto)
+
+            if self.__validate_ponto(ponto):
+                return False
+
+            x += step
+        return True
+
+    def get_destino(self, p1: tuple, p2: tuple) -> list:
+        p1 = self.__reduzir_ponto(p1)
+        p2 = self.__reduzir_ponto(p2)
+        p1 = self.__inverter_ponto(p1)
+        p2 = self.__inverter_ponto(p2)
+
+        caminho = self.__AStar.search_path(p1, p2, False)
+        if len(caminho) > 0:
+            ponto_destino = caminho[0]
+            ponto_destino = self.__inverter_ponto(ponto_destino)
+            ponto_destino = self.__aumentar_ponto(ponto_destino)
+            return ponto_destino
+
+        return None
 
     def executar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
-        self.desenhar_ataque(tela, personagem)
+        self.__desenhar_ataque(tela, personagem)
 
         rect_arma = personagem.get_rect_arma()
         for inimigo in self.inimigos:
@@ -133,10 +156,10 @@ class AbstractTerreno(ABC):
                 dano_causado = inimigo.tomar_dano(dano)
 
                 if inimigo.vida < 1:
-                    self.remover_inimigo(inimigo)
+                    self.__remover_inimigo(inimigo)
 
     def executar_ataque_inimigo(self, tela: TelaJogo, personagem: AbstractPersonagem):
-        self.desenhar_ataque(tela, personagem)
+        self.__desenhar_ataque(tela, personagem)
 
         rect_arma = personagem.get_rect_arma()
         rect_jogador = pygame.Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
@@ -149,52 +172,18 @@ class AbstractTerreno(ABC):
         for inimigo in self.inimigos:
             inimigo.mover()
 
-    def remover_inimigo(self, inimigo):
-        self.inimigos.remove(inimigo)
-
     def load_inimigos(self, inimigos: list) -> None:
         self.inimigos.extend(inimigos)
 
-    def is_line_of_sight_clear(self, p1, p2) -> bool:
-        x1 = p1[0] // self.__opcoes.MENOR_UNIDADE
-        y1 = p1[1] // self.__opcoes.MENOR_UNIDADE
+    def __remover_inimigo(self, inimigo):
+        self.inimigos.remove(inimigo)
 
-        x2 = p2[0] // self.__opcoes.MENOR_UNIDADE
-        y2 = p2[1] // self.__opcoes.MENOR_UNIDADE
+    def __desenhar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
+        rect_arma = personagem.get_rect_arma()
+        alcance = personagem.alcance
 
-        func = gerar_equação_vetorial_reta((x1, y1), (x2, y2))
-
-        x = 0
-        step = 0.05
-        while x < 1:
-            ponto = func(x)
-
-            ponto = (int(ponto[0]), int(ponto[1]))
-
-            cell = self.__matrix[ponto[1]][ponto[0]]
-            if cell != ' ' and cell != 'J':
-                return False
-
-            x += step
-
-        return True
-
-    def get_destino(self, p1: tuple, p2: tuple) -> list:
-        p1 = self.__reduzir_ponto(p1)
-        p2 = self.__reduzir_ponto(p2)
-
-        # Inverto os pontos para adaptar a grid do pygame para o AStar
-        p1 = (p1[1], p1[0])
-        p2 = (p2[1], p2[0])
-
-        caminho = self.__AStar.search_path(p1, p2, False)
-        if len(caminho) > 0:
-            ponto_destino = caminho[0]
-            # Inverte o ponto para a grid do pygame
-            ponto_destino = (ponto_destino[1], ponto_destino[0])
-            ponto_destino = self.__aumentar_ponto(ponto_destino)
-            return ponto_destino
-        return None
+        color = (255, 255, 255)
+        pygame.draw.circle(tela.janela, color, rect_arma.center, alcance)
 
     def __reduzir_ponto(self, ponto: tuple) -> tuple:
         x = ponto[0] // self.__opcoes.MENOR_UNIDADE
@@ -207,6 +196,16 @@ class AbstractTerreno(ABC):
         y = ponto[1] * self.__opcoes.MENOR_UNIDADE
 
         return (x, y)
+
+    def __inverter_ponto(self, ponto: tuple) -> tuple:
+        return (ponto[1], ponto[0])
+
+    def __validate_ponto(self, ponto: tuple) -> bool:
+        cell = self.__matrix[ponto[0]][ponto[1]]
+        if cell != ' ' and cell != 'J':
+            return False
+        else:
+            return True
 
     @property
     def jogador(self) -> Jogador:
