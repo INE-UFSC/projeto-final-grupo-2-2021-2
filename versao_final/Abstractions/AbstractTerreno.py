@@ -11,6 +11,7 @@ from Abstractions.AbstractPersonagem import AbstractPersonagem
 from Utils.Movement import AStar, gerar_equação_vetorial_reta
 import pygame
 import time
+import random
 
 
 class AbstractTerreno(ABC):
@@ -146,20 +147,42 @@ class AbstractTerreno(ABC):
             x += step
         return True
 
-    def get_destino(self, p1: tuple, p2: tuple) -> list:
+    def get_path(self, p1: tuple, p2: tuple) -> list:
         p1 = self.__reduzir_ponto(p1)
         p2 = self.__reduzir_ponto(p2)
         p1 = self.__inverter_ponto(p1)
         p2 = self.__inverter_ponto(p2)
 
         caminho = self.__AStar.search_path(p1, p2, True)
-        if len(caminho) > 0:
-            ponto_destino = caminho[0]
-            ponto_destino = self.__inverter_ponto(ponto_destino)
-            ponto_destino = self.__aumentar_ponto(ponto_destino)
-            return ponto_destino
+        for index, ponto in enumerate(caminho):
+            ponto = self.__inverter_ponto(ponto)
+            ponto = self.__aumentar_ponto(ponto)
+            caminho[index] = ponto
 
-        return None
+        return caminho
+
+    def get_random_path(self, p1) -> list:
+        ponto_destino = self.__get_valid_reduced_point()
+        while True:
+            p1 = self.__reduzir_ponto(p1)
+            p1 = self.__inverter_ponto(p1)
+
+            caminho = self.__AStar.search_path(p1, ponto_destino, True)
+            if len(caminho) > 0:
+                for index, ponto in enumerate(caminho):
+                    ponto = self.__inverter_ponto(ponto)
+                    ponto = self.__aumentar_ponto(ponto)
+                    caminho[index] = ponto
+
+                return caminho
+
+    def __get_valid_reduced_point(self) -> tuple:
+        while True:
+            y = random.randint(1, len(self.__matrix[0]) - 1)
+            x = random.randint(6, len(self.__matrix) - 1)
+
+            if self.__validate_reduced_ponto((x, y)):
+                return (x, y)
 
     def mover_inimigos(self) -> None:
         for inimigo in self.__inimigos:
@@ -169,7 +192,6 @@ class AbstractTerreno(ABC):
         self.__jogador.update()
         for inimigo in self.__inimigos:
             inimigo.update()
-            inimigo.update_visao(self.__jogador.hitbox)
 
     def lidar_ataques(self, tela: TelaJogo) -> None:
         if self.__jogador.verificar_ataque():

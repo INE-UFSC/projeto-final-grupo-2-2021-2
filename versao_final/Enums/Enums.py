@@ -30,3 +30,9 @@ class Direction(Enum):
     DIREITA_BAIXO = 6
     DIREITA_MEIO = 7
     DIREITA_CIMA = 8
+
+
+class Estado(Enum):
+    ALERTA = 1
+    REPOUSO = 2
+    ATACANDO = 3
