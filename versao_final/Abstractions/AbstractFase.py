@@ -33,6 +33,7 @@ class AbstractFase(ABC):
         self.__terreno.update()
         self.__terreno.lidar_ataques(tela)
         self.__terreno.desenhar(tela, self.__jogador)
+        self.__terreno.dropar_item()
 
     @property
     def jogador(self) -> Jogador:

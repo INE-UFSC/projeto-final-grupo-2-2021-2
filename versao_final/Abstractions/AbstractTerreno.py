@@ -9,8 +9,12 @@ from Config.Opcoes import Opcoes
 from Config.TelaJogo import TelaJogo
 from Abstractions.AbstractPersonagem import AbstractPersonagem
 from Utils.Movement import AStar, gerar_equação_vetorial_reta
+from Utils.Movement import gerar_equação_vetorial_reta
+from Itens.PocaoDefesa import PocaoDefesa
+from Itens.PocaoMedia import PocaoMedia
+from Itens.PocaoPequena import PocaoPequena
+from Itens.PocaoInvencivel import PocaoInvencivel
 import pygame
-import time
 import random
 
 
@@ -26,6 +30,16 @@ class AbstractTerreno(ABC):
         self.__hitbox = Hitbox(posicao=(0, 0), tamanho=self.__opcoes.TAMANHO_TELA)
         self.__jogador = jogador
         self.__sprite_path = sprite_path
+
+        self.__itens_tela = []
+        pocao_defesa = PocaoDefesa()
+        pocao_media = PocaoMedia()
+        pocao_invencivel = PocaoInvencivel()
+        pocao_pequena = PocaoPequena()
+        self.__itens.append(pocao_defesa)
+        self.__itens.append(pocao_media)
+        self.__itens.append(pocao_invencivel)
+        self.__itens.append(pocao_pequena)
 
     def _setup_mapa(self, matriz_terreno: list) -> None:
         self.__matrix = matriz_terreno
@@ -69,6 +83,11 @@ class AbstractTerreno(ABC):
 
         if jogador.checar_atacando():
             self.__desenhar_ataque(tela, jogador)
+
+        for item in self.itens_tela:
+            item_surf = item.imagem
+            item_rect = item_surf.get_rect(center=(item.posicao))
+            tela.janela.blit(item_surf, item_rect)
 
         tamanho = jogador.hitbox.tamanho
         posicao = jogador.hitbox.posicao
@@ -251,7 +270,8 @@ class AbstractTerreno(ABC):
         return self.__validate_reduced_ponto(ponto)
 
     def __remover_inimigo(self, inimigo):
-        self.__inimigos.remove(inimigo)
+        self.inimigos.remove(inimigo)
+        self.criar_item(inimigo.hitbox.posicao)
 
     def __desenhar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
         rect_arma = personagem.get_rect_arma()
@@ -281,6 +301,13 @@ class AbstractTerreno(ABC):
     def __inverter_ponto(self, ponto: tuple) -> tuple:
         return (ponto[1], ponto[0])
 
+    def criar_item(self, posicao):
+        if len(self.__itens) != 0:
+            pocao = random.choice(self.__itens)
+            pocao.posicao = posicao
+            self.itens_tela.append(pocao)
+            self.__itens.remove(pocao)
+
     @property
     def jogador(self) -> Jogador:
         """Retorna a instância do Jogador que está no Terreno"""
@@ -302,9 +329,18 @@ class AbstractTerreno(ABC):
     def obstaculos(self) -> list:
         return self.__obstaculos
 
-    @abstractmethod
-    def dropar_item():
-        pass
+    @property
+    def itens_tela(self):
+        return self.__itens_tela
+
+    def dropar_item(self):
+        rect_jogador = pygame.Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
+        for pocao in self.itens_tela:
+            item_surf = pocao.imagem
+            pocao_rect = item_surf.get_rect(center=(pocao.posicao))
+            if pocao_rect.colliderect(rect_jogador):
+                self.itens_tela.remove(pocao)
+                print("colidiu e aplicou o item")
 
     @abstractmethod
     def has_ended():
