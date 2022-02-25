@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
+from Abstractions.AbstractObstaculo import AbstractObstaculo
 from Utils.Hitbox import Hitbox
 from Obstaculos.Buraco import Buraco
 from Obstaculos.Parede import Parede
@@ -15,9 +16,10 @@ import time
 class AbstractTerreno(ABC):
     def __init__(self, inimigos: list, itens, jogador, sprite_path: str):
         self.__inimigos: List[AbstractPersonagem] = inimigos
-        self.__obstaculos = []
+        self.__obstaculos: List[AbstractObstaculo] = []
         self.__itens = itens
         self.__matrix = []
+        self.__pontos = []
 
         self.__opcoes = Opcoes()
         self.__hitbox = Hitbox(posicao=(0, 0), tamanho=self.__opcoes.TAMANHO_TELA)
@@ -44,14 +46,14 @@ class AbstractTerreno(ABC):
     def desenhar(self, tela: TelaJogo, jogador) -> None:
         mapa1 = pygame.image.load(self.__sprite_path)
         tela.janela.blit(mapa1, (0, 127))
-        for obstaculo in self.obstaculos:
+        for obstaculo in self.__obstaculos:
             posicao = obstaculo.hitbox.posicao
             tamanho = obstaculo.hitbox.tamanho
             color = (125, 0, 0)
             rect = pygame.Rect(posicao, tamanho)
             pygame.draw.rect(tela.janela, color, rect)
 
-        for inimigo in self.inimigos:
+        for inimigo in self.__inimigos:
             posicao = inimigo.hitbox.posicao
             tamanho = inimigo.hitbox.tamanho
             color = (0, 0, 125)
@@ -60,6 +62,9 @@ class AbstractTerreno(ABC):
 
             if inimigo.checar_atacando():
                 self.__desenhar_ataque(tela, inimigo)
+
+        # Código exclusivo para testes
+        self.__desenhar_pontos(tela)
 
         if jogador.checar_atacando():
             self.__desenhar_ataque(tela, jogador)
@@ -70,16 +75,27 @@ class AbstractTerreno(ABC):
         rect = pygame.Rect(posicao, tamanho)
         pygame.draw.rect(tela.janela, color, rect)
 
-        surface = self.jogador.status.vida()
+        surface = self.__jogador.status.vida()
         tela.janela.blit(surface, (0, 0))
+
+    # Código exclusivo para testes
+    def __desenhar_pontos(self, tela: TelaJogo):
+        for ponto in self.__pontos:
+            rect = pygame.Rect(ponto, (2, 2))
+            color = (0, 255, 255)
+            pygame.draw.rect(tela.janela, color, rect)
+        self.__pontos = []
 
     def validar_movimento(self, personagem: AbstractPersonagem, posicao: tuple) -> bool:
         if not isinstance(personagem, AbstractPersonagem):
             return False
 
+        if personagem.hitbox.posicao == posicao:
+            return True
+
         personagem_rect = pygame.Rect(posicao, personagem.hitbox.tamanho)
-        terreno_rect = pygame.Rect(self.hitbox.posicao, self.hitbox.tamanho)
-        jogador_rect = pygame.Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
+        terreno_rect = pygame.Rect(self.__hitbox.posicao, self.__hitbox.tamanho)
+        jogador_rect = pygame.Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
 
         # Validação com os cantos do terreno
         if personagem_rect.left < terreno_rect.left:
@@ -92,40 +108,39 @@ class AbstractTerreno(ABC):
             return False
 
         # Validação com todos os obstáculos do terreno
-        for obstaculo in self.obstaculos:
+        for obstaculo in self.__obstaculos:
             obstaculo_rect = pygame.Rect(obstaculo.hitbox.posicao, obstaculo.hitbox.tamanho)
             if personagem_rect.colliderect(obstaculo_rect):
                 return False
 
         # Validação com os outros inimigos do terreno
-        for inimigo in self.inimigos:
-            if inimigo == personagem:  # Impede a comparação de uma mesma instância
-                continue
+        for inimigo in self.__inimigos:
+            # Inimigos não se batem
+            if personagem != self.__jogador:
+                break
 
             inimigo_rect = pygame.Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
             if personagem_rect.colliderect(inimigo_rect):
                 return False
 
         # Validação com o Jogador
-        if personagem != self.jogador:
+        if personagem != self.__jogador:
             if personagem_rect.colliderect(jogador_rect):
                 return False
 
         return True
 
     def is_line_of_sight_clear(self, p1, p2) -> bool:
-        p1 = self.__reduzir_ponto(p1)
-        p2 = self.__reduzir_ponto(p2)
-
         equação_vetorial = gerar_equação_vetorial_reta(p1, p2)
 
         x = 0.05
         step = 0.05
         while x < 1:
             ponto = equação_vetorial(x)
-            ponto = self.__inverter_ponto(ponto)
+            # Código exclusivo para testes
+            self.__pontos.append(ponto)
 
-            if not self.__validate_ponto(ponto):
+            if not self.__validate_normal_ponto(ponto):
                 return False
 
             x += step
@@ -137,7 +152,7 @@ class AbstractTerreno(ABC):
         p1 = self.__inverter_ponto(p1)
         p2 = self.__inverter_ponto(p2)
 
-        caminho = self.__AStar.search_path(p1, p2, False)
+        caminho = self.__AStar.search_path(p1, p2, True)
         if len(caminho) > 0:
             ponto_destino = caminho[0]
             ponto_destino = self.__inverter_ponto(ponto_destino)
@@ -147,7 +162,7 @@ class AbstractTerreno(ABC):
         return None
 
     def mover_inimigos(self) -> None:
-        for inimigo in self.inimigos:
+        for inimigo in self.__inimigos:
             inimigo.mover(self.__jogador.hitbox)
 
     def update(self):
@@ -166,13 +181,13 @@ class AbstractTerreno(ABC):
                     self.__executar_ataque_inimigo(tela, inimigo)
 
     def load_inimigos(self, inimigos: list) -> None:
-        self.inimigos.extend(inimigos)
+        self.__inimigos.extend(inimigos)
 
     def __executar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
         self.__desenhar_ataque(tela, personagem)
 
         rect_arma = personagem.get_rect_arma()
-        for inimigo in self.inimigos:
+        for inimigo in self.__inimigos:
             rect_inimigo = pygame.Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
 
             if rect_arma.colliderect(rect_inimigo):
@@ -186,14 +201,35 @@ class AbstractTerreno(ABC):
         self.__desenhar_ataque(tela, personagem)
 
         rect_arma = personagem.get_rect_arma()
-        rect_jogador = pygame.Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
+        rect_jogador = pygame.Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
 
         if rect_arma.colliderect(rect_jogador):
             dano = personagem.dano
-            dano_causado = self.jogador.tomar_dano(dano)
+            dano_causado = self.__jogador.tomar_dano(dano)
+
+    def __validate_reduced_ponto(self, ponto: tuple) -> bool:
+        x = int(ponto[0])
+        y = int(ponto[1])
+        try:
+            cell = self.__matrix[x][y]
+        except IndexError:
+            print(f'Acesso indevido a matriz em [{x}][{y}]')
+            print(len(self.__matrix))
+            print(len(self.__matrix[0]))
+            return False
+
+        if cell != ' ' and cell != 'J':
+            return False
+        else:
+            return True
+
+    def __validate_normal_ponto(self, ponto: tuple) -> bool:
+        ponto = self.__reduzir_ponto(ponto)
+        ponto = self.__inverter_ponto(ponto)
+        return self.__validate_reduced_ponto(ponto)
 
     def __remover_inimigo(self, inimigo):
-        self.inimigos.remove(inimigo)
+        self.__inimigos.remove(inimigo)
 
     def __desenhar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
         rect_arma = personagem.get_rect_arma()
@@ -206,7 +242,7 @@ class AbstractTerreno(ABC):
         x = ponto[0] // self.__opcoes.MENOR_UNIDADE
         y = ponto[1] // self.__opcoes.MENOR_UNIDADE
 
-        return (x, y)
+        return (int(x), int(y))
 
     def __aumentar_ponto(self, ponto: tuple) -> tuple:
         x = ponto[0] * self.__opcoes.MENOR_UNIDADE
@@ -214,22 +250,14 @@ class AbstractTerreno(ABC):
 
         return (x, y)
 
+    def __centralizar_ponto(self, ponto: tuple) -> tuple:
+        x = ponto[0] + self.__opcoes.MENOR_UNIDADE
+        y = ponto[1] + self.__opcoes.MENOR_UNIDADE
+
+        return (x, y)
+
     def __inverter_ponto(self, ponto: tuple) -> tuple:
         return (ponto[1], ponto[0])
-
-    def __validate_ponto(self, ponto: tuple) -> bool:
-        x = int(ponto[0])
-        y = int(ponto[1])
-        try:
-            cell = self.__matrix[x][y]
-        except IndexError:
-            print(f'Acesso indevido a matriz em [{x}][{y}]')
-            return False
-
-        if cell != ' ' and cell != 'J':
-            return False
-        else:
-            return True
 
     @property
     def jogador(self) -> Jogador:

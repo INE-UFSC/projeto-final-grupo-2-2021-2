@@ -10,46 +10,35 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: AbstractTerreno, sprite_paths) -> None:
         self.__direction = Direction.MEIO_BAIXO
         self.__em_repouso = True
-        self.__destino = None
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 15
 
         super().__init__(stats, posicao, tamanho, terreno, sprite_paths)
-
-    def update_visao(self, hit_jogador: Hitbox) -> None:
-        if self.__em_repouso:
-            if self.__esta_vendo_jogador(hit_jogador):
-                self.__em_repouso = False
 
     def mover(self, hit_jogador: Hitbox) -> None:
         if self.__em_repouso:
             return None
 
-        if self.__destino is None:
-            self.__destino = self.terreno.get_destino(self.hitbox.posicao, hit_jogador.posicao)
-
-        if self.__destino is None:
-            rect_jogador = pygame.Rect(hit_jogador.posicao, hit_jogador.tamanho)
-            center_jogador = rect_jogador.center
-
+        if self.__esta_vendo_completamente(hit_jogador):
             self.__dumb_movement(hit_jogador)
         else:
-            self.__mover_destino()
+            proximo_ponto = self.terreno.get_destino(self.hitbox.posicao, hit_jogador.posicao)
+            if proximo_ponto is None:
+                self.__dumb_movement(hit_jogador)
+            else:
+                self.__mover_para_ponto(proximo_ponto)
 
-    def __dumb_movement(self, hit_jogador: Hitbox) -> None:
-        rect_jogador = pygame.Rect(hit_jogador.posicao, hit_jogador.tamanho)
-        center_jogador = rect_jogador.center
-
-        if center_jogador[0] > self.hitbox.x:
+    def __mover_para_ponto(self, ponto: tuple) -> None:
+        if ponto[0] > self.hitbox.x:
             x_movement = self.vel
-        elif center_jogador[0] < self.hitbox.x:
-            x_movement = - self.vel
+        elif ponto[0] < self.hitbox.x:
+            x_movement = -self.vel
         else:
             x_movement = 0
 
-        if center_jogador[1] > self.hitbox.y:
+        if ponto[1] > self.hitbox.y:
             y_movement = self.vel
-        elif center_jogador[1] < self.hitbox.y:
-            y_movement = - self.vel
+        elif ponto[1] < self.hitbox.y:
+            y_movement = -self.vel
         else:
             y_movement = 0
 
@@ -63,6 +52,17 @@ class AbstractInimigo(AbstractPersonagem, ABC):
 
         self._atualizar_sprite(x_movement, y_movement)
         self.__atualizar_frente(x_movement, y_movement)
+
+    def __dumb_movement(self, hit_jogador: Hitbox) -> None:
+        rect_jogador = pygame.Rect(hit_jogador.posicao, hit_jogador.tamanho)
+        center_jogador = rect_jogador.center
+        self.__mover_para_ponto(center_jogador)
+
+    def update_visao(self, hit_jogador: Hitbox) -> None:
+        if self.__em_repouso:
+            if self.__jogador_dentro_da_visao(hit_jogador):
+                if self.__esta_vendo_jogador(hit_jogador):
+                    self.__em_repouso = False
 
     def verificar_ataque(self, hit_jogador: Hitbox):
         distancia = self.__calcular_distancia(hit_jogador)
@@ -85,40 +85,38 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         else:
             return False
 
-    def __esta_vendo_jogador(self, hit_jogador: Hitbox) -> bool:
+    def __jogador_dentro_da_visao(self, hit_jogador) -> bool:
         distancia = self.__calcular_distancia(hit_jogador)
-        if distancia > self.__view_distance:
-            return False
-
-        esta_vendo = self.terreno.is_line_of_sight_clear(self.hitbox.posicao, hit_jogador.posicao)
-        if esta_vendo:
+        if distancia < self.__view_distance:
             return True
         else:
             return False
 
-    def __mover_destino(self):
-        if self.__destino[0] > self.hitbox.x:
-            x_movement = self.vel
-        elif self.__destino[0] < self.hitbox.x:
-            x_movement = -self.vel
+    def __esta_vendo_jogador(self, hit_jogador: Hitbox) -> bool:
+        pontos_jogador = [hit_jogador.topleft, hit_jogador.topright,
+                          hit_jogador.bottomleft, hit_jogador.bottomright]
+        for ponto in pontos_jogador:
+            if self.terreno.is_line_of_sight_clear(self.hitbox.center, ponto):
+                return True
+
+        return False
+
+    def __esta_vendo_completamente(self, hit_jogador: Hitbox) -> bool:
+        pares_pontos = [
+            [self.hitbox.topleft, hit_jogador.topleft],
+            [self.hitbox.bottomleft, hit_jogador.bottomleft],
+            [self.hitbox.bottomright, hit_jogador.bottomright],
+            [self.hitbox.topright, hit_jogador.topright]
+        ]
+        quant = 0
+        for par_ponto in pares_pontos:
+            if self.terreno.is_line_of_sight_clear(par_ponto[0], par_ponto[1]):
+                quant += 1
+
+        if quant == 4:
+            return True
         else:
-            x_movement = 0
-
-        if self.__destino[1] > self.hitbox.y:
-            y_movement = self.vel
-        elif self.__destino[1] < self.hitbox.y:
-            y_movement = -self.vel
-        else:
-            y_movement = 0
-
-        nova_posicao = (self.hitbox.x + x_movement, self.hitbox.y + y_movement)
-        self.hitbox.posicao = nova_posicao
-
-        if self.__destino == self.hitbox.posicao:
-            self.__destino = None
-
-        self._atualizar_sprite(x_movement, y_movement)
-        self.__atualizar_frente(x_movement, y_movement)
+            return False
 
     def __atualizar_frente(self, x_movement, y_movement):
         if x_movement < 0:
