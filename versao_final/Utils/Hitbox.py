@@ -4,6 +4,58 @@ class Hitbox():
         self.__tamanho = tamanho
 
     @property
+    def center(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0] // 2
+        y = self.__posicao[1] + self.__tamanho[1] // 2
+        return (x, y)
+
+    @property
+    def topright(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0]
+        y = self.__posicao[1]
+        return (x, y)
+
+    @property
+    def topleft(self) -> tuple:
+        return self.__posicao
+
+    @property
+    def bottomleft(self) -> tuple:
+        x = self.__posicao[0]
+        y = self.__posicao[1] + self.__tamanho[1]
+        return (x, y)
+
+    @property
+    def bottomright(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0]
+        y = self.__posicao[1] + self.__tamanho[1]
+        return (x, y)
+
+    @property
+    def midright(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0]
+        y = self.__posicao[1] + self.__tamanho[1] // 2
+        return (x, y)
+
+    @property
+    def midbottom(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0] // 2
+        y = self.__posicao[1] + self.__tamanho[1]
+        return (x, y)
+
+    @property
+    def midleft(self) -> tuple:
+        x = self.__posicao[0]
+        y = self.__posicao[1] + self.__tamanho[1] // 2
+        return (x, y)
+
+    @property
+    def midtop(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0] // 2
+        y = self.__posicao[1]
+        return (x, y)
+
+    @property
     def posicao(self) -> tuple:
         return self.__posicao
 
