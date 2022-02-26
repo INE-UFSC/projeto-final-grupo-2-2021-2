@@ -28,7 +28,7 @@ class Fase1(AbstractFase):
 
         elif dificuldade == Dificuldade.medio:
             self.__INIMIGO_POS = [(200, 200), (350, 200), (900, 200),
-                                  (200, 600), (400, 600), (1000, 600)]
+                                  (200, 600), (350, 350), (1000, 600)]
         else:
             self.__INIMIGO_POS = [(200, 200), (350, 200), (900, 200),
                                   (200, 600), (400, 600), (1000, 600),

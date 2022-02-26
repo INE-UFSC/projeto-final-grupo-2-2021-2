@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from math import ceil
 from typing import List
 from Abstractions.AbstractObstaculo import AbstractObstaculo
 from Utils.Hitbox import Hitbox
@@ -8,7 +9,8 @@ from Personagens.Jogador.Jogador import Jogador
 from Config.Opcoes import Opcoes
 from Config.TelaJogo import TelaJogo
 from Abstractions.AbstractPersonagem import AbstractPersonagem
-from Utils.Movement import AStar, gerar_equação_vetorial_reta
+from Utils.Maps import update_invalid_position_in_map_for_size
+from Utils.Movement import AStar, distancia_dois_pontos, gerar_equação_vetorial_reta
 from Utils.Movement import gerar_equação_vetorial_reta
 from Itens.PocaoDefesa import PocaoDefesa
 from Itens.PocaoMedia import PocaoMedia
@@ -43,7 +45,7 @@ class AbstractTerreno(ABC):
 
     def _setup_mapa(self, matriz_terreno: list) -> None:
         self.__matrix = matriz_terreno
-        self.__AStar = AStar(self.__matrix, empty_points=[' ', 'J'])
+        self.__configure_pathfinders()
 
         for index_row, row in enumerate(matriz_terreno):
             for index_column, cell in enumerate(row):
@@ -61,6 +63,9 @@ class AbstractTerreno(ABC):
     def desenhar(self, tela: TelaJogo, jogador) -> None:
         mapa1 = pygame.image.load(self.__sprite_path)
         tela.janela.blit(mapa1, (0, 127))
+        # Código exclusivo para testes
+        self.__desenhar_quadrados(tela)
+
         for obstaculo in self.__obstaculos:
             posicao = obstaculo.hitbox.posicao
             tamanho = obstaculo.hitbox.tamanho
@@ -105,6 +110,26 @@ class AbstractTerreno(ABC):
             color = (0, 255, 255)
             pygame.draw.rect(tela.janela, color, rect)
         self.__pontos = []
+
+    # Código exclusivo para testes
+    def __desenhar_quadrados(self, tela: TelaJogo):
+        for index, linha in enumerate(self.__matrix):
+            for index_column, coluna in enumerate(linha):
+                posicao = self.__aumentar_ponto((index_column, index))
+
+                if index % 2 == 0:
+                    if index_column % 2 == 0:
+                        color = (255, 125, 125)
+                    else:
+                        color = (125, 125, 255)
+                else:
+                    if index_column % 2 == 0:
+                        color = (125, 125, 255)
+                    else:
+                        color = (255, 125, 125)
+
+                rect = pygame.Rect(posicao, (32, 32))
+                pygame.draw.rect(tela.janela, color, rect)
 
     def validar_movimento(self, personagem: AbstractPersonagem, posicao: tuple) -> bool:
         if not isinstance(personagem, AbstractPersonagem):
@@ -152,27 +177,31 @@ class AbstractTerreno(ABC):
 
     def is_line_of_sight_clear(self, p1, p2) -> bool:
         equação_vetorial = gerar_equação_vetorial_reta(p1, p2)
+        distancia = distancia_dois_pontos(p1, p2)
+
+        distancia_entre_pixels_checados = 8
+        step = 1 / (distancia // distancia_entre_pixels_checados)
 
         x = 0.05
-        step = 0.05
         while x < 1:
             ponto = equação_vetorial(x)
             # Código exclusivo para testes
             self.__pontos.append(ponto)
 
-            if not self.__validate_normal_ponto(ponto):
+            if not self.__validate_normal_ponto_for_obstaculo(ponto):
                 return False
 
             x += step
         return True
 
-    def get_path(self, p1: tuple, p2: tuple) -> list:
-        p1 = self.__reduzir_ponto(p1)
+    def get_path(self, hitbox: Hitbox, p2: tuple) -> list:
+        p1 = self.__reduzir_ponto(hitbox.posicao)
         p2 = self.__reduzir_ponto(p2)
         p1 = self.__inverter_ponto(p1)
         p2 = self.__inverter_ponto(p2)
 
-        caminho = self.__AStar.search_path(p1, p2, True)
+        pathfinder = self.__get_AStar_pathfinder_for_hitbox(hitbox)
+        caminho = pathfinder.search_path(p1, p2, True)
         for index, ponto in enumerate(caminho):
             ponto = self.__inverter_ponto(ponto)
             ponto = self.__aumentar_ponto(ponto)
@@ -180,13 +209,14 @@ class AbstractTerreno(ABC):
 
         return caminho
 
-    def get_random_path(self, p1) -> list:
-        ponto_destino = self.__get_valid_reduced_point()
+    def get_random_path(self, hitbox: Hitbox) -> list:
+        ponto_destino = self.__get_valid_destiny_point_for_hitbox(hitbox)
         while True:
-            p1 = self.__reduzir_ponto(p1)
+            p1 = self.__reduzir_ponto(hitbox.posicao)
             p1 = self.__inverter_ponto(p1)
 
-            caminho = self.__AStar.search_path(p1, ponto_destino, True)
+            pathfinder = self.__get_AStar_pathfinder_for_hitbox(hitbox)
+            caminho = pathfinder.search_path(p1, ponto_destino, True)
             if len(caminho) > 0:
                 for index, ponto in enumerate(caminho):
                     ponto = self.__inverter_ponto(ponto)
@@ -195,13 +225,73 @@ class AbstractTerreno(ABC):
 
                 return caminho
 
-    def __get_valid_reduced_point(self) -> tuple:
+    def __get_AStar_pathfinder_for_hitbox(self, hitbox: Hitbox) -> AStar:
+        proporcao = self.__get_proporsion_for_hitbox(hitbox)
+
+        if proporcao in self.__proporcao_to_pathfinders.keys():
+            matrix = self.__proporcao_to_matrix[proporcao]
+
+            return self.__proporcao_to_pathfinders[proporcao]
+        else:
+            matrix = self.__get_reduced_matrix_for_proporsion(proporcao)
+
+            pathfinder = AStar(matrix, [' ', 'J'], ['X'])
+            self.__proporcao_to_pathfinders[proporcao] = pathfinder
+            return pathfinder
+
+    def __configure_pathfinders(self):
+        self.__proporcao_to_matrix = {}
+        self.__proporcao_to_pathfinders = {}
+
+        matrix_1_1 = self.__get_reduced_matrix_for_proporsion((1, 1))
+        matrix_1_2 = self.__get_reduced_matrix_for_proporsion((1, 2))
+        matrix_2_1 = self.__get_reduced_matrix_for_proporsion((2, 1))
+        matrix_2_2 = self.__get_reduced_matrix_for_proporsion((2, 2))
+
+        pathfinder_1_1 = AStar(matrix_1_1, [' ', 'J'], ['X'])
+        pathfinder_1_2 = AStar(matrix_1_2, [' ', 'J'], ['X'])
+        pathfinder_2_1 = AStar(matrix_2_1, [' ', 'J'], ['X'])
+        pathfinder_2_2 = AStar(matrix_2_2, [' ', 'J'], ['X'])
+
+        self.__proporcao_to_pathfinders = {
+            (1, 1): pathfinder_1_1,
+            (1, 2): pathfinder_1_2,
+            (2, 1): pathfinder_2_1,
+            (2, 2): pathfinder_2_2,
+        }
+        self.__proporcao_to_matrix = {
+            (1, 1): matrix_1_1,
+            (1, 2): matrix_1_2,
+            (2, 1): matrix_2_1,
+            (2, 2): matrix_2_2,
+        }
+
+    def __get_reduced_matrix_for_proporsion(self, proporsion: tuple) -> list:
+        if proporsion in self.__proporcao_to_matrix.keys():
+            return self.__proporcao_to_matrix[proporsion]
+
+        try:
+            return update_invalid_position_in_map_for_size(self.__matrix, proporsion, 'X', ['P'])
+        except Exception as e:
+            print(f'Erro na criação do mapa: {e}')
+            return self.__matrix
+
+    def __get_valid_destiny_point_for_hitbox(self, hitbox: Hitbox) -> tuple:
+        proporcao = self.__get_proporsion_for_hitbox(hitbox)
+        matrix = self.__get_reduced_matrix_for_proporsion(proporcao)
+
         while True:
             y = random.randint(1, len(self.__matrix[0]) - 1)
             x = random.randint(6, len(self.__matrix) - 1)
 
-            if self.__validate_reduced_ponto((x, y)):
+            if self.__validate_inverted_ponto_in_matrix((x, y), matrix):
                 return (x, y)
+
+    def __get_proporsion_for_hitbox(self, hitbox: Hitbox) -> tuple:
+        proporsion_y = hitbox.tamanho[0] / self.__opcoes.MENOR_UNIDADE
+        proporsion_x = hitbox.tamanho[1] / self.__opcoes.MENOR_UNIDADE
+
+        return (ceil(proporsion_x), ceil(proporsion_y))
 
     def mover_inimigos(self) -> None:
         for inimigo in self.__inimigos:
@@ -248,26 +338,44 @@ class AbstractTerreno(ABC):
             dano = personagem.dano
             dano_causado = self.__jogador.tomar_dano(dano)
 
-    def __validate_reduced_ponto(self, ponto: tuple) -> bool:
+    def __validate_inverted_ponto_in_matrix(self, ponto: tuple, matrix: list) -> bool:
         x = int(ponto[0])
         y = int(ponto[1])
-        try:
-            cell = self.__matrix[x][y]
-        except IndexError:
+
+        if x < 0 or x >= len(matrix):
             print(f'Acesso indevido a matriz em [{x}][{y}]')
-            print(len(self.__matrix))
-            print(len(self.__matrix[0]))
             return False
 
-        if cell != ' ' and cell != 'J':
+        if y < 0 or y >= len(matrix[0]):
+            print(f'Acesso indevido a matriz em [{x}][{y}]')
             return False
-        else:
-            return True
 
-    def __validate_normal_ponto(self, ponto: tuple) -> bool:
+        if matrix[x][y] != ' ' and matrix[x][y] != 'J':
+            return False
+
+        return True
+
+    def __validate_reduced_ponto_for_obstaculo(self, ponto: tuple) -> bool:
+        x = int(ponto[0])
+        y = int(ponto[1])
+
+        if x < 0 or x >= len(self.__matrix):
+            print(f'Acesso indevido a matriz em [{x}][{y}]')
+            return False
+
+        if y < 0 or y >= len(self.__matrix[0]):
+            print(f'Acesso indevido a matriz em [{x}][{y}]')
+            return False
+
+        if self.__matrix[x][y] == 'P':
+            return False
+
+        return True
+
+    def __validate_normal_ponto_for_obstaculo(self, ponto: tuple) -> bool:
         ponto = self.__reduzir_ponto(ponto)
         ponto = self.__inverter_ponto(ponto)
-        return self.__validate_reduced_ponto(ponto)
+        return self.__validate_reduced_ponto_for_obstaculo(ponto)
 
     def __remover_inimigo(self, inimigo):
         self.inimigos.remove(inimigo)
@@ -300,6 +408,15 @@ class AbstractTerreno(ABC):
 
     def __inverter_ponto(self, ponto: tuple) -> tuple:
         return (ponto[1], ponto[0])
+
+    def __ponto_dentro_da_matriz(self, ponto: tuple) -> bool:
+        if ponto[0] < 0 or ponto[0] >= len(self.__matrix):
+            return False
+
+        if ponto[1] < 0 or ponto[1] >= len(self.__matrix[0]):
+            return False
+
+        return True
 
     def criar_item(self, posicao):
         if len(self.__itens) != 0:

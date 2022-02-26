@@ -20,42 +20,50 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         if self.__estado == Estado.REPOUSO:
             self.__update_visao(hit_jogador)
         elif self.__estado == Estado.ALERTA:
+            # print('Procurar')
             self.__procurar_jogador(hit_jogador)
         elif self.__estado == Estado.ATACANDO:
+            # print('Seguir Jogador')
             self.__seguir_jogador(hit_jogador)
 
     def __seguir_jogador(self, hit_jogador: Hitbox) -> None:
         # Se está vendo completamente, faz caminho burro
         if self.__esta_vendo_jogador_completamente(hit_jogador):
             self.__estava_vendo_jogador = True
+            # print('Dumb 1')
             self.__dumb_movement(hit_jogador)
 
         else:
             # Se está vendo parcialmente o jogador
             if self.__esta_vendo_jogador_minimamente(hit_jogador):
+                # print('Dumb 2')
                 self.__estava_vendo_jogador = True
 
-                self.__caminho = self.terreno.get_path(self.hitbox.posicao, hit_jogador.posicao)
+                self.__caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
                 self.__mover_caminho()
 
             # Não possui visão do jogador
             else:
                 # Se acabou de perder visão, busca o caminho para a ultima posição jogador
                 if self.__estava_vendo_jogador:
+                    # print('Dumb 3')
                     self.__estava_vendo_jogador = False
 
-                    self.__caminho = self.terreno.get_path(self.hitbox.posicao, hit_jogador.posicao)
+                    self.__caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
                     self.__mover_caminho()
                 else:  # Segue a ultima posição conhecida do jogador
+                    # print('Dumb 4')
                     self.__mover_caminho()
 
     def __procurar_jogador(self, hit_jogador: Hitbox) -> None:
         # Caso não tenha um caminho pega um aleatório
         if len(self.__caminho) == 0:
-            self.__caminho = self.terreno.get_random_path(self.hitbox.posicao)
+            # print('Pegando caminho aleatorio')
+            self.__caminho = self.terreno.get_random_path(self.hitbox)
 
         # Procura o jogador
         if self.__encontrou_jogador_novamente(hit_jogador):
+            # print('Achou novamente')
             self.__estado = Estado.ATACANDO
             self.__caminho = []
         else:
@@ -65,7 +73,8 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def __mover_caminho(self):
         if len(self.__caminho) > 0:
             proximo_ponto = self.__caminho[0]
-            if self.hitbox.posicao == proximo_ponto:
+            if self.__chegou_no_ponto(proximo_ponto):
+                # print('Removeu ponto')
                 self.__caminho.pop(0)
 
             self.__mover_para_ponto(proximo_ponto)
@@ -73,6 +82,13 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             # Perdeu totalmente a visão do jogador e foi para o ultimo caminho
             # passa para estado de alerta, vai ficar procurando o jogador
             self.__estado = Estado.ALERTA
+
+    def __chegou_no_ponto(self, ponto: tuple) -> bool:
+        rect = pygame.Rect(self.hitbox.posicao, self.hitbox.tamanho)
+        if rect.collidepoint(ponto):
+            return True
+        else:
+            return False
 
     def __dumb_movement(self, hit_jogador: Hitbox) -> None:
         rect_jogador = pygame.Rect(hit_jogador.posicao, hit_jogador.tamanho)

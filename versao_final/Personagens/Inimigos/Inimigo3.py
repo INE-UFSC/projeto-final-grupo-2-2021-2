@@ -14,7 +14,7 @@ class Inimigo3(AbstractInimigo):
         ]
 
         super().__init__(stats=stats, posicao=posicao,
-                         tamanho=(20, 25), terreno=terreno, sprite_paths=sprite_paths)
+                         tamanho=(50, 50), terreno=terreno, sprite_paths=sprite_paths)
 
     def _calibrar_dificuldade(self, dificuldade: Dificuldade) -> dict:
         if dificuldade.medio:
