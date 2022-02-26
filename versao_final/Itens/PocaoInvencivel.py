@@ -27,9 +27,6 @@ class PocaoInvencivel(AbstractItem):
     def posicao(self, posicao):
         self.__posicao = posicao
 
-    def adicionar_status(self, status: Status) -> None:
-        pass
-
     def modificar_status(self, status: Status) -> None:
         if not self.__aplicado:
             self.__status = status

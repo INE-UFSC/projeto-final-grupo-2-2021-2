@@ -120,6 +120,10 @@ class AbstractPersonagem(ABC):
     def sprite_path(self, value) -> None:
         if type(value) == str:
             self.__sprite_path = value
+    
+    @property
+    def status(self):
+        return self.__status
 
     @abstractmethod
     def atacar(self):

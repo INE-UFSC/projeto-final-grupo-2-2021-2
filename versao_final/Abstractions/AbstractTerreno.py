@@ -15,7 +15,7 @@ from Itens.PocaoMedia import PocaoMedia
 from Itens.PocaoPequena import PocaoPequena
 from Itens.PocaoInvencivel import PocaoInvencivel
 import pygame
-import random
+import random, math
 
 
 class AbstractTerreno(ABC):
@@ -31,6 +31,7 @@ class AbstractTerreno(ABC):
         self.__jogador = jogador
         self.__sprite_path = sprite_path
 
+        #itens
         self.__itens_tela = []
         pocao_defesa = PocaoDefesa()
         pocao_media = PocaoMedia()
@@ -40,6 +41,7 @@ class AbstractTerreno(ABC):
         self.__itens.append(pocao_media)
         self.__itens.append(pocao_invencivel)
         self.__itens.append(pocao_pequena)
+        self.__aparecer_item = 40 #porcentagem que o item tem de aparecer na tela
 
     def _setup_mapa(self, matriz_terreno: list) -> None:
         self.__matrix = matriz_terreno
@@ -85,8 +87,10 @@ class AbstractTerreno(ABC):
             self.__desenhar_ataque(tela, jogador)
 
         for item in self.itens_tela:
+            x = item.posicao[0] 
+            y = item.posicao[1]
             item_surf = item.imagem
-            item_rect = item_surf.get_rect(center=(item.posicao))
+            item_rect = item_surf.get_rect(center = (x,y))
             tela.janela.blit(item_surf, item_rect)
 
         tamanho = jogador.hitbox.tamanho
@@ -95,7 +99,7 @@ class AbstractTerreno(ABC):
         rect = pygame.Rect(posicao, tamanho)
         pygame.draw.rect(tela.janela, color, rect)
 
-        surface = self.__jogador.status.vida()
+        surface = self.__jogador.status_tela.vida()
         tela.janela.blit(surface, (0, 0))
 
     # Código exclusivo para testes
@@ -302,11 +306,13 @@ class AbstractTerreno(ABC):
         return (ponto[1], ponto[0])
 
     def criar_item(self, posicao):
-        if len(self.__itens) != 0:
-            pocao = random.choice(self.__itens)
-            pocao.posicao = posicao
-            self.itens_tela.append(pocao)
-            self.__itens.remove(pocao)
+        chance_aparecer = math.ceil(100*random.random()) #sorteia um numero entre 1 e 100
+        if chance_aparecer > self.aparecer_item:
+            if len(self.__itens) != 0:
+                pocao = random.choice(self.__itens)
+                pocao.posicao = posicao
+                self.itens_tela.append(pocao)
+                self.__itens.remove(pocao)
 
     @property
     def jogador(self) -> Jogador:
@@ -332,6 +338,10 @@ class AbstractTerreno(ABC):
     @property
     def itens_tela(self):
         return self.__itens_tela
+    
+    @property
+    def aparecer_item(self):
+        return self.__aparecer_item
 
     def dropar_item(self):
         rect_jogador = pygame.Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
@@ -339,8 +349,9 @@ class AbstractTerreno(ABC):
             item_surf = pocao.imagem
             pocao_rect = item_surf.get_rect(center=(pocao.posicao))
             if pocao_rect.colliderect(rect_jogador):
+                self.__jogador.receber_item(pocao)
                 self.itens_tela.remove(pocao)
-                print("colidiu e aplicou o item")
+                
 
     @abstractmethod
     def has_ended():

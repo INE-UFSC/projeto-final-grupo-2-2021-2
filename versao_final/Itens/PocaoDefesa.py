@@ -1,5 +1,6 @@
 from Abstractions.AbstractItem import AbstractItem
 from Personagens.Status import Status
+from Utils.Hitbox import Hitbox
 import pygame
 
 
@@ -24,9 +25,6 @@ class PocaoDefesa(AbstractItem):
     @posicao.setter
     def posicao(self, posicao):
         self.__posicao = posicao
-    
-    def adicionar_status(self, status: Status) -> None:
-        pass
     
     def modificar_status(self, status: Status) -> None:
         if not self.__aplicado:
