@@ -11,7 +11,10 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__direction = Direction.MEIO_BAIXO
         self.__estado = Estado.REPOUSO
         self.__caminho = []
+        self.__len_caminho = 0
         self.__estava_vendo_jogador = False
+        self.__PERTO = 4
+        self.__MINIMO_PASSOS_DADOS = 2
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 15
 
         super().__init__(stats, posicao, tamanho, terreno, sprite_paths)
@@ -20,50 +23,50 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         if self.__estado == Estado.REPOUSO:
             self.__update_visao(hit_jogador)
         elif self.__estado == Estado.ALERTA:
-            # print('Procurar')
             self.__procurar_jogador(hit_jogador)
         elif self.__estado == Estado.ATACANDO:
-            # print('Seguir Jogador')
             self.__seguir_jogador(hit_jogador)
 
     def __seguir_jogador(self, hit_jogador: Hitbox) -> None:
         # Se está vendo completamente, faz caminho burro
         if self.__esta_vendo_jogador_completamente(hit_jogador):
-            self.__estava_vendo_jogador = True
-            # print('Dumb 1')
-            self.__dumb_movement(hit_jogador)
+            passos_dados = self.__len_caminho - len(self.__caminho)
+            if passos_dados < self.__MINIMO_PASSOS_DADOS and len(self.__caminho) > 0:
+                self.__mover_caminho()
+            else:
+                self.__estava_vendo_jogador = True
+                self.__dumb_movement(hit_jogador)
 
         else:
             # Se está vendo parcialmente o jogador
             if self.__esta_vendo_jogador_minimamente(hit_jogador):
-                # print('Dumb 2')
                 self.__estava_vendo_jogador = True
 
-                self.__caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
+                novo_caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
+                self.__len_caminho = len(novo_caminho)
+                self.__caminho = novo_caminho
                 self.__mover_caminho()
 
             # Não possui visão do jogador
             else:
                 # Se acabou de perder visão, busca o caminho para a ultima posição jogador
                 if self.__estava_vendo_jogador:
-                    # print('Dumb 3')
                     self.__estava_vendo_jogador = False
 
-                    self.__caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
+                    novo_caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
+                    self.__len_caminho = len(novo_caminho)
+                    self.__caminho = novo_caminho
                     self.__mover_caminho()
                 else:  # Segue a ultima posição conhecida do jogador
-                    # print('Dumb 4')
                     self.__mover_caminho()
 
     def __procurar_jogador(self, hit_jogador: Hitbox) -> None:
         # Caso não tenha um caminho pega um aleatório
         if len(self.__caminho) == 0:
-            # print('Pegando caminho aleatorio')
             self.__caminho = self.terreno.get_random_path(self.hitbox)
 
         # Procura o jogador
         if self.__encontrou_jogador_novamente(hit_jogador):
-            # print('Achou novamente')
             self.__estado = Estado.ATACANDO
             self.__caminho = []
         else:
@@ -74,7 +77,6 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         if len(self.__caminho) > 0:
             proximo_ponto = self.__caminho[0]
             if self.__chegou_no_ponto(proximo_ponto):
-                # print('Removeu ponto')
                 self.__caminho.pop(0)
 
             self.__mover_para_ponto(proximo_ponto)
@@ -91,22 +93,32 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             return False
 
     def __dumb_movement(self, hit_jogador: Hitbox) -> None:
+        distancia = self.__calcular_distancia(hit_jogador)
+
         rect_jogador = pygame.Rect(hit_jogador.posicao, hit_jogador.tamanho)
-        center_jogador = rect_jogador.center
-        self.__mover_para_ponto(center_jogador)
+        if distancia < self.__PERTO:
+            destino = rect_jogador.center
+        else:
+            destino = rect_jogador.topleft
+
+        self.__mover_para_ponto(destino)
 
     def __mover_para_ponto(self, ponto: tuple) -> None:
+        dist_x = abs(ponto[0] - self.hitbox.x)
+        vel_x = self.vel if dist_x > self.vel else dist_x
         if ponto[0] > self.hitbox.x:
-            x_movement = self.vel
+            x_movement = vel_x
         elif ponto[0] < self.hitbox.x:
-            x_movement = -self.vel
+            x_movement = -vel_x
         else:
             x_movement = 0
 
+        dist_y = abs(ponto[1] - self.hitbox.y)
+        vel_y = self.vel if dist_y > self.vel else dist_y
         if ponto[1] > self.hitbox.y:
-            y_movement = self.vel
+            y_movement = vel_y
         elif ponto[1] < self.hitbox.y:
-            y_movement = -self.vel
+            y_movement = -vel_y
         else:
             y_movement = 0
 

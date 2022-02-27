@@ -167,10 +167,10 @@ class AbstractTerreno(ABC):
         equação_vetorial = gerar_equação_vetorial_reta(p1, p2)
         distancia = distancia_dois_pontos(p1, p2)
 
-        distancia_entre_pixels_checados = 8
+        distancia_entre_pixels_checados = 4
         step = 1 / (distancia // distancia_entre_pixels_checados)
 
-        x = 0.05
+        x = 0
         while x < 1:
             ponto = equação_vetorial(x)
             # Código exclusivo para testes
@@ -233,14 +233,6 @@ class AbstractTerreno(ABC):
 
     def load_inimigos(self, inimigos: list) -> None:
         self.__inimigos.extend(inimigos)
-
-        inimigo = self.__inimigos[0]
-        hitbox = inimigo.hitbox
-
-        proporsion = self.__get_proporsion_for_hitbox(hitbox)
-        matrix = self.__get_reduced_matrix_for_proporsion(proporsion)
-        for linha in matrix:
-            print(linha)
 
     def __executar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
         self.__desenhar_ataque(tela, personagem)
