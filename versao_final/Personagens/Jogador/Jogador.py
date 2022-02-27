@@ -27,15 +27,15 @@ class Jogador(AbstractPersonagem):
         ]
         self.__itens: List[AbstractItem] = []
         self.__nome = nome
-        self.__status = StatusJogador(self)
+        self.__status_tela = StatusJogador(self)
         self.__direction = Direction.MEIO_CIMA
 
         super().__init__(stats=JogadorStats, posicao=posicao,
                          tamanho=tamanho, terreno=terreno, sprite_paths=sprite_paths)
 
     @property
-    def status(self):
-        return self.__status
+    def status_tela(self):
+        return self.__status_tela
 
     def lidar_inputs(self) -> None:
         keys = pygame.key.get_pressed()
@@ -62,7 +62,7 @@ class Jogador(AbstractPersonagem):
         return rect
 
     def receber_item(self, item: AbstractItem) -> None:
-        item.modificar_status(self.__status)
+        item.modificar_status(self.status)
 
     def update(self) -> None:
         self.arma.update()

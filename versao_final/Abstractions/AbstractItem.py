@@ -4,7 +4,7 @@ from Personagens.Status import Status
 
 class AbstractItem(ABC):
     @abstractmethod
-    def adicionar_status(self, status: Status) -> None:
+    def modificar_status(self, status: Status) -> None:
         pass
 
     @abstractmethod

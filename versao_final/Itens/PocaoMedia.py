@@ -22,7 +22,7 @@ class PocaoMedia(AbstractItem):
     def posicao(self, posicao):
         self.__posicao = posicao
 
-    def adicionar_status(self, status: Status) -> None:
+    def modificar_status(self, status: Status) -> None:
         if not self.__pronto:
             status.vida += self.__potencia
             self.__pronto = True

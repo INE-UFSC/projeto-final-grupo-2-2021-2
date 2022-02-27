@@ -18,6 +18,7 @@ from Itens.PocaoPequena import PocaoPequena
 from Itens.PocaoInvencivel import PocaoInvencivel
 import pygame
 import random
+import math
 
 
 class AbstractTerreno(ABC):
@@ -33,6 +34,7 @@ class AbstractTerreno(ABC):
         self.__jogador = jogador
         self.__sprite_path = sprite_path
 
+        # itens
         self.__itens_tela = []
         pocao_defesa = PocaoDefesa()
         pocao_media = PocaoMedia()
@@ -42,6 +44,7 @@ class AbstractTerreno(ABC):
         self.__itens.append(pocao_media)
         self.__itens.append(pocao_invencivel)
         self.__itens.append(pocao_pequena)
+        self.__aparecer_item = 40  # porcentagem que o item tem de aparecer na tela
 
     def _setup_mapa(self, matriz_terreno: list) -> None:
         self.__matrix = matriz_terreno
@@ -89,9 +92,11 @@ class AbstractTerreno(ABC):
         if jogador.checar_atacando():
             self.__desenhar_ataque(tela, jogador)
 
-        for item in self.itens_tela:
+        for item in self.__itens_tela:
+            x = item.posicao[0]
+            y = item.posicao[1]
             item_surf = item.imagem
-            item_rect = item_surf.get_rect(center=(item.posicao))
+            item_rect = item_surf.get_rect(center=(x, y))
             tela.janela.blit(item_surf, item_rect)
 
         tamanho = jogador.hitbox.tamanho
@@ -100,24 +105,26 @@ class AbstractTerreno(ABC):
         rect = pygame.Rect(posicao, tamanho)
         pygame.draw.rect(tela.janela, color, rect)
 
-        surface = self.__jogador.status.vida()
+        surface = self.__jogador.status_tela.vida()
         tela.janela.blit(surface, (0, 0))
 
     def criar_item(self, posicao):
-        if len(self.__itens) != 0:
-            pocao = random.choice(self.__itens)
-            pocao.posicao = posicao
-            self.itens_tela.append(pocao)
-            self.__itens.remove(pocao)
+        chance_aparecer = math.ceil(100*random.random())  # sorteia um numero entre 1 e 100
+        if chance_aparecer > self.__aparecer_item:
+            if len(self.__itens) != 0:
+                pocao = random.choice(self.__itens)
+                pocao.posicao = posicao
+                self.__itens_tela.append(pocao)
+                self.__itens.remove(pocao)
 
     def dropar_item(self):
-        rect_jogador = pygame.Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
-        for pocao in self.itens_tela:
+        rect_jogador = pygame.Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
+        for pocao in self.__itens_tela:
             item_surf = pocao.imagem
             pocao_rect = item_surf.get_rect(center=(pocao.posicao))
             if pocao_rect.colliderect(rect_jogador):
-                self.itens_tela.remove(pocao)
-                print("colidiu e aplicou o item")
+                self.__jogador.receber_item(pocao)
+                self.__itens_tela.remove(pocao)
 
     def validar_movimento(self, personagem: AbstractPersonagem, posicao: tuple) -> bool:
         if not isinstance(personagem, AbstractPersonagem):
@@ -211,7 +218,7 @@ class AbstractTerreno(ABC):
                     ponto = self.__aumentar_ponto(ponto)
                     caminho[index] = ponto
 
-                return caminho
+            return caminho
 
     def mover_inimigos(self) -> None:
         for inimigo in self.__inimigos:
@@ -395,7 +402,7 @@ class AbstractTerreno(ABC):
                 pygame.draw.rect(tela.janela, color, rect)
 
     def __remover_inimigo(self, inimigo):
-        self.inimigos.remove(inimigo)
+        self.__inimigos.remove(inimigo)
         self.criar_item(inimigo.hitbox.posicao)
 
     def __desenhar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
@@ -426,24 +433,12 @@ class AbstractTerreno(ABC):
         return self.__jogador
 
     @property
-    def hitbox(self) -> Hitbox:
-        return self.__hitbox
-
-    @property
-    def itens(self):
-        return self.__itens
-
-    @property
     def inimigos(self) -> list:
         return self.__inimigos
 
     @property
     def obstaculos(self) -> list:
         return self.__obstaculos
-
-    @property
-    def itens_tela(self):
-        return self.__itens_tela
 
     @abstractmethod
     def has_ended():
