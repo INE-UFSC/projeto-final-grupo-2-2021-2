@@ -7,6 +7,10 @@ def gerar_equação_vetorial_reta(p1, p2):
     return funcao
 
 
+def distancia_dois_pontos(p1: tuple, p2: tuple) -> float:
+    return ((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2) ** (1/2)
+
+
 class NodeHeap():
     def __init__(self, index, value) -> None:
         self.value = value
@@ -191,7 +195,7 @@ class Node:
 
 
 class AStar:
-    def __init__(self, matrix: list, empty_points: list) -> None:
+    def __init__(self, matrix: list, empty_points: list, valid_initial: list) -> None:
         self.__matrix = matrix
         self.__x = len(matrix)
         self.__y = len(matrix[0])
@@ -199,10 +203,11 @@ class AStar:
         self.__open_list = MinHeap([])
         self.__closed_nodes = []
         self.__empty_points = empty_points
+        self.__valid_initial = valid_initial
 
     def search_path(self, start_position: tuple, end_position: tuple, diagonal=False) -> list:
-        if not self.__validate_positions([start_position, end_position]):
-            print('Input inválido')
+        if not self.__validate_initial_positions([start_position, end_position]):
+            print('Input Inválido')
             return []
 
         start_node = Node(start_position, None)
@@ -232,6 +237,8 @@ class AStar:
                 children = self.__search_children_diagonal(current_node)
                 for child in children:
                     self.__update_queue_diagonal(current_node, child)
+
+        return []
 
     def __search_children_sides(self, node: Node) -> list:
         children = []
@@ -326,11 +333,29 @@ class AStar:
 
         return path
 
-    def __validate_positions(self, position_list: list) -> bool:
-        for position in position_list:
-            valid = self.__validate_position(position)
-            if not valid:
+    def __validate_initial_positions(self, positions: list) -> bool:
+        def validate_initial_position(position: tuple):
+            if len(position) != 2:
                 return False
+
+            if position[0] < 0 or position[0] > self.__x - 1:
+                return False
+
+            if position[1] < 0 or position[1] > self.__y - 1:
+                return False
+
+            if self.__matrix[position[0]][position[1]] in self.__valid_initial:
+                return True
+
+            if self.__matrix[position[0]][position[1]] not in self.__empty_points:
+                return False
+
+            return True
+
+        for position in positions:
+            if not validate_initial_position(position):
+                return False
+
         return True
 
     def __validate_position(self, position: tuple) -> bool:

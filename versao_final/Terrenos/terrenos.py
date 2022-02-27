@@ -1,4 +1,4 @@
-# altura: 20 unidades * 32 -> 640px
+# altura: 24 unidades * 32 -> 768px
 # largura: 35 unidades * 32 -> 1120px
 
 
@@ -16,7 +16,7 @@ matriz_terreno1 = [
     'P               PP                P',
     'P               PP                P',
     'P               PP                P',
-    'P  PP           PPJ           PP  P',
+    'P  PP           PP     J      PP  P',
     'P  PP           PP            PP  P',
     'P               PP                P',
     'P               PP                P',
