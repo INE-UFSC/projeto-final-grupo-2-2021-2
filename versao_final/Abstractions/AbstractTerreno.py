@@ -9,7 +9,7 @@ from Personagens.Jogador.Jogador import Jogador
 from Config.Opcoes import Opcoes
 from Config.TelaJogo import TelaJogo
 from Abstractions.AbstractPersonagem import AbstractPersonagem
-from Utils.Maps import update_invalid_position_in_map_for_size
+from Utils.Maps import MapUpdater
 from Utils.Movement import AStar, distancia_dois_pontos, gerar_equação_vetorial_reta
 from Utils.Movement import gerar_equação_vetorial_reta
 from Itens.PocaoDefesa import PocaoDefesa
@@ -103,33 +103,21 @@ class AbstractTerreno(ABC):
         surface = self.__jogador.status.vida()
         tela.janela.blit(surface, (0, 0))
 
-    # Código exclusivo para testes
-    def __desenhar_pontos(self, tela: TelaJogo):
-        for ponto in self.__pontos:
-            rect = pygame.Rect(ponto, (2, 2))
-            color = (0, 255, 255)
-            pygame.draw.rect(tela.janela, color, rect)
-        self.__pontos = []
+    def criar_item(self, posicao):
+        if len(self.__itens) != 0:
+            pocao = random.choice(self.__itens)
+            pocao.posicao = posicao
+            self.itens_tela.append(pocao)
+            self.__itens.remove(pocao)
 
-    # Código exclusivo para testes
-    def __desenhar_quadrados(self, tela: TelaJogo):
-        for index, linha in enumerate(self.__matrix):
-            for index_column, coluna in enumerate(linha):
-                posicao = self.__aumentar_ponto((index_column, index))
-
-                if index % 2 == 0:
-                    if index_column % 2 == 0:
-                        color = (255, 125, 125)
-                    else:
-                        color = (125, 125, 255)
-                else:
-                    if index_column % 2 == 0:
-                        color = (125, 125, 255)
-                    else:
-                        color = (255, 125, 125)
-
-                rect = pygame.Rect(posicao, (32, 32))
-                pygame.draw.rect(tela.janela, color, rect)
+    def dropar_item(self):
+        rect_jogador = pygame.Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
+        for pocao in self.itens_tela:
+            item_surf = pocao.imagem
+            pocao_rect = item_surf.get_rect(center=(pocao.posicao))
+            if pocao_rect.colliderect(rect_jogador):
+                self.itens_tela.remove(pocao)
+                print("colidiu e aplicou o item")
 
     def validar_movimento(self, personagem: AbstractPersonagem, posicao: tuple) -> bool:
         if not isinstance(personagem, AbstractPersonagem):
@@ -225,23 +213,76 @@ class AbstractTerreno(ABC):
 
                 return caminho
 
+    def mover_inimigos(self) -> None:
+        for inimigo in self.__inimigos:
+            inimigo.mover(self.__jogador.hitbox)
+
+    def update(self):
+        self.__jogador.update()
+        for inimigo in self.__inimigos:
+            inimigo.update()
+
+    def lidar_ataques(self, tela: TelaJogo) -> None:
+        if self.__jogador.verificar_ataque():
+            self.__executar_ataque(tela, self.__jogador)
+
+        for inimigo in self.__inimigos:
+            if inimigo.verificar_ataque(self.__jogador.hitbox):
+                if inimigo.atacar():
+                    self.__executar_ataque_inimigo(tela, inimigo)
+
+    def load_inimigos(self, inimigos: list) -> None:
+        self.__inimigos.extend(inimigos)
+
+        inimigo = self.__inimigos[0]
+        hitbox = inimigo.hitbox
+
+        proporsion = self.__get_proporsion_for_hitbox(hitbox)
+        matrix = self.__get_reduced_matrix_for_proporsion(proporsion)
+        for linha in matrix:
+            print(linha)
+
+    def __executar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
+        self.__desenhar_ataque(tela, personagem)
+
+        rect_arma = personagem.get_rect_arma()
+        for inimigo in self.__inimigos:
+            rect_inimigo = pygame.Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
+
+            if rect_arma.colliderect(rect_inimigo):
+                dano = personagem.dano
+                dano_causado = inimigo.tomar_dano(dano)
+
+                if inimigo.vida < 1:
+                    self.__remover_inimigo(inimigo)
+
+    def __executar_ataque_inimigo(self, tela: TelaJogo, personagem: AbstractPersonagem):
+        self.__desenhar_ataque(tela, personagem)
+
+        rect_arma = personagem.get_rect_arma()
+        rect_jogador = pygame.Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
+
+        if rect_arma.colliderect(rect_jogador):
+            dano = personagem.dano
+            dano_causado = self.__jogador.tomar_dano(dano)
+
     def __get_AStar_pathfinder_for_hitbox(self, hitbox: Hitbox) -> AStar:
         proporcao = self.__get_proporsion_for_hitbox(hitbox)
 
         if proporcao in self.__proporcao_to_pathfinders.keys():
-            matrix = self.__proporcao_to_matrix[proporcao]
-
             return self.__proporcao_to_pathfinders[proporcao]
         else:
             matrix = self.__get_reduced_matrix_for_proporsion(proporcao)
-
             pathfinder = AStar(matrix, [' ', 'J'], ['X'])
+
+            self.__proporcao_to_matrix[proporcao] = matrix
             self.__proporcao_to_pathfinders[proporcao] = pathfinder
             return pathfinder
 
     def __configure_pathfinders(self):
         self.__proporcao_to_matrix = {}
         self.__proporcao_to_pathfinders = {}
+        self.__MapUpdater = MapUpdater(self.__matrix, 'X', ['J', ' '], 'P')
 
         matrix_1_1 = self.__get_reduced_matrix_for_proporsion((1, 1))
         matrix_1_2 = self.__get_reduced_matrix_for_proporsion((1, 2))
@@ -271,7 +312,8 @@ class AbstractTerreno(ABC):
             return self.__proporcao_to_matrix[proporsion]
 
         try:
-            return update_invalid_position_in_map_for_size(self.__matrix, proporsion, 'X', ['P'])
+            updated_map = self.__MapUpdater.update_map_for_size(proporsion)
+            return updated_map
         except Exception as e:
             print(f'Erro na criação do mapa: {e}')
             return self.__matrix
@@ -292,51 +334,6 @@ class AbstractTerreno(ABC):
         proporsion_x = hitbox.tamanho[1] / self.__opcoes.MENOR_UNIDADE
 
         return (ceil(proporsion_x), ceil(proporsion_y))
-
-    def mover_inimigos(self) -> None:
-        for inimigo in self.__inimigos:
-            inimigo.mover(self.__jogador.hitbox)
-
-    def update(self):
-        self.__jogador.update()
-        for inimigo in self.__inimigos:
-            inimigo.update()
-
-    def lidar_ataques(self, tela: TelaJogo) -> None:
-        if self.__jogador.verificar_ataque():
-            self.__executar_ataque(tela, self.__jogador)
-
-        for inimigo in self.__inimigos:
-            if inimigo.verificar_ataque(self.__jogador.hitbox):
-                if inimigo.atacar():
-                    self.__executar_ataque_inimigo(tela, inimigo)
-
-    def load_inimigos(self, inimigos: list) -> None:
-        self.__inimigos.extend(inimigos)
-
-    def __executar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
-        self.__desenhar_ataque(tela, personagem)
-
-        rect_arma = personagem.get_rect_arma()
-        for inimigo in self.__inimigos:
-            rect_inimigo = pygame.Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
-
-            if rect_arma.colliderect(rect_inimigo):
-                dano = personagem.dano
-                dano_causado = inimigo.tomar_dano(dano)
-
-                if inimigo.vida < 1:
-                    self.__remover_inimigo(inimigo)
-
-    def __executar_ataque_inimigo(self, tela: TelaJogo, personagem: AbstractPersonagem):
-        self.__desenhar_ataque(tela, personagem)
-
-        rect_arma = personagem.get_rect_arma()
-        rect_jogador = pygame.Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
-
-        if rect_arma.colliderect(rect_jogador):
-            dano = personagem.dano
-            dano_causado = self.__jogador.tomar_dano(dano)
 
     def __validate_inverted_ponto_in_matrix(self, ponto: tuple, matrix: list) -> bool:
         x = int(ponto[0])
@@ -377,6 +374,34 @@ class AbstractTerreno(ABC):
         ponto = self.__inverter_ponto(ponto)
         return self.__validate_reduced_ponto_for_obstaculo(ponto)
 
+    # Código exclusivo para testes
+    def __desenhar_pontos(self, tela: TelaJogo):
+        for ponto in self.__pontos:
+            rect = pygame.Rect(ponto, (2, 2))
+            color = (0, 255, 255)
+            pygame.draw.rect(tela.janela, color, rect)
+        self.__pontos = []
+
+    # Código exclusivo para testes
+    def __desenhar_quadrados(self, tela: TelaJogo):
+        for index, linha in enumerate(self.__matrix):
+            for index_column, coluna in enumerate(linha):
+                posicao = self.__aumentar_ponto((index_column, index))
+
+                if index % 2 == 0:
+                    if index_column % 2 == 0:
+                        color = (255, 125, 125)
+                    else:
+                        color = (125, 125, 255)
+                else:
+                    if index_column % 2 == 0:
+                        color = (125, 125, 255)
+                    else:
+                        color = (255, 125, 125)
+
+                rect = pygame.Rect(posicao, (32, 32))
+                pygame.draw.rect(tela.janela, color, rect)
+
     def __remover_inimigo(self, inimigo):
         self.inimigos.remove(inimigo)
         self.criar_item(inimigo.hitbox.posicao)
@@ -400,30 +425,8 @@ class AbstractTerreno(ABC):
 
         return (x, y)
 
-    def __centralizar_ponto(self, ponto: tuple) -> tuple:
-        x = ponto[0] + self.__opcoes.MENOR_UNIDADE
-        y = ponto[1] + self.__opcoes.MENOR_UNIDADE
-
-        return (x, y)
-
     def __inverter_ponto(self, ponto: tuple) -> tuple:
         return (ponto[1], ponto[0])
-
-    def __ponto_dentro_da_matriz(self, ponto: tuple) -> bool:
-        if ponto[0] < 0 or ponto[0] >= len(self.__matrix):
-            return False
-
-        if ponto[1] < 0 or ponto[1] >= len(self.__matrix[0]):
-            return False
-
-        return True
-
-    def criar_item(self, posicao):
-        if len(self.__itens) != 0:
-            pocao = random.choice(self.__itens)
-            pocao.posicao = posicao
-            self.itens_tela.append(pocao)
-            self.__itens.remove(pocao)
 
     @property
     def jogador(self) -> Jogador:
@@ -449,15 +452,6 @@ class AbstractTerreno(ABC):
     @property
     def itens_tela(self):
         return self.__itens_tela
-
-    def dropar_item(self):
-        rect_jogador = pygame.Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
-        for pocao in self.itens_tela:
-            item_surf = pocao.imagem
-            pocao_rect = item_surf.get_rect(center=(pocao.posicao))
-            if pocao_rect.colliderect(rect_jogador):
-                self.itens_tela.remove(pocao)
-                print("colidiu e aplicou o item")
 
     @abstractmethod
     def has_ended():

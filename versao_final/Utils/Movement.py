@@ -238,7 +238,6 @@ class AStar:
                 for child in children:
                     self.__update_queue_diagonal(current_node, child)
 
-        print('Caminho não encontrado')
         return []
 
     def __search_children_sides(self, node: Node) -> list:
@@ -346,11 +345,9 @@ class AStar:
                 return False
 
             if self.__matrix[position[0]][position[1]] in self.__valid_initial:
-                print('In Valid Initial')
                 return True
 
             if self.__matrix[position[0]][position[1]] not in self.__empty_points:
-                # print('Not in')
                 return False
 
             return True
@@ -372,7 +369,6 @@ class AStar:
             return False
 
         if self.__matrix[position[0]][position[1]] not in self.__empty_points:
-            # print('Not in')
             return False
 
         return True
