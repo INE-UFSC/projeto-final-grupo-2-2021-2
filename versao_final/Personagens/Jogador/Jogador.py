@@ -19,19 +19,12 @@ JogadorStats = {
 
 class Jogador(AbstractPersonagem):
     def __init__(self, posicao: tuple, tamanho: tuple, nome: str, terreno=None) -> None:
-        sprite_paths = [
-            "",  # Esquerda
-            "",  # Direita
-            "",  # Cima
-            ""  # Baixo
-        ]
         self.__itens: List[AbstractItem] = []
         self.__nome = nome
         self.__status_tela = StatusJogador(self)
         self.__direction = Direction.MEIO_CIMA
 
-        super().__init__(stats=JogadorStats, posicao=posicao,
-                         tamanho=tamanho, terreno=terreno, sprite_paths=sprite_paths)
+        super().__init__(stats=JogadorStats, posicao=posicao, tamanho=tamanho, terreno=terreno)
 
     @property
     def direction(self) -> Direction:
@@ -131,7 +124,6 @@ class Jogador(AbstractPersonagem):
             self.hitbox.posicao = nova_posicao_y
 
         self.__atualizar_frente(x_movement, y_movement)
-        self._atualizar_sprite(x_movement, y_movement)
 
     def __posicao_frente(self):
         rect = pygame.Rect(self.hitbox.posicao, self.hitbox.tamanho)

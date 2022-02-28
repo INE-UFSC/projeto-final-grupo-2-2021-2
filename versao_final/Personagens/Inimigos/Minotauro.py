@@ -7,27 +7,67 @@ from random import random
 from pygame import sprite, Surface, Rect
 
 
-class Inimigo1(AbstractInimigo, sprite.Sprite):
+class Minotauro(AbstractInimigo, sprite.Sprite):
+    __ANIMACOES_IMPORTADAS = False
+    __CHANCE_DAMAGE_STOP_ATTACK = 0.6
+    __TAMANHO_IMAGEM = (80, 65)
+    __TAMANHO = (36, 48)
+    __SPRITE_PATH = 'Assets/Personagens/Minotauro/'
+    __STATS_FACIL = {'vida': 6, 'ataque': 3, 'defesa': 1,
+                     'vel': 2, 'vel_ataque': 1, 'arma_dano': 1,
+                               'arma_alcance': 10, 'view_distance': 150}
+    __STATS_MEDIO = {'vida': 8, 'ataque': 2, 'defesa': 2,
+                     'vel': 2, 'vel_ataque': 1, 'arma_dano': 2,
+                               'arma_alcance': 10, 'view_distance': 150}
+    __STATS_DIFICIL = {'vida': 10, 'ataque': 6, 'defesa': 3,
+                       'vel': 2, 'vel_ataque': 1, 'arma_dano': 4,
+                                 'arma_alcance': 10, 'view_distance': 150}
+
     def __init__(self, posicao: tuple, dificuldade: Dificuldade, terreno: AbstractTerreno) -> None:
-        stats = self._calibrar_dificuldade(dificuldade)
-        sprite_paths = [
-            "",  # Esquerda
-            "",  # Direita
-            "",  # Cima
-            ""  # Baixo
-        ]
-        super().__init__(stats=stats, posicao=posicao, tamanho=(36, 48),
-                         terreno=terreno, sprite_paths=sprite_paths)
+        stats = Minotauro.__calibrar_dificuldade(dificuldade)
+
+        super().__init__(stats=stats, posicao=posicao, tamanho=Minotauro.__TAMANHO, terreno=terreno)
+
+        if not Minotauro.__ANIMACOES_IMPORTADAS:
+            Minotauro.__import_character_assets()
+            Minotauro.__ANIMACOES_IMPORTADAS = True
+
         self.__animation = 'Idle'
-        self.__tamanho_imagem = (80, 65)
         self.__frame_index = 0
         self.__animation_speed = 0.35
         self.__FRAME_TO_WAIT = 0
         self.__MORREU = False
         self.__LAST_ANIMATION = 'Idle'
-        self.__CHANCE_DAMAGE_STOP_ATTACK = 0.6
         self.__ANIMACAO_RESETADA = False
-        self.__import_character_assets()
+        self.__animations = Minotauro.__normal_animations
+
+    @classmethod
+    def __import_character_assets(cls):
+        Minotauro.__animations_length = {}
+        Minotauro.__normal_animations = {}
+        Minotauro.__fliped_animations = {}
+
+        animations_names = ['Idle', 'Walking', 'Taunt', 'Idle Blink',
+                            'Taunt', 'Attacking', 'Dying', 'Hurt']
+
+        for animation in animations_names:
+            full_path = Minotauro.__SPRITE_PATH + animation
+
+            normal_images = import_folder(full_path, Minotauro.__TAMANHO_IMAGEM)
+            fliped_images = import_fliped_folder(full_path, Minotauro.__TAMANHO_IMAGEM)
+
+            Minotauro.__fliped_animations[animation] = fliped_images
+            Minotauro.__normal_animations[animation] = normal_images
+            Minotauro.__animations_length[animation] = len(normal_images)
+
+    @classmethod
+    def __calibrar_dificuldade(cls, dificuldade: Dificuldade) -> dict:
+        if dificuldade.medio:
+            return Minotauro.__STATS_MEDIO
+        elif dificuldade.dificil:
+            return Minotauro.__STATS_DIFICIL
+        else:
+            return Minotauro.__STATS_FACIL
 
     @property
     def image(self) -> Surface:
@@ -85,9 +125,9 @@ class Inimigo1(AbstractInimigo, sprite.Sprite):
 
         # Update de qual a fonte de sprite, esquerda ou direita
         if self.direction == Direction.DIREITA_BAIXO or self.direction == Direction.DIREITA_CIMA or self.direction == Direction.DIREITA_MEIO:
-            self.__animations = self.__animations_normal
+            self.__animations = Minotauro.__normal_animations
         else:
-            self.__animations = self.__animations_fliped
+            self.__animations = Minotauro.__fliped_animations
 
         # Update quanto a animação de atacar
         if self.__animation != 'Attacking' and self.__animation != 'Hurt':
@@ -166,7 +206,7 @@ class Inimigo1(AbstractInimigo, sprite.Sprite):
                 self.__animation = self.__get_random_searching_animation()
 
     def __set_animation_frame_to_wait(self, animation: str) -> None:
-        self.__FRAME_TO_WAIT = self.__animations_size[animation] // self.__animation_speed
+        self.__FRAME_TO_WAIT = Minotauro.__animations_length[animation] // self.__animation_speed
 
     def __will_damage_stop_attack(self) -> bool:
         chance = random()
@@ -189,43 +229,3 @@ class Inimigo1(AbstractInimigo, sprite.Sprite):
             return 'Taunt'
         else:
             return 'Walking'
-
-    def __import_character_assets(self):
-        character_path = 'Assets/Personagens/Minotauro/'
-        self.__animations_size = {}
-        self.__animations_normal = {}
-        self.__animations_fliped = {}
-        self.__animations = {
-            'Idle': [], 'Walking': [], 'Taunt': [], 'Idle Blink': [],
-            'Taunt': [], 'Attacking': [], 'Dying': [], 'Hurt': [],
-        }
-
-        for animation in self.__animations.keys():
-            full_path = character_path + animation
-            normal_images = import_folder(full_path, self.__tamanho_imagem)
-            fliped_images = import_fliped_folder(full_path, self.__tamanho_imagem)
-            self.__animations_fliped[animation] = fliped_images
-            self.__animations_normal[animation] = normal_images
-            self.__animations_size[animation] = len(normal_images)
-
-            self.__animations = self.__animations_normal
-
-    def _calibrar_dificuldade(self, dificuldade: Dificuldade) -> dict:
-        if dificuldade.medio:
-            return {
-                'vida': 8, 'ataque': 2, 'defesa': 2,
-                'vel': 2, 'vel_ataque': 1, 'arma_dano': 2,
-                'arma_alcance': 10, 'view_distance': 150
-            }
-        elif dificuldade.dificil:
-            return {
-                'vida': 10, 'ataque': 6, 'defesa': 3,
-                'vel': 2, 'vel_ataque': 1, 'arma_dano': 4,
-                'arma_alcance': 10, 'view_distance': 150
-            }
-        else:  # Facil
-            return {
-                'vida': 6, 'ataque': 3, 'defesa': 1,
-                'vel': 2, 'vel_ataque': 1, 'arma_dano': 1,
-                'arma_alcance': 10, 'view_distance': 150
-            }

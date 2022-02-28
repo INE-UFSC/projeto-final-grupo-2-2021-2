@@ -6,7 +6,7 @@ from pygame import Rect
 
 
 class AbstractInimigo(AbstractPersonagem, ABC):
-    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno, sprite_paths) -> None:
+    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno) -> None:
         self.__direction = Direction.MEIO_BAIXO
         self.__estado = Estado.REPOUSO
 
@@ -17,7 +17,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__MINIMO_PASSOS_DADOS = 2
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 150
 
-        super().__init__(stats, posicao, tamanho, terreno, sprite_paths)
+        super().__init__(stats, posicao, tamanho, terreno)
 
     @property
     def _estado(self) -> Estado:
@@ -175,7 +175,6 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
             self.hitbox.posicao = nova_posicao_y
 
-        self._atualizar_sprite(x_movement, y_movement)
         self.__atualizar_frente(x_movement, y_movement)
 
     def __mover_para_ponto(self, ponto: tuple) -> None:
@@ -205,7 +204,6 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
             self.hitbox.posicao = nova_posicao_y
 
-        self._atualizar_sprite(x_movement, y_movement)
         self.__atualizar_frente(x_movement, y_movement)
 
     def __update_visao(self, hit_jogador: Hitbox) -> None:
@@ -268,21 +266,29 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def __atualizar_frente(self, x_movement, y_movement):
         if x_movement < 0:
             if y_movement < 0:
+                #print('Esquerda Cima')
                 self.__direction = Direction.ESQUERDA_CIMA
             elif y_movement > 0:
+                #print('Esquerda Baixo')
                 self.__direction = Direction.ESQUERDA_BAIXO
             else:
+                #print('Esquerda Meio')
                 self.__direction = Direction.ESQUERDA_MEIO
         elif x_movement > 0:
             if y_movement < 0:
+                #print('Direita Cima')
                 self.__direction = Direction.DIREITA_CIMA
             elif y_movement > 0:
+                #print('Direita Baixo')
                 self.__direction = Direction.DIREITA_BAIXO
             else:
+                #print('Direita Meio')
                 self.__direction = Direction.DIREITA_MEIO
         elif y_movement > 0:
+            #print('Meio Baixo')
             self.__direction = Direction.MEIO_BAIXO
         elif y_movement < 0:
+            #print('Meio Cima')
             self.__direction = Direction.MEIO_CIMA
 
     def _calcular_distancia(self, outro_hitbox: Hitbox):
