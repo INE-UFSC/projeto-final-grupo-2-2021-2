@@ -13,6 +13,7 @@ class AbstractPersonagem(ABC):
         alcance = stats['arma_alcance'] if 'arma_alcance' in stats.keys() else 0
         self.__arma = Arma(dano, alcance)
 
+        self.__acabou_de_tomar_dano = False
         self.__hitbox = Hitbox(posicao, tamanho)
         self.__terreno = terreno
 
@@ -26,11 +27,20 @@ class AbstractPersonagem(ABC):
             self._sprite_cima = sprite_paths[2]
             self._sprite_baixo = sprite_paths[3]
 
+    @property
+    def _tomou_dano(self) -> bool:
+        if self.__acabou_de_tomar_dano:
+            self.__acabou_de_tomar_dano = False
+            return True
+        else:
+            return False
+
     def tomar_dano(self, dano: int) -> int:
         if type(dano) == int:
             dano_real = dano - self.__status.defesa
             self.__status.vida -= dano_real
-
+            if dano_real > 0:
+                self.__acabou_de_tomar_dano = True
             return dano_real
         else:
             return 0
@@ -120,7 +130,7 @@ class AbstractPersonagem(ABC):
     def sprite_path(self, value) -> None:
         if type(value) == str:
             self.__sprite_path = value
-    
+
     @property
     def status(self):
         return self.__status

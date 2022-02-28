@@ -1,6 +1,7 @@
 from Enums.Enums import Dificuldade
 from Abstractions.AbstractInimigo import AbstractInimigo
 from Abstractions.AbstractTerreno import AbstractTerreno
+from Utils.Hitbox import Hitbox
 
 
 class Inimigo2(AbstractInimigo):
@@ -15,6 +16,12 @@ class Inimigo2(AbstractInimigo):
 
         super().__init__(stats=stats, posicao=posicao,
                          tamanho=(40, 50), terreno=terreno, sprite_paths=sprite_paths)
+
+    def morreu(self) -> bool:
+        return super().morreu()
+
+    def update(self, hit_jogador: Hitbox):
+        return super().update(hit_jogador)
 
     def _calibrar_dificuldade(self, dificuldade: Dificuldade) -> dict:
         if dificuldade.medio:

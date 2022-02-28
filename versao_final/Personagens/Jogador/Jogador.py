@@ -12,7 +12,7 @@ JogadorStats = {
     'defesa': 2,
     'vel': 4,
     'vel_ataque': 1,
-    'arma_dano': 10, #3
+    'arma_dano': 3,
     'arma_alcance': 20
 }
 
@@ -32,6 +32,10 @@ class Jogador(AbstractPersonagem):
 
         super().__init__(stats=JogadorStats, posicao=posicao,
                          tamanho=tamanho, terreno=terreno, sprite_paths=sprite_paths)
+
+    @property
+    def direction(self) -> Direction:
+        return self.__direction
 
     @property
     def status_tela(self):

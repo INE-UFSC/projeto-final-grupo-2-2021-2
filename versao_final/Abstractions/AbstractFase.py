@@ -29,8 +29,8 @@ class AbstractFase(ABC):
     def ciclo(self, tela: TelaJogo) -> None:
         """Função para ser executada em todo ciclo do main loop"""
         self.__jogador.lidar_inputs()
-        self.__terreno.mover_inimigos()
         self.__terreno.update()
+        self.__terreno.mover_inimigos()
         self.__terreno.lidar_ataques(tela)
         self.__terreno.desenhar(tela, self.__jogador)
         self.__terreno.dropar_item()

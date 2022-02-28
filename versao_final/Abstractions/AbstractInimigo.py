@@ -2,24 +2,41 @@ from abc import ABC, abstractmethod
 from Utils.Hitbox import Hitbox
 from Abstractions.AbstractPersonagem import AbstractPersonagem
 from Enums.Enums import Direction, Estado
-from Abstractions.AbstractTerreno import AbstractTerreno
-import pygame
+from pygame import Rect
 
 
 class AbstractInimigo(AbstractPersonagem, ABC):
-    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: AbstractTerreno, sprite_paths) -> None:
+    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno, sprite_paths) -> None:
         self.__direction = Direction.MEIO_BAIXO
         self.__estado = Estado.REPOUSO
+
         self.__caminho = []
         self.__len_caminho = 0
         self.__estava_vendo_jogador = False
-        self.__PERTO = 4
+        self.__PERTO = 10
         self.__MINIMO_PASSOS_DADOS = 2
-        self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 15
+        self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 150
 
         super().__init__(stats, posicao, tamanho, terreno, sprite_paths)
 
+    @property
+    def _estado(self) -> Estado:
+        return self.__estado
+
+    @property
+    def direction(self) -> Direction:
+        return self.__direction
+
+    @abstractmethod
+    def update(self, hit_jogador: Hitbox) -> None:
+        if self.vida <= 0:
+            self.__estado = Estado.MORRENDO
+        super().update()
+
     def mover(self, hit_jogador: Hitbox) -> None:
+        if self.__estado == Estado.MORRENDO:
+            return None
+
         if self.__estado == Estado.REPOUSO:
             self.__update_visao(hit_jogador)
         elif self.__estado == Estado.ALERTA:
@@ -27,7 +44,33 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         elif self.__estado == Estado.ATACANDO:
             self.__seguir_jogador(hit_jogador)
 
+    def get_rect_arma(self) -> Rect:
+        posicao_frente = self.__determinar_posicao_frente()
+
+        rect = Rect(posicao_frente, (self.alcance * 2, self.alcance * 2))
+        rect.center = posicao_frente
+        return rect
+
+    @abstractmethod
+    def atacar(self):
+        if self.arma.atacar():
+            return True
+        else:
+            return False
+
+    @abstractmethod
+    def _calibrar_dificuldade(self):
+        pass
+
+    @abstractmethod
+    def morreu(self) -> bool:
+        pass
+
     def __seguir_jogador(self, hit_jogador: Hitbox) -> None:
+        distancia = self._calcular_distancia(hit_jogador)
+        if distancia < self.__PERTO:
+            self.__dumb_movement(hit_jogador)
+
         # Se está vendo completamente, faz caminho burro
         if self.__esta_vendo_jogador_completamente(hit_jogador):
             passos_dados = self.__len_caminho - len(self.__caminho)
@@ -86,22 +129,54 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             self.__estado = Estado.ALERTA
 
     def __chegou_no_ponto(self, ponto: tuple) -> bool:
-        rect = pygame.Rect(self.hitbox.posicao, self.hitbox.tamanho)
+        rect = Rect(self.hitbox.posicao, self.hitbox.tamanho)
         if rect.collidepoint(ponto):
             return True
         else:
             return False
 
     def __dumb_movement(self, hit_jogador: Hitbox) -> None:
-        distancia = self.__calcular_distancia(hit_jogador)
+        distancia = self._calcular_distancia(hit_jogador)
 
-        rect_jogador = pygame.Rect(hit_jogador.posicao, hit_jogador.tamanho)
+        rect_jogador = Rect(hit_jogador.posicao, hit_jogador.tamanho)
         if distancia < self.__PERTO:
-            destino = rect_jogador.center
+            return self.__mover_para_o_centro(hit_jogador)
         else:
             destino = rect_jogador.topleft
+            self.__mover_para_ponto(destino)
 
-        self.__mover_para_ponto(destino)
+    def __mover_para_o_centro(self, hit_jogador: Hitbox) -> None:
+
+        ponto = hit_jogador.center
+
+        dist_x = abs(ponto[0] - self.hitbox.center[0])
+        vel_x = self.vel if dist_x > self.vel else dist_x
+        if ponto[0] > self.hitbox.center[0]:
+            x_movement = vel_x
+        elif ponto[0] < self.hitbox.center[0]:
+            x_movement = -vel_x
+        else:
+            x_movement = 0
+
+        dist_y = abs(ponto[1] - self.hitbox.center[1])
+        vel_y = self.vel if dist_y > self.vel else dist_y
+        if ponto[1] > self.hitbox.center[1]:
+            y_movement = vel_y
+        elif ponto[1] < self.hitbox.center[1]:
+            y_movement = -vel_y
+        else:
+            y_movement = 0
+
+        nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
+        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
+            self.hitbox.posicao = nova_posicao_x
+
+        nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
+        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
+            self.hitbox.posicao = nova_posicao_y
+
+        self._atualizar_sprite(x_movement, y_movement)
+        self.__atualizar_frente(x_movement, y_movement)
 
     def __mover_para_ponto(self, ponto: tuple) -> None:
         dist_x = abs(ponto[0] - self.hitbox.x)
@@ -144,29 +219,8 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             if self.__esta_vendo_jogador_minimamente(hit_jogador):
                 return True
 
-    def verificar_ataque(self, hit_jogador: Hitbox):
-        distancia = self.__calcular_distancia(hit_jogador)
-
-        if distancia < self.arma.alcance:
-            return True
-        else:
-            return False
-
-    def get_rect_arma(self) -> pygame.Rect:
-        posicao_frente = self.__determinar_posicao_frente()
-
-        rect = pygame.Rect(posicao_frente, (self.alcance, self.alcance))
-        rect.center = posicao_frente
-        return rect
-
-    def atacar(self):
-        if self.arma.atacar():
-            return True
-        else:
-            return False
-
     def __jogador_dentro_da_visao(self, hit_jogador) -> bool:
-        distancia = self.__calcular_distancia(hit_jogador)
+        distancia = self._calcular_distancia(hit_jogador)
         if distancia < self.__view_distance:
             return True
         else:
@@ -231,14 +285,36 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         elif y_movement < 0:
             self.__direction = Direction.MEIO_CIMA
 
-    def __calcular_distancia(self, outro_hitbox: Hitbox):
+    def _calcular_distancia(self, outro_hitbox: Hitbox):
+        if self.__hitbox_encostado(outro_hitbox):
+            return 0
+
         posicao1, posicao2 = self.__determinar_posicoes_mais_proximas(outro_hitbox)
 
-        x = abs(posicao1[0] - posicao2[0])
-        y = abs(posicao1[1] - posicao2[1])
+        x = abs(posicao1[0] - posicao2[0]) ** 2
+        y = abs(posicao1[1] - posicao2[1]) ** 2
 
         dist = (x + y)**(1/2)
         return dist
+
+    def __hitbox_encostado(self, hitbox: Hitbox) -> bool:
+        # Alinhados na horizontal
+        if self.hitbox.left == hitbox.right or self.hitbox.right == hitbox.left:
+            if self.hitbox.top > hitbox.top and self.hitbox.top < hitbox.bottom:
+                return True
+            elif hitbox.top > self.hitbox.top and hitbox.top < self.hitbox.bottom:
+                return True
+            else:
+                return False
+        # Alinhados na vertical
+        elif self.hitbox.top == hitbox.bottom or self.hitbox.bottom == hitbox.top:
+            if self.hitbox.right > hitbox.left and self.hitbox.right < hitbox.right:
+                return True
+            elif hitbox.right > self.hitbox.left and hitbox.right < self.hitbox.left:
+                return True
+            else:
+                return False
+        return False
 
     def __determinar_posicoes_mais_proximas(self, hit_jogador: Hitbox):
         if self.hitbox.x + self.hitbox.largura <= hit_jogador.x:  # A direita
@@ -281,7 +357,3 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             return self.hitbox.midtop
         else:
             return self.hitbox.midtop
-
-    @abstractmethod
-    def _calibrar_dificuldade(self):
-        pass
