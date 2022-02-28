@@ -59,10 +59,6 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             return False
 
     @abstractmethod
-    def _calibrar_dificuldade(self):
-        pass
-
-    @abstractmethod
     def morreu(self) -> bool:
         pass
 
