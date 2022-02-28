@@ -53,13 +53,15 @@ class AbstractTerreno(ABC):
 
         for index_row, row in enumerate(matriz_terreno):
             for index_column, cell in enumerate(row):
+                posicao = (index_column * self.__opcoes.MENOR_UNIDADE,
+                           index_row * self.__opcoes.MENOR_UNIDADE)
+
                 if cell == 'B':  # Buraco
-                    self.__obstaculos.append(Buraco((index_column, index_row)))
+                    self.__obstaculos.append(Buraco(posicao))
                 elif cell == 'P':  # Parede
-                    self.__obstaculos.append(Parede((index_column, index_row)))
+                    self.__obstaculos.append(Parede(posicao))
                 elif cell == 'J':  # Jogador
-                    nova_posicao = (index_column * 32, index_row * 32)
-                    self.__jogador.hitbox.posicao = nova_posicao
+                    self.__jogador.hitbox.posicao = posicao
 
     def iniciar_rodada(self, tela: TelaJogo, jogador) -> None:
         self.desenhar(tela, jogador)

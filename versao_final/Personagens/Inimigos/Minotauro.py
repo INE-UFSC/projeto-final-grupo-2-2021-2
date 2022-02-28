@@ -13,15 +13,12 @@ class Minotauro(AbstractInimigo, sprite.Sprite):
     __TAMANHO_IMAGEM = (80, 65)
     __TAMANHO = (36, 48)
     __SPRITE_PATH = 'Assets/Personagens/Minotauro/'
-    __STATS_FACIL = {'vida': 6, 'ataque': 3, 'defesa': 1,
-                     'vel': 2, 'vel_ataque': 1, 'arma_dano': 1,
-                               'arma_alcance': 10, 'view_distance': 150}
-    __STATS_MEDIO = {'vida': 8, 'ataque': 2, 'defesa': 2,
-                     'vel': 2, 'vel_ataque': 1, 'arma_dano': 2,
-                               'arma_alcance': 10, 'view_distance': 150}
-    __STATS_DIFICIL = {'vida': 10, 'ataque': 6, 'defesa': 3,
-                       'vel': 2, 'vel_ataque': 1, 'arma_dano': 4,
-                                 'arma_alcance': 10, 'view_distance': 150}
+    __STATS_FACIL = {'vida': 6, 'ataque': 3, 'defesa': 1, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 1,
+                     'arma_alcance': 10, 'view_distance': 150, 'transpassavel': False}
+    __STATS_MEDIO = {'vida': 8, 'ataque': 2, 'defesa': 2, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 2,
+                     'arma_alcance': 10, 'view_distance': 150, 'transpassavel': False}
+    __STATS_DIFICIL = {'vida': 10, 'ataque': 6, 'defesa': 3, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 4,
+                       'arma_alcance': 10, 'view_distance': 150, 'transpassavel': False}
 
     def __init__(self, posicao: tuple, dificuldade: Dificuldade, terreno: AbstractTerreno) -> None:
         stats = Minotauro.__calibrar_dificuldade(dificuldade)
@@ -43,31 +40,31 @@ class Minotauro(AbstractInimigo, sprite.Sprite):
 
     @classmethod
     def __import_character_assets(cls):
-        Minotauro.__animations_length = {}
-        Minotauro.__normal_animations = {}
-        Minotauro.__fliped_animations = {}
+        cls.__animations_length = {}
+        cls.__normal_animations = {}
+        cls.__fliped_animations = {}
 
         animations_names = ['Idle', 'Walking', 'Taunt', 'Idle Blink',
                             'Taunt', 'Attacking', 'Dying', 'Hurt']
 
         for animation in animations_names:
-            full_path = Minotauro.__SPRITE_PATH + animation
+            full_path = cls.__SPRITE_PATH + animation
 
-            normal_images = import_folder(full_path, Minotauro.__TAMANHO_IMAGEM)
-            fliped_images = import_fliped_folder(full_path, Minotauro.__TAMANHO_IMAGEM)
+            normal_images = import_folder(full_path, cls.__TAMANHO_IMAGEM)
+            fliped_images = import_fliped_folder(full_path, cls.__TAMANHO_IMAGEM)
 
-            Minotauro.__fliped_animations[animation] = fliped_images
-            Minotauro.__normal_animations[animation] = normal_images
-            Minotauro.__animations_length[animation] = len(normal_images)
+            cls.__fliped_animations[animation] = fliped_images
+            cls.__normal_animations[animation] = normal_images
+            cls.__animations_length[animation] = len(normal_images)
 
     @classmethod
     def __calibrar_dificuldade(cls, dificuldade: Dificuldade) -> dict:
         if dificuldade.medio:
-            return Minotauro.__STATS_MEDIO
+            return cls.__STATS_MEDIO
         elif dificuldade.dificil:
-            return Minotauro.__STATS_DIFICIL
+            return cls.__STATS_DIFICIL
         else:
-            return Minotauro.__STATS_FACIL
+            return cls.__STATS_FACIL
 
     @property
     def image(self) -> Surface:

@@ -13,7 +13,8 @@ JogadorStats = {
     'vel': 4,
     'vel_ataque': 1,
     'arma_dano': 3,
-    'arma_alcance': 20
+    'arma_alcance': 20,
+    'transpassavel': False
 }
 
 

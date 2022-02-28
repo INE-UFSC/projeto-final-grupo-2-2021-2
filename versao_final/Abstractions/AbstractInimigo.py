@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from Utils.Hitbox import Hitbox
 from Abstractions.AbstractPersonagem import AbstractPersonagem
 from Enums.Enums import Direction, Estado
-from pygame import Rect
+from pygame import Rect, Surface
 
 
 class AbstractInimigo(AbstractPersonagem, ABC):
@@ -60,6 +60,16 @@ class AbstractInimigo(AbstractPersonagem, ABC):
 
     @abstractmethod
     def morreu(self) -> bool:
+        pass
+
+    @property
+    @abstractmethod
+    def image(self) -> Surface:
+        pass
+
+    @property
+    @abstractmethod
+    def rect(self) -> Rect:
         pass
 
     def __seguir_jogador(self, hit_jogador: Hitbox) -> None:
