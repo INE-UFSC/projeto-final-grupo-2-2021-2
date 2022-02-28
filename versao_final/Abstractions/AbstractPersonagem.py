@@ -5,45 +5,35 @@ from Personagens.Status import Status
 
 
 class AbstractPersonagem(ABC):
-    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: None, sprite_paths: list) -> None:
+    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: None) -> None:
         """Recebe um dicionário com os stats iniciais, tuplas com a posição e tamanho do personagem"""
         self.__status = Status(stats)
 
-        dano = stats['arma_dano'] if 'arma_dano' in stats.keys() else 0
-        alcance = stats['arma_alcance'] if 'arma_alcance' in stats.keys() else 0
+        dano = stats['arma_dano'] if 'arma_dano' in stats.keys() else 2
+        alcance = stats['arma_alcance'] if 'arma_alcance' in stats.keys() else 10
         self.__arma = Arma(dano, alcance)
 
+        self.__ACABOU_DE_TOMAR_DANO = False
         self.__hitbox = Hitbox(posicao, tamanho)
         self.__terreno = terreno
 
-        # O sprite path recebido deve ser uma lista com 4 valores, que será o caminho
-        # para o sprite da 1º Esquerda, 2º Direita, 3º Cima, 4º Baixo
-        self.__sprite_path = None
-        if len(sprite_paths) == 4:
-            self.__sprite_path = sprite_paths[3]  # Inicializa com o sprite para baixo
-            self._sprite_esquerda = sprite_paths[0]
-            self._sprite_direita = sprite_paths[1]
-            self._sprite_cima = sprite_paths[2]
-            self._sprite_baixo = sprite_paths[3]
+    @property
+    def _tomou_dano(self) -> bool:
+        if self.__ACABOU_DE_TOMAR_DANO:
+            self.__ACABOU_DE_TOMAR_DANO = False
+            return True
+        else:
+            return False
 
     def tomar_dano(self, dano: int) -> int:
         if type(dano) == int:
             dano_real = dano - self.__status.defesa
             self.__status.vida -= dano_real
-
+            if dano_real > 0:
+                self.__ACABOU_DE_TOMAR_DANO = True
             return dano_real
         else:
             return 0
-
-    def _atualizar_sprite(self, x_movement, y_movement):
-        if y_movement < 0:
-            self.sprite_path = self._sprite_cima
-        elif x_movement > 0:
-            self.sprite_path = self._sprite_direita
-        elif x_movement < 0:
-            self.sprite_path = self._sprite_esquerda
-        elif y_movement > 0:
-            self.sprite_path = self._sprite_baixo
 
     def update(self):
         self.__arma.update()
@@ -112,15 +102,6 @@ class AbstractPersonagem(ABC):
     def hitbox(self) -> Hitbox:
         return self.__hitbox
 
-    @property
-    def sprite_path(self) -> str:
-        return self.__sprite_path
-
-    @sprite_path.setter
-    def sprite_path(self, value) -> None:
-        if type(value) == str:
-            self.__sprite_path = value
-    
     @property
     def status(self):
         return self.__status

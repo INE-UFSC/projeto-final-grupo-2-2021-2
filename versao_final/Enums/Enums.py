@@ -36,3 +36,4 @@ class Estado(Enum):
     ALERTA = 1
     REPOUSO = 2
     ATACANDO = 3
+    MORRENDO = 4

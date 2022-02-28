@@ -6,7 +6,7 @@ class Arma():
         self.__desenhando_ataque = False
 
         self.__sprite_ataque = ''
-        self.__timer_desenhando = 2
+        self.__timer_desenhando = 12
         self.__timer_delay = 30
 
     @property
@@ -24,6 +24,10 @@ class Arma():
     @property
     def alcance(self) -> int:
         return self.__alcance
+
+    @property
+    def atacando(self) -> bool:
+        return self.__em_delay_ataque
 
     def atacar(self) -> bool:
         if self.__em_delay_ataque:

@@ -12,6 +12,6 @@ class Terreno3(AbstractTerreno):
 
     def has_ended(self) -> bool:
         for inimigo in self.inimigos:
-            if inimigo.vida > 0:
+            if not inimigo.morreu:
                 return False
         return True

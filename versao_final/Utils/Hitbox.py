@@ -90,20 +90,36 @@ class Hitbox():
 
     @property
     def altura(self) -> int:
-        return self.__tamanho[0]
+        return self.__tamanho[1]
 
     @altura.setter
     def altura(self, altura) -> None:
         if type(altura) == int:
-            novo_tamanho = (altura, self.__tamanho[1])
+            novo_tamanho = (altura, self.__tamanho[0])
             self.__tamanho = novo_tamanho
 
     @property
     def largura(self) -> int:
-        return self.__tamanho[1]
+        return self.__tamanho[0]
 
     @largura.setter
     def largura(self, largura) -> None:
         if type(largura) == int:
-            novo_tamanho = (self.__tamanho[0], largura)
+            novo_tamanho = (self.__tamanho[1], largura)
             self.__tamanho = novo_tamanho
+
+    @property
+    def left(self) -> int:
+        return self.__posicao[0]
+
+    @property
+    def right(self) -> int:
+        return self.__posicao[0] + self.__tamanho[0]
+
+    @property
+    def top(self) -> int:
+        return self.__posicao[1]
+
+    @property
+    def bottom(self) -> int:
+        return self.__posicao[1] + self.__tamanho[1]

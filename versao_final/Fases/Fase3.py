@@ -1,7 +1,7 @@
 from Personagens.Jogador.Jogador import Jogador
 from Config.Opcoes import Dificuldade
 from Terrenos.Terreno3 import Terreno3
-from Personagens.Inimigos.Inimigo3 import Inimigo3
+from Personagens.Inimigos.Minotauro import Minotauro
 from Abstractions.AbstractFase import AbstractFase
 
 
@@ -17,7 +17,7 @@ class Fase3(AbstractFase):
 
         inimigos = []
         for x in range(len(self.__INIMIGO_POS)):
-            inimigo = Inimigo3(self.__INIMIGO_POS[x], self.dificuldade, self.terreno)
+            inimigo = Minotauro(self.__INIMIGO_POS[x], self.dificuldade, self.terreno)
             inimigos.append(inimigo)
         self.terreno.load_inimigos(inimigos)
 
