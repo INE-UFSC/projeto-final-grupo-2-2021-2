@@ -55,11 +55,12 @@ class AbstractTerreno(ABC):
             for index_column, cell in enumerate(row):
                 posicao = (index_column * self.__opcoes.MENOR_UNIDADE,
                            index_row * self.__opcoes.MENOR_UNIDADE)
+                tamanho = (self.__opcoes.MENOR_UNIDADE, self.__opcoes.MENOR_UNIDADE)
 
                 if cell == 'B':  # Buraco
-                    self.__obstaculos.append(Buraco(posicao))
+                    self.__obstaculos.append(Buraco(posicao, tamanho))
                 elif cell == 'P':  # Parede
-                    self.__obstaculos.append(Parede(posicao))
+                    self.__obstaculos.append(Parede(posicao, tamanho))
                 elif cell == 'J':  # Jogador
                     self.__jogador.hitbox.posicao = posicao
 

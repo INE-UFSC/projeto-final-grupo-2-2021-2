@@ -1,3 +1,7 @@
+from abc import ABC
+from typing import List
+
+
 def gerar_equação_vetorial_reta(p1, p2):
     def funcao(x):
         sub = ((p2[0] - p1[0]) * x, (p2[1] - p1[1]) * x)
@@ -11,9 +15,9 @@ def distancia_dois_pontos(p1: tuple, p2: tuple) -> float:
     return ((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2) ** (1/2)
 
 
-class NodeHeap():
+class NodeHeap:
     def __init__(self, index, value) -> None:
-        self.value = value
+        self.value: Node = value
         self.index = index
 
     @property
@@ -29,13 +33,88 @@ class NodeHeap():
         return self.index * 2 + 2
 
 
-class MinHeap():
+class Node:
+    def __init__(self, position: tuple, parent) -> None:
+        self.parent: Node = parent
+        self.position = position
+
+        self.f = 0  # Distance
+        self.g = 0  # Start-Node
+        self.h = 0  # Node-End
+
+    def __gt__(self, x) -> bool:
+        if type(x) == type(self):
+            if self.f == x.f:
+                return self.h > x.h
+            else:
+                return self.f > x.f
+        elif type(x) == int or type(x) == float:
+            return self.f > x
+        else:
+            print(f'Invalid Type GT: {type(self)}-{type(x)}')
+            return False
+
+    def __lt__(self, x) -> bool:
+        if type(x) == type(self):
+            if self.f == x.f:
+                return self.h < x.h
+            else:
+                return self.f < x.f
+        elif type(x) == int or type(x) == float:
+            return self.f < x
+        else:
+            print(f'Invalid Type LT: {type(self)}-{type(x)}')
+            return False
+
+    def __le__(self, x) -> bool:
+        if type(x) == type(self):
+            if self.f == x.f:
+                return self.h <= x.h
+            else:
+                return self.f <= x.f
+        elif type(x) == int or type(x) == float:
+            return self.f <= x
+        else:
+            print(f'Invalid Type LE: {type(self)}-{type(x)}')
+            return False
+
+    def __ge__(self, x) -> bool:
+        if type(x) == type(self):
+            if self.f == x.f:
+                return self.h >= x.h
+            else:
+                return self.f >= x.f
+        elif type(x) == int or type(x) == float:
+            return self.f >= x
+        else:
+            print(f'Invalid Type GE: {type(self)}-{type(x)}')
+            return False
+
+    def __eq__(self, x) -> bool:
+        if type(x) == type(self):
+            return self.position == x.position
+        elif type(x) == tuple:
+            return self.position == x
+        elif x is None:
+            return False
+        else:
+            print(f'Invalid Type EQ: {type(self)}-{type(x)}')
+            return False
+
+    def __ne__(self, x) -> bool:
+        if type(x) == type(self):
+            return self.position != x.position
+        else:
+            print(f'Invalid Type NE: {type(self)}-{type(x)}')
+            return False
+
+
+class MinHeap:
     def __init__(self, array: list) -> None:
-        self.heap = array
+        self.heap: List[NodeHeap] = array
 
     def printHeap(self) -> None:
-        for node in self.heap:
-            print(node.value.f, node.value.position)
+        print([(node.value.f, node.value.position) for node in self.heap])
 
     def insert(self, value) -> None:
         newIndex = len(self.heap)
@@ -48,7 +127,7 @@ class MinHeap():
         if len(self.heap) > 0:
             return self.heap[0].value
 
-    def popMinimum(self) -> int:
+    def popMinimum(self) -> Node:
         if len(self.heap) == 0:
             return None
 
@@ -56,7 +135,6 @@ class MinHeap():
 
         if len(self.heap) > 0:
             last = self.heap.pop()  # Extract the last element
-
             last.index = 0  # Update the index of node object
             self.heap.insert(0, last)
 
@@ -64,7 +142,7 @@ class MinHeap():
 
         return min.value
 
-    def update(self, index, new_value) -> None:
+    def update(self, index, new_value: Node) -> None:
         if index >= len(self.heap):
             return None
 
@@ -103,7 +181,7 @@ class MinHeap():
                 nodeRight = self.heap[node.right]
 
                 # If the current node is lesser, finish the decrease
-                if node.value < max(nodeLeft.value, nodeRight.value):
+                if node.value < min(nodeLeft.value, nodeRight.value):
                     break
 
                 # if left child is lesser, swap them
@@ -126,74 +204,6 @@ class MinHeap():
         return len(self.heap)
 
 
-class Node:
-    def __init__(self, position: tuple, parent) -> None:
-        self.parent: Node = parent
-        self.position = position
-
-        self.f = 0  # Distance
-        self.g = 0  # Start-Node
-        self.h = 0  # Node-End
-
-    def __gt__(self, x) -> bool:
-        if type(x) == type(self):
-            if self.f == x.f:
-                return self.h > self.h
-            else:
-                return self.f > x.f
-        else:
-            print(f'Invalid Type GT: {type(self)}-{type(x)}')
-            return False
-
-    def __lt__(self, x) -> bool:
-        if type(x) == type(self):
-            if self.f == x.f:
-                return self.h < self.h
-            else:
-                return self.f < x.f
-        else:
-            print(f'Invalid Type LT: {type(self)}-{type(x)}')
-            return False
-
-    def __le__(self, x) -> bool:
-        if type(x) == type(self):
-            if self.f == x.f:
-                return self.h <= self.h
-            else:
-                return self.f <= x.f
-        else:
-            print(f'Invalid Type LE: {type(self)}-{type(x)}')
-            return False
-
-    def __ge__(self, x) -> bool:
-        if type(x) == type(self):
-            if self.f == x.f:
-                return self.h >= self.h
-            else:
-                return self.f >= x.f
-        else:
-            print(f'Invalid Type GE: {type(self)}-{type(x)}')
-            return False
-
-    def __eq__(self, x) -> bool:
-        if type(x) == type(self):
-            return self.position == x.position
-        elif type(x) == tuple:
-            return self.position == x
-        elif x is None:
-            return False
-        else:
-            print(f'Invalid Type EQ: {type(self)}-{type(x)}')
-            return False
-
-    def __ne__(self, x) -> bool:
-        if type(x) == type(self):
-            return self.position != x.position
-        else:
-            print(f'Invalid Type NE: {type(self)}-{type(x)}')
-            return False
-
-
 class AStar:
     def __init__(self, matrix: list, empty_points: list, valid_initial: list) -> None:
         self.__matrix = matrix
@@ -201,7 +211,7 @@ class AStar:
         self.__y = len(matrix[0])
         self.__end = ()
         self.__open_list = MinHeap([])
-        self.__closed_nodes = []
+        self.__closed_nodes: List[Node] = []
         self.__empty_points = empty_points
         self.__valid_initial = valid_initial
 
@@ -220,10 +230,6 @@ class AStar:
 
         while len(self.__open_list) > 0:
             current_node = self.__open_list.popMinimum()
-
-            x = current_node.position[0]
-            y = current_node.position[1]
-
             self.__closed_nodes.append(current_node)
 
             if self.__check_finish(current_node, end_position):
@@ -274,28 +280,30 @@ class AStar:
 
         return children
 
-    def __update_queue_side(self, current_node, child: Node) -> None:
-        child.g = current_node.g + 1
-        child.h = ((child.position[0] - self.__end[0]) ** 2) + \
-            ((child.position[1] - self.__end[1]) ** 2)
+    def __update_queue_side(self, current_node: Node, child: Node) -> None:
+        deltaX = abs(child.position[0] - self.__end[0]) ** 2
+        deltaY = abs(child.position[1] - self.__end[1]) ** 2
+
+        child.g = current_node.g + 1  # Distancia do inicio até o ponto
+        child.h = (deltaX + deltaY)  # Distancia reta até o destino
         child.f = child.g + child.h
 
+        # Procura o node que está sendo atualizado na lista de abertos
         for index, heapNode in enumerate(self.__open_list.heap):
-            if heapNode.value == child:
-                if heapNode.value.g > child.g:
-                    heapNode.value.parent = current_node
-                    heapNode.value.g = current_node.g + 1
+            node = heapNode.value
+            if node == child:
+                if node.f > child.f or node.g > child.g:
                     self.__open_list.update(index, child)
-                    return None
-                else:
-                    return None
+                return None
 
         self.__open_list.insert(child)
 
     def __update_queue_diagonal(self, current_node, child: Node) -> None:
+        deltaX = (child.position[0] - self.__end[0]) ** 2
+        deltaY = (child.position[1] - self.__end[1]) ** 2
+
         child.g = current_node.g + 1.5
-        child.h = ((child.position[0] - self.__end[0]) ** 2) + \
-            ((child.position[1] - self.__end[1]) ** 2)
+        child.h = (deltaX + deltaY)
         child.f = child.g + child.h
 
         node, index = self.__get_if_in_open(child)
@@ -303,22 +311,8 @@ class AStar:
             self.__open_list.insert(child)
             return None
         else:
-            if node.g > child.g:
-                node.parent = current_node
-                node.g = current_node.g + 1
+            if node.f > child.f or node.g > child.g:
                 self.__open_list.update(index, child)
-
-        for index, heapNode in enumerate(self.__open_list.heap):
-            if heapNode.value == child:
-                if heapNode.value.g > child.g:
-                    heapNode.value.parent = current_node
-                    heapNode.value.g = current_node.g + 1
-                    self.__open_list.update(index, child)
-                    return None
-                else:
-                    return None
-
-        self.__open_list.insert(child)
 
     def __check_finish(self, current_node, end_position) -> bool:
         return current_node.position == end_position
@@ -385,3 +379,58 @@ class AStar:
                 return node.value, index
 
         return None, None
+
+
+matriz_terreno_24 = [
+    '                                               ', '                                               ',
+    '                                               ', '                                               ',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP', '                                               ',
+    '                                               ', '                                               ',
+    '                                               ', '                                               ',
+    '                PPPPPPPPPPPPP                  ', '                                               ',
+    '                                               ', '                                               ',
+    '                                               ', '                                               ',
+    '                     J                         ', '                                               ',
+    '                                               ', '              PPPPPPPPPPPPP                    ',
+    '                                               ', '                                               ',
+    '                                               ', '                                               ',
+    '                                               ', '                                               ',
+    '                                               ', '                                               ',
+    '                                               ', '                                               ',
+    '                                               ', '                                               ',
+]
+
+
+def main():
+    inicio = (8, 22)
+    fim = (12, 22)
+    #inicio = (17, 13)
+    #fim = (20, 19)
+
+    searcher = AStar(matriz_terreno_24, [' ', 'J'], [' '])
+    path, abertos = searcher.search_path(inicio, fim, False)
+
+    for ponto in abertos:
+        antes = matriz_terreno_24[ponto[0]][0:ponto[1]]
+        depois = matriz_terreno_24[ponto[0]][ponto[1]+1:]
+        matriz_terreno_24[ponto[0]] = f'{antes}A{depois}'
+
+    for ponto in path:
+        antes = matriz_terreno_24[ponto[0]][0:ponto[1]]
+        depois = matriz_terreno_24[ponto[0]][ponto[1]+1:]
+        matriz_terreno_24[ponto[0]] = f'{antes}X{depois}'
+
+    antes = matriz_terreno_24[inicio[0]][0:inicio[1]]
+    depois = matriz_terreno_24[inicio[0]][inicio[1]+1:]
+    matriz_terreno_24[inicio[0]] = f'{antes}I{depois}'
+
+    antes = matriz_terreno_24[fim[0]][0:fim[1]]
+    depois = matriz_terreno_24[fim[0]][fim[1]+1:]
+    matriz_terreno_24[fim[0]] = f'{antes}F{depois}'
+
+    for linha in matriz_terreno_24:
+        print(linha)
+
+
+if __name__ == '__main__':
+    main()

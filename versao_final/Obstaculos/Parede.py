@@ -16,8 +16,8 @@ class Parede(AbstractObstaculo):
             Parede.__import_sprites()
             Parede.__SPRITES_CARREGADOS = True
 
-        self.__image = Parede.__SPRITE
-        self.__rect = self.__image.get_rect(center=self.hitbox.center)
+        # self.__image = Parede.__SPRITE
+        # self.__rect = self.__image.get_rect(center=self.hitbox.center)
 
     @property
     def image(self) -> Surface:

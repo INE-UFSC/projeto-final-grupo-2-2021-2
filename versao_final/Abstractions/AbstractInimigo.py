@@ -15,6 +15,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__estava_vendo_jogador = False
         self.__PERTO = 10
         self.__MINIMO_PASSOS_DADOS = 2
+        self.__MINIMO_PASSOS_NO_CAMINHO = 0
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 150
 
         super().__init__(stats, posicao, tamanho, terreno)
@@ -79,11 +80,14 @@ class AbstractInimigo(AbstractPersonagem, ABC):
 
         # Se está vendo completamente, faz caminho burro
         if self.__esta_vendo_jogador_completamente(hit_jogador):
+            self.__estava_vendo_jogador = True
             passos_dados = self.__len_caminho - len(self.__caminho)
             if passos_dados < self.__MINIMO_PASSOS_DADOS and len(self.__caminho) > 0:
                 self.__mover_caminho()
             else:
-                self.__estava_vendo_jogador = True
+                # Reseta flags de forçar andar em caminho possivelmente já calculados
+                self.__caminho = []
+                self.__MINIMO_PASSOS_NO_CAMINHO = 0
                 self.__dumb_movement(hit_jogador)
 
         else:
@@ -91,10 +95,15 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             if self.__esta_vendo_jogador_minimamente(hit_jogador):
                 self.__estava_vendo_jogador = True
 
-                novo_caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
-                self.__len_caminho = len(novo_caminho)
-                self.__caminho = novo_caminho
-                self.__mover_caminho()
+                # Caso já tenha um caminho calculado e não perdeu visao do jogador força continuar o caminho antigo
+                passos_dados = self.__len_caminho - len(self.__caminho)
+                if len(self.__caminho) > 0 and passos_dados < self.__MINIMO_PASSOS_NO_CAMINHO:
+                    self.__mover_caminho()
+                else:
+                    # Busca um novo caminho
+                    novo_caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
+                    self.__set_caminho(novo_caminho)
+                    self.__mover_caminho()
 
             # Não possui visão do jogador
             else:
@@ -103,11 +112,21 @@ class AbstractInimigo(AbstractPersonagem, ABC):
                     self.__estava_vendo_jogador = False
 
                     novo_caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
-                    self.__len_caminho = len(novo_caminho)
-                    self.__caminho = novo_caminho
+                    self.__set_caminho(novo_caminho)
                     self.__mover_caminho()
                 else:  # Segue a ultima posição conhecida do jogador
                     self.__mover_caminho()
+
+    def __set_caminho(self, caminho) -> None:
+        self.__len_caminho = len(caminho)
+        self.__caminho = caminho
+
+        if self.__len_caminho > 10:
+            self.__MINIMO_PASSOS_NO_CAMINHO = 3
+        elif self.__len_caminho > 7:
+            self.__MINIMO_PASSOS_NO_CAMINHO = 2
+        elif self.__len_caminho > 5:
+            self.__MINIMO_PASSOS_NO_CAMINHO = 1
 
     def __procurar_jogador(self, hit_jogador: Hitbox) -> None:
         # Caso não tenha um caminho pega um aleatório

@@ -9,8 +9,8 @@ class Opcoes(Singleton):
             self.__dificuldade = Dificuldade.medio
             self.__nome = 'Tatakae'
             self.__tocar_musica = True
-            self.__menor_unidade = 32
-            self.__tamanho_tela = (1120, 768)
+            self.__menor_unidade = 24
+            self.__tamanho_tela = (1128, 768)
             self.__GAME_TITLE = 'The Binding of Isaac'
 
     @property
