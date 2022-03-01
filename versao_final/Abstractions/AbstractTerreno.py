@@ -18,6 +18,7 @@ from Itens.PocaoDefesa import PocaoDefesa
 from Itens.PocaoMedia import PocaoMedia
 from Itens.PocaoPequena import PocaoPequena
 from Itens.PocaoInvencivel import PocaoInvencivel
+from Itens.PocaoVeneno import PocaoVeneno
 from pygame import image, Rect, draw
 from random import random, choice, randint
 
@@ -37,14 +38,17 @@ class AbstractTerreno(ABC):
 
         # itens
         self.__itens_tela = []
+        self.__itens_dropados = []
         pocao_defesa = PocaoDefesa()
         pocao_media = PocaoMedia()
         pocao_invencivel = PocaoInvencivel()
         pocao_pequena = PocaoPequena()
+        pocao_veneno = PocaoVeneno()
         self.__itens.append(pocao_defesa)
         self.__itens.append(pocao_media)
         self.__itens.append(pocao_invencivel)
         self.__itens.append(pocao_pequena)
+        self.__itens.append(pocao_veneno)
         self.__aparecer_item = 40  # porcentagem que o item tem de aparecer na tela
 
     def _setup_mapa(self, matriz_terreno: list) -> None:
@@ -98,7 +102,7 @@ class AbstractTerreno(ABC):
             x = item.posicao[0]
             y = item.posicao[1]
             item_surf = item.imagem
-            item_rect = item_surf.get_rect(center=(x, y))
+            item_rect = item_surf.get_rect(topleft = (x, y))
             tela.janela.blit(item_surf, item_rect)
 
         tamanho = jogador.hitbox.tamanho
@@ -112,6 +116,7 @@ class AbstractTerreno(ABC):
 
     def criar_item(self, posicao):
         chance_aparecer = ceil(100*random())  # sorteia um numero entre 1 e 100
+        print(chance_aparecer)
         if chance_aparecer > self.__aparecer_item:
             if len(self.__itens) != 0:
                 pocao = choice(self.__itens)
@@ -124,9 +129,18 @@ class AbstractTerreno(ABC):
         for pocao in self.__itens_tela:
             item_surf = pocao.imagem
             pocao_rect = item_surf.get_rect(center=(pocao.posicao))
+
             if pocao_rect.colliderect(rect_jogador):
+                self.__itens_dropados.append(pocao)
                 self.__jogador.receber_item(pocao)
                 self.__itens_tela.remove(pocao)
+        self.duracao_pocao()
+    
+    def duracao_pocao(self):
+        for pocao in self.__itens_dropados:
+            variavel = pocao.check_aplicado()
+            if variavel == True:
+                self.__itens_dropados.remove(pocao)
 
     def validar_movimento(self, personagem: AbstractPersonagem, posicao: tuple) -> bool:
         if not isinstance(personagem, AbstractPersonagem):
