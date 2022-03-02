@@ -7,6 +7,8 @@ class Status():
         self.__vel = status['vel'] if 'vel' in status.keys() else 0
         self.__vida = self.__vida_maxima
         self.__invencibilidade = False
+        self.__transpassavel = status['transpassavel'] if 'transpassavel' in status.keys(
+        ) else False
 
     @property
     def ataque(self) -> int:
@@ -70,3 +72,12 @@ class Status():
     def invencibilidade(self, value):
         if type(value) == bool:
             self.__invencibilidade = value
+
+    @property
+    def transpassavel(self) -> bool:
+        return self.__transpassavel
+
+    @transpassavel.setter
+    def transpassavel(self, value):
+        if type(value) == bool:
+            self.__transpassavel = value

@@ -13,7 +13,8 @@ JogadorStats = {
     'vel': 4,
     'vel_ataque': 1,
     'arma_dano': 3,
-    'arma_alcance': 20
+    'arma_alcance': 20,
+    'transpassavel': False
 }
 
 
@@ -115,13 +116,15 @@ class Jogador(AbstractPersonagem):
         else:
             y_movement = 0
 
-        nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
-        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
-            self.hitbox.posicao = nova_posicao_x
+        if x_movement != 0:
+            nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
+            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
+                self.hitbox.posicao = nova_posicao_x
 
-        nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
-        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
-            self.hitbox.posicao = nova_posicao_y
+        if y_movement != 0:
+            nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
+            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
+                self.hitbox.posicao = nova_posicao_y
 
         self.__atualizar_frente(x_movement, y_movement)
 

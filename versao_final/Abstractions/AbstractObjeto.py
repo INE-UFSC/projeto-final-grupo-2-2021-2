@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-
-from pygame import Rect, Surface
+from Config.TelaJogo import TelaJogo
 from Utils.Hitbox import Hitbox
 
 
-class AbstractObstaculo(ABC):
-    def __init__(self, posicao: tuple, tamanho: tuple, transpassavel: bool) -> None:
+class AbstractObjeto(ABC):
+    def __init__(self, posicao: tuple, tamanho: tuple, transpassavel=False, bloqueia_visao=True) -> None:
         self.__transpassavel = transpassavel
+        self.__bloqueia_visao = bloqueia_visao
         self.__hitbox = Hitbox(posicao=posicao, tamanho=tamanho)
 
     @property
@@ -19,16 +19,18 @@ class AbstractObstaculo(ABC):
             self.__transpassavel = value
 
     @property
+    def bloqueia_visao(self) -> bool:
+        return self.__bloqueia_visao
+
+    @bloqueia_visao.setter
+    def bloqueia_visao(self, value):
+        if type(value) == bool:
+            self.__bloqueia_visao = value
+
+    @property
     def hitbox(self) -> Hitbox:
         return self.__hitbox
 
-    @property
     @abstractmethod
-    def image(self) -> Surface:
+    def desenhar(self, tela: TelaJogo) -> None:
         pass
-    
-    @property
-    @abstractmethod
-    def rect(self) -> Rect:
-        pass
-

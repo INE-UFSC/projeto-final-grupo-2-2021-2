@@ -1,4 +1,4 @@
-from Fases.Fase1 import Fase1
+from Fases.DungeonFase import DungeonFase
 from Fases.Fase2 import Fase2
 from Fases.Fase3 import Fase3
 from Personagens.Jogador.Jogador import Jogador
@@ -8,7 +8,7 @@ from Abstractions.AbstractFase import AbstractFase
 class ControladorFases():
     def __init__(self, jogador: Jogador) -> None:
         self.__fases = []
-        self.__fases.append(Fase1(jogador))
+        self.__fases.append(DungeonFase(jogador))
         self.__fases.append(Fase2(jogador))
         self.__fases.append(Fase3(jogador))
 
