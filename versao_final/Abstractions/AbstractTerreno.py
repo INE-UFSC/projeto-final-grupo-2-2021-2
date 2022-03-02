@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from math import ceil
 from typing import List
+import pygame
 from Abstractions.AbstractInimigo import AbstractInimigo
 from Abstractions.AbstractItem import AbstractItem
 from Abstractions.AbstractObjeto import AbstractObjeto
@@ -57,6 +58,9 @@ class AbstractTerreno(ABC):
 
     def desenhar(self, tela: TelaJogo, jogador) -> None:
         tela.janela.blit(self.image, self.rect)
+        image = pygame.image.load('Assets/HUD/Fundo.png')
+        rect = image.get_rect(topleft=(0, 0))
+        tela.janela.blit(image, rect)
 
         for objeto in self.__objetos:
             objeto.desenhar(tela)
@@ -264,7 +268,7 @@ class AbstractTerreno(ABC):
             return self.__proporcao_to_pathfinders[proporcao]
         else:
             matrix = self._get_reduced_matrix_for_proporsion(proporcao)
-            pathfinder = AStar(matrix, [' ', 'J'], ['X'])
+            pathfinder = AStar(matrix, [' '], ['X'])
 
             self.__proporcao_to_matrix[proporcao] = matrix
             self.__proporcao_to_pathfinders[proporcao] = pathfinder
@@ -273,7 +277,7 @@ class AbstractTerreno(ABC):
     def __configure_pathfinders(self):
         self.__proporcao_to_matrix = {}
         self.__proporcao_to_pathfinders = {}
-        self.__MapUpdater = MapUpdater(self.__matrix, 'X', ['J', ' '], ['P, 0'])
+        self.__MapUpdater = MapUpdater(self.__matrix, 'X', [' '], ['P', '0', '1', '2'])
 
         matrix_1_1 = self._get_reduced_matrix_for_proporsion((1, 1))
         matrix_1_2 = self._get_reduced_matrix_for_proporsion((1, 2))
@@ -304,6 +308,7 @@ class AbstractTerreno(ABC):
 
         try:
             updated_map = self.__MapUpdater.update_map_for_size(proporsion)
+            self.__proporcao_to_matrix[proporsion] = updated_map
             return updated_map
         except Exception as e:
             print(f'Erro na criação do mapa: {e}')

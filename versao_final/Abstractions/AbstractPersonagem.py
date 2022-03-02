@@ -28,10 +28,12 @@ class AbstractPersonagem(ABC):
     def tomar_dano(self, dano: int) -> int:
         if type(dano) == int:
             dano_real = dano - self.__status.defesa
-            self.__status.vida -= dano_real
             if dano_real > 0:
+                self.__status.vida -= dano_real
                 self.__ACABOU_DE_TOMAR_DANO = True
-            return dano_real
+                return dano_real
+            else:
+                return 0
         else:
             return 0
 

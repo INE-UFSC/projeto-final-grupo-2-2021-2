@@ -11,11 +11,14 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__estado = Estado.REPOUSO
 
         self.__caminho = []
+        self.__ultimos_pontos = []
+        self.__HISTORY_POINTS_MAX = 20
         self.__len_caminho = 0
         self.__estava_vendo_jogador = False
         self.__PERTO = 10
         self.__MINIMO_PASSOS_DADOS = 2
         self.__MINIMO_PASSOS_NO_CAMINHO = 0
+        self.__TRAVADO = False
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 150
 
         super().__init__(stats, posicao, tamanho, terreno)
@@ -160,6 +163,33 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         else:
             return False
 
+    def __verificar_travado(self):
+        if len(self.__ultimos_pontos) == self.__HISTORY_POINTS_MAX:
+            for ponto in self.__ultimos_pontos:
+                if ponto != self.__ultimos_pontos[0]:
+                    return False
+            self.__ultimos_pontos = []
+            return True
+        return False
+
+    def __atualizar_bug_handler(self):
+        self.__ultimos_pontos.append(self.hitbox.posicao)
+        if len(self.__ultimos_pontos) > self.__HISTORY_POINTS_MAX:
+            self.__ultimos_pontos.pop(0)
+
+    def __handle_travado(self, hit_jogador: Hitbox) -> None:
+        if not self.__TRAVADO:
+            self.__TRAVADO = True
+            novo_caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
+            self.__set_caminho(novo_caminho)
+            self.__mover_caminho()
+            print(novo_caminho)
+        else:
+            if len(self.__caminho) == 0:
+                self.__TRAVADO = False
+            else:
+                self.__mover_caminho()
+
     def __dumb_movement(self, hit_jogador: Hitbox) -> None:
         distancia = self._calcular_distancia(hit_jogador)
 
@@ -171,7 +201,6 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             self.__mover_para_ponto(destino)
 
     def __mover_para_o_centro(self, hit_jogador: Hitbox) -> None:
-
         ponto = hit_jogador.center
 
         dist_x = abs(ponto[0] - self.hitbox.center[0])
@@ -203,6 +232,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
                 self.hitbox.posicao = nova_posicao_y
 
         self.__atualizar_frente(x_movement, y_movement)
+        self.__atualizar_bug_handler()
 
     def __mover_para_ponto(self, ponto: tuple) -> None:
         dist_x = abs(ponto[0] - self.hitbox.x)
@@ -233,7 +263,8 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
                 self.hitbox.posicao = nova_posicao_y
 
-            self.__atualizar_frente(x_movement, y_movement)
+        self.__atualizar_frente(x_movement, y_movement)
+        self.__atualizar_bug_handler()
 
     def __update_visao(self, hit_jogador: Hitbox) -> None:
         if self.__estado == Estado.REPOUSO or self.__estado == Estado.ALERTA:
