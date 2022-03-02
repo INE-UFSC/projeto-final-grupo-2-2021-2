@@ -7,7 +7,7 @@ class PocaoMedia(AbstractItem):
     def __init__(self) -> None:
         self.__potencia = 5
         self.__pronto = False
-        self.__imagem = pygame.image.load('imagens/pocao.png')
+        self.__imagem = pygame.image.load('Assets/pocoes/pocao_media.png')
         self.__posicao = ()
     
     @property

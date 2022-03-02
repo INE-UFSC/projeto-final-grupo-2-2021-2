@@ -7,7 +7,7 @@ class PocaoPequena(AbstractItem):
     def __init__(self) -> None:
         self.__potencia = 3
         self.__pronto = False
-        self.__imagem = pygame.image.load('imagens/pocao.png')
+        self.__imagem = pygame.image.load('Assets/pocoes/pocao_pequena.png')
         self.__posicao = ()
     
     @property
@@ -28,4 +28,4 @@ class PocaoPequena(AbstractItem):
             self.__pronto = True
 
     def check_aplicado(self) -> bool:
-        return self.__pronto
+        return True
