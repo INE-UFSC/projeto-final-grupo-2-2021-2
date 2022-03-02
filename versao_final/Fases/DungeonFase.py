@@ -1,11 +1,11 @@
 from Personagens.Jogador.Jogador import Jogador
 from Config.Opcoes import Dificuldade
-from Terrenos.Terreno1 import Terreno1
+from Terrenos.DungeonMap import DungeonMap
 from Personagens.Inimigos.Minotauro import Minotauro
 from Abstractions.AbstractFase import AbstractFase
 
 
-class Fase1(AbstractFase):
+class DungeonFase(AbstractFase):
     def __init__(self, jogador: Jogador) -> None:
         super().__init__(jogador)
 
@@ -13,7 +13,7 @@ class Fase1(AbstractFase):
         self.__determinar_inimigos(self.dificuldade)
 
     def load(self) -> None:
-        self.terreno = Terreno1(inimigos=[], itens=[], jogador=self.jogador)
+        self.terreno = DungeonMap(inimigos=[], itens=[], jogador=self.jogador)
 
         inimigos = []
         for x in range(len(self.__INIMIGO_POS)):

@@ -18,6 +18,7 @@ def import_folder(path: str, size: tuple) -> list:
         print(f'Erro carregando sprite: {e}')
         return []
 
+
 def import_fliped_folder(path: str, size: tuple) -> list:
     try:
         surface_list = []
@@ -35,10 +36,14 @@ def import_fliped_folder(path: str, size: tuple) -> list:
         print(f'Erro carregando sprite: {e}')
         return []
 
-def import_single_sprite(path, size) -> pygame.Surface:
+
+def import_single_sprite(path, size, rotate_angle=0) -> pygame.Surface:
     try:
         image_surf = pygame.image.load(path).convert_alpha()
         image_surf = pygame.transform.scale(image_surf, size)
+
+        if rotate_angle > 0:
+            image_surf = pygame.transform.rotate(image_surf, rotate_angle)
 
         return image_surf
     except Exception as e:

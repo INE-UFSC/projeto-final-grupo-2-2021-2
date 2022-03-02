@@ -79,6 +79,11 @@ class Minotauro(AbstractInimigo, sprite.Sprite):
         self.__rect = self.__image.get_rect(center=self.hitbox.center)
         return self.__rect
 
+    @rect.setter
+    def rect(self, value: Rect) -> None:
+        if type(value) == Rect:
+            self.__rect = value
+
     def animate(self) -> None:
         animation_name = self.__get_current_animation()
         animation = self.__animations[animation_name]

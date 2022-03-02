@@ -192,13 +192,15 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         else:
             y_movement = 0
 
-        nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
-        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
-            self.hitbox.posicao = nova_posicao_x
+        if x_movement != 0:
+            nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
+            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
+                self.hitbox.posicao = nova_posicao_x
 
-        nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
-        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
-            self.hitbox.posicao = nova_posicao_y
+        if y_movement != 0:
+            nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
+            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
+                self.hitbox.posicao = nova_posicao_y
 
         self.__atualizar_frente(x_movement, y_movement)
 
@@ -221,15 +223,17 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         else:
             y_movement = 0
 
-        nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
-        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
-            self.hitbox.posicao = nova_posicao_x
+        if x_movement != 0:
+            nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
+            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
+                self.hitbox.posicao = nova_posicao_x
 
-        nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
-        if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
-            self.hitbox.posicao = nova_posicao_y
+        if y_movement != 0:
+            nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
+            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
+                self.hitbox.posicao = nova_posicao_y
 
-        self.__atualizar_frente(x_movement, y_movement)
+            self.__atualizar_frente(x_movement, y_movement)
 
     def __update_visao(self, hit_jogador: Hitbox) -> None:
         if self.__estado == Estado.REPOUSO or self.__estado == Estado.ALERTA:
@@ -291,29 +295,21 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def __atualizar_frente(self, x_movement, y_movement):
         if x_movement < 0:
             if y_movement < 0:
-                #print('Esquerda Cima')
                 self.__direction = Direction.ESQUERDA_CIMA
             elif y_movement > 0:
-                #print('Esquerda Baixo')
                 self.__direction = Direction.ESQUERDA_BAIXO
             else:
-                #print('Esquerda Meio')
                 self.__direction = Direction.ESQUERDA_MEIO
         elif x_movement > 0:
             if y_movement < 0:
-                #print('Direita Cima')
                 self.__direction = Direction.DIREITA_CIMA
             elif y_movement > 0:
-                #print('Direita Baixo')
                 self.__direction = Direction.DIREITA_BAIXO
             else:
-                #print('Direita Meio')
                 self.__direction = Direction.DIREITA_MEIO
         elif y_movement > 0:
-            #print('Meio Baixo')
             self.__direction = Direction.MEIO_BAIXO
         elif y_movement < 0:
-            #print('Meio Cima')
             self.__direction = Direction.MEIO_CIMA
 
     def _calcular_distancia(self, outro_hitbox: Hitbox):

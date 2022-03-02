@@ -1,5 +1,5 @@
-from abc import ABC
 from typing import List
+from math import sqrt
 
 
 def gerar_equação_vetorial_reta(p1, p2):
@@ -45,7 +45,8 @@ class Node:
     def __gt__(self, x) -> bool:
         if type(x) == type(self):
             if self.f == x.f:
-                return self.h > x.h
+                # Utiliza um tie breaking entregando valores mais longe do inicio
+                return self.g < x.g
             else:
                 return self.f > x.f
         elif type(x) == int or type(x) == float:
@@ -57,7 +58,8 @@ class Node:
     def __lt__(self, x) -> bool:
         if type(x) == type(self):
             if self.f == x.f:
-                return self.h < x.h
+                # Utiliza um tie breaking entregando valores mais longe do inicio
+                return self.g > x.g
             else:
                 return self.f < x.f
         elif type(x) == int or type(x) == float:
@@ -233,6 +235,7 @@ class AStar:
             self.__closed_nodes.append(current_node)
 
             if self.__check_finish(current_node, end_position):
+
                 return self.__get_traceback(start_node, current_node)
 
             children = self.__search_children_sides(current_node)
@@ -244,6 +247,7 @@ class AStar:
                 for child in children:
                     self.__update_queue_diagonal(current_node, child)
 
+        print('Retornando caminho vazio')
         return []
 
     def __search_children_sides(self, node: Node) -> list:
@@ -286,8 +290,11 @@ class AStar:
 
         child.g = current_node.g + 1  # Distancia do inicio até o ponto
         child.h = (deltaX + deltaY)  # Distancia reta até o destino
-        child.f = child.g + child.h
+        # child.f = child.g + child.h
 
+        x = abs(child.position[0] - self.__end[0])
+        y = abs(child.position[1] - self.__end[1])
+        child.f = max(x, y) + (sqrt(2)-1)*min(x, y)
         # Procura o node que está sendo atualizado na lista de abertos
         for index, heapNode in enumerate(self.__open_list.heap):
             node = heapNode.value
@@ -304,7 +311,10 @@ class AStar:
 
         child.g = current_node.g + 1.5
         child.h = (deltaX + deltaY)
-        child.f = child.g + child.h
+        # child.f = child.g + child.h
+        x = abs(child.position[0] - self.__end[0])
+        y = abs(child.position[1] - self.__end[1])
+        child.f = max(x, y) + (sqrt(2)-1)*min(x, y)
 
         node, index = self.__get_if_in_open(child)
         if node == None:
@@ -408,7 +418,9 @@ def main():
     #fim = (20, 19)
 
     searcher = AStar(matriz_terreno_24, [' ', 'J'], [' '])
-    path, abertos = searcher.search_path(inicio, fim, False)
+    path, abertos = searcher.search_path(inicio, fim, True)
+
+    print(len(abertos) - len(path))
 
     for ponto in abertos:
         antes = matriz_terreno_24[ponto[0]][0:ponto[1]]
