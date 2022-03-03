@@ -1,22 +1,28 @@
 from typing_extensions import Self
 from pygame import Rect, Surface
+from Abstractions.AbstractItem import AbstractItem
 from Abstractions.AbstractTerreno import AbstractTerreno
+from Itens.PocaoDefesa import PocaoDefesa
+from Itens.PocaoMedia import PocaoMedia
+from Itens.PocaoPequena import PocaoPequena
 from Obstaculos.ObstaculoInvisivel import ObjetoInvisivel
 from Utils.Folder import import_single_sprite
+from random import random
 
 
 class DungeonMap(AbstractTerreno):
     __SPRITE_PATH = 'Assets/Mapas/Dungeon/fundo.png'
     __POSICAO_INICIAL_JOGADOR = (650, 650)
 
-    def __init__(self, inimigos: list, itens: list, jogador):
-        super().__init__(inimigos, itens, jogador)
+    def __init__(self, inimigos: list, jogador):
+        super().__init__(inimigos, jogador)
 
         super()._setup_mapa(terreno)
         DungeonMap.__setup_mapa(self)
 
         self.__image = import_single_sprite(DungeonMap.__SPRITE_PATH, self._opcoes.TAMANHO_MAPAS)
         self.__rect = self.__image.get_rect(center=self.hitbox.center)
+        self.__itens_e_chances = [(PocaoDefesa, 0.1), (PocaoMedia, 0.15), (PocaoPequena, 0.35)]
 
     @classmethod
     def __setup_mapa(cls, self: Self) -> None:
@@ -45,6 +51,13 @@ class DungeonMap(AbstractTerreno):
 
     def __add_animated_objects(self):
         pass
+
+    def _get_item_to_drop(self) -> AbstractItem:
+        for item_chance in self.__itens_e_chances:
+            chance = item_chance[1]
+            item = item_chance[0]
+            if chance > random():
+                return item()
 
     @property
     def image(self) -> Surface:

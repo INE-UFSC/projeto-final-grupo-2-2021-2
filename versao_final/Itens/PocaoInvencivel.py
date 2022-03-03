@@ -1,30 +1,37 @@
-from Abstractions.AbstractItem import AbstractItem
+from Itens.PocaoGenerica import PocaoGenerica
 from Personagens.Status import Status
-import pygame
+from pygame import Surface, Rect
 
-class PocaoInvencivel(AbstractItem):
-    def __init__(self) -> None:
+
+class PocaoInvencivel(PocaoGenerica):
+    __PATH = 'Assets/pocoes/pocao_invencivel.png'
+    __SIZE = (30, 30)
+
+    def __init__(self, position=(0, 0)) -> None:
+        super().__init__(PocaoInvencivel.__PATH, PocaoInvencivel.__SIZE)
         self.__status: Status = None
         self.__pronto = False
         self.__aplicado = False
         self.__BUFF_TIMER = 80
-        self.__imagem = pygame.image.load('Assets/pocoes/pocao_invencivel.png')
-        self.__posicao = ()
-    
+        self.__posicao = position
+        self.__image = self._get_image()
+        self.__rect = self.__image.get_rect(center=self.__posicao)
+
     @property
-    def imagem(self):
-        return self.__imagem
-    
-    @imagem.setter
-    def imagem(self, imagem):
-        self.__imagem = imagem
-    
+    def rect(self) -> Rect:
+        return self.__rect
+
     @property
-    def posicao(self):
+    def image(self) -> Surface:
+        return self.__image
+
+    @property
+    def posicao(self) -> tuple:
         return self.__posicao
-    
+
     @posicao.setter
     def posicao(self, posicao):
+        self.__rect = self.__image.get_rect(center=self.__posicao)
         self.__posicao = posicao
 
     def modificar_status(self, status: Status) -> None:

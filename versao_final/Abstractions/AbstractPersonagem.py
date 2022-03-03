@@ -105,7 +105,7 @@ class AbstractPersonagem(ABC):
         return self.__hitbox
 
     @property
-    def status(self):
+    def status(self) -> Status:
         return self.__status
 
     @abstractmethod

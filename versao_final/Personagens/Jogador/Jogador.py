@@ -37,6 +37,9 @@ class Jogador(AbstractPersonagem):
 
     def lidar_inputs(self) -> None:
         keys = pygame.key.get_pressed()
+        if keys[pygame.K_e]:
+            self.terreno.pegar_item()
+
         self.__mover(keys)
 
     def verificar_ataque(self) -> bool:

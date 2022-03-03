@@ -1,26 +1,36 @@
-from Abstractions.AbstractItem import AbstractItem
+from Itens.PocaoGenerica import PocaoGenerica
 from Personagens.Status import Status
-import pygame
+from pygame import Rect, Surface
 
 
-class PocaoPequena(AbstractItem):
-    def __init__(self) -> None:
+class PocaoPequena(PocaoGenerica):
+    __PATH = 'Assets/pocoes/pocao_pequena.png'
+    __SIZE = (30, 30)
+
+    def __init__(self, position=(0, 0)) -> None:
+        super().__init__(PocaoPequena.__PATH, PocaoPequena.__SIZE)
         self.__potencia = 3
         self.__pronto = False
-        self.__imagem = pygame.image.load('Assets/pocoes/pocao_pequena.png')
-        self.__posicao = ()
-    
+        self.__posicao = position
+        self.__image = self._get_image()
+        self.__rect = self.__image.get_rect(center=self.__posicao)
+
     @property
-    def imagem(self):
-        return self.__imagem
-    
+    def image(self) -> Surface:
+        return self.__image
+
     @property
-    def posicao(self):
+    def rect(self) -> Rect:
+        return self.__rect
+
+    @property
+    def posicao(self) -> tuple:
         return self.__posicao
-    
+
     @posicao.setter
     def posicao(self, posicao):
         self.__posicao = posicao
+        self.__rect = self.__image.get_rect(center=self.__posicao)
 
     def modificar_status(self, status: Status) -> None:
         if not self.__pronto:

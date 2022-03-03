@@ -11,6 +11,8 @@ class Opcoes(Singleton):
             self.__tocar_musica = True
             self.__menor_unidade = 24
             self.__tamanho_tela = (1128, 768)
+            self.__TAMANHO_HUD = (1128, 144)
+            self.__POSICAO_HUD = (0, 0)
             self.__POSICAO_MAPAS = (0, 144)
             self.__TAMANHO_MATRIZ_REDUZIDA = (
                 1128 / self.__menor_unidade, 624 / self.__menor_unidade)
@@ -63,3 +65,11 @@ class Opcoes(Singleton):
     @property
     def POSICAO_MAPAS(self) -> str:
         return self.__POSICAO_MAPAS
+
+    @property
+    def TAMANHO_HUD(self) -> int:
+        return self.__TAMANHO_HUD
+
+    @property
+    def POSICAO_HUD(self) -> str:
+        return self.__POSICAO_HUD

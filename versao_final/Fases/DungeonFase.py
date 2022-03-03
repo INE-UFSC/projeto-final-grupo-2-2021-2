@@ -13,7 +13,7 @@ class DungeonFase(AbstractFase):
         self.__determinar_inimigos(self.dificuldade)
 
     def load(self) -> None:
-        self.terreno = DungeonMap(inimigos=[], itens=[], jogador=self.jogador)
+        self.terreno = DungeonMap(inimigos=[], jogador=self.jogador)
 
         inimigos = []
         for x in range(len(self.__INIMIGO_POS)):

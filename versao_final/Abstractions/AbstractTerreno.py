@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from math import ceil
 from typing import List
-import pygame
 from Abstractions.AbstractInimigo import AbstractInimigo
 from Abstractions.AbstractItem import AbstractItem
 from Abstractions.AbstractObjeto import AbstractObjeto
@@ -13,41 +12,25 @@ from Abstractions.AbstractPersonagem import AbstractPersonagem
 from Utils.Maps import MapUpdater
 from Utils.Movement import AStar, distancia_dois_pontos, gerar_equação_vetorial_reta
 from Utils.Movement import gerar_equação_vetorial_reta
-from Itens.PocaoDefesa import PocaoDefesa
-from Itens.PocaoMedia import PocaoMedia
-from Itens.PocaoPequena import PocaoPequena
-from Itens.PocaoInvencivel import PocaoInvencivel
 from pygame import Surface, Rect, draw, font
-from Itens.PocaoVeneno import PocaoVeneno
-from random import random, choice, randint
+from random import randint
+from Views.HUD import HUD
 
 
 class AbstractTerreno(ABC):
-    def __init__(self, inimigos: list, itens: list, jogador: Jogador):
+    def __init__(self, inimigos: list, jogador: Jogador):
         self.__inimigos: List[AbstractInimigo] = inimigos
-        self.__itens: List[AbstractItem] = itens
         self.__objetos: List[AbstractObjeto] = []
+        self.__itens: List[AbstractItem] = []
+        self.__itens_to_duration = {}
+
         self.__matrix = []
         self.__pontos = []
 
         self.__opcoes = Opcoes()
         self.__hitbox = Hitbox(self.__opcoes.POSICAO_MAPAS, self.__opcoes.TAMANHO_MAPAS)
         self.__jogador = jogador
-
-        # itens
-        self.__itens_tela = []
-        self.__itens_dropados = []
-        pocao_defesa = PocaoDefesa()
-        pocao_media = PocaoMedia()
-        pocao_invencivel = PocaoInvencivel()
-        pocao_pequena = PocaoPequena()
-        pocao_veneno = PocaoVeneno()
-        self.__itens.append(pocao_defesa)
-        self.__itens.append(pocao_media)
-        self.__itens.append(pocao_invencivel)
-        self.__itens.append(pocao_pequena)
-        self.__itens.append(pocao_veneno)
-        self.__aparecer_item = 40  # porcentagem que o item tem de aparecer na tela
+        self.__HUD = HUD(self.__jogador.status)
 
     def _setup_mapa(self, matriz_terreno: list) -> None:
         self.__matrix = matriz_terreno
@@ -58,20 +41,26 @@ class AbstractTerreno(ABC):
 
     def desenhar(self, tela: TelaJogo, jogador) -> None:
         tela.janela.blit(self.image, self.rect)
-        image = pygame.image.load('Assets/HUD/Fundo.png')
-        rect = image.get_rect(topleft=(0, 0))
-        tela.janela.blit(image, rect)
+        self.__HUD.desenhar(tela)
 
         for objeto in self.__objetos:
             objeto.desenhar(tela)
 
+        for item in self.__itens:
+            duration = self.__itens_to_duration[item]
+            if duration > 100:
+                tela.janela.blit(item.image, item.rect)
+            else:
+                if duration % 4 == 0:
+                    tela.janela.blit(item.image, item.rect)
+
         for inimigo in self.__inimigos:
-            posicao = inimigo.hitbox.posicao
-            tamanho = inimigo.hitbox.tamanho
-            color = (0, 0, 125)
-            rect = Rect(posicao, tamanho)
+            # posicao = inimigo.hitbox.posicao
+            # tamanho = inimigo.hitbox.tamanho
+            # color = (0, 0, 125)
+            # rect = Rect(posicao, tamanho)
             # Desenha os hitbox deles
-            draw.rect(tela.janela, color, rect)
+            # draw.rect(tela.janela, color, rect)
 
             inimigo.animate()
             tela.janela.blit(inimigo.image, inimigo.rect)
@@ -80,15 +69,7 @@ class AbstractTerreno(ABC):
         if jogador.checar_atacando():
             self.__desenhar_ataque(tela, jogador)
 
-        for item in self.__itens_tela:
-            x = item.posicao[0]
-            y = item.posicao[1]
-            item_surf = item.imagem
-            item_rect = item_surf.get_rect(topleft=(x, y))
-            tela.janela.blit(item_surf, item_rect)
-
         # self.__desenhar_pontos(tela)
-
         tamanho = jogador.hitbox.tamanho
         posicao = jogador.hitbox.posicao
         color = (0, 255, 0)
@@ -98,33 +79,13 @@ class AbstractTerreno(ABC):
         surface = self.__jogador.status_tela.vida()
         tela.janela.blit(surface, (0, 0))
 
-    def criar_item(self, posicao):
-        chance_aparecer = ceil(100*random())  # sorteia um numero entre 1 e 100
-        print(chance_aparecer)
-        if chance_aparecer > self.__aparecer_item:
-            if len(self.__itens) != 0:
-                pocao = choice(self.__itens)
-                pocao.posicao = posicao
-                self.__itens_tela.append(pocao)
-                self.__itens.remove(pocao)
-
-    def dropar_item(self):
+    def pegar_item(self) -> AbstractItem:
         rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
-        for pocao in self.__itens_tela:
-            item_surf = pocao.imagem
-            pocao_rect = item_surf.get_rect(center=(pocao.posicao))
-
-            if pocao_rect.colliderect(rect_jogador):
-                self.__itens_dropados.append(pocao)
-                self.__jogador.receber_item(pocao)
-                self.__itens_tela.remove(pocao)
-        self.duracao_pocao()
-
-    def duracao_pocao(self):
-        for pocao in self.__itens_dropados:
-            variavel = pocao.check_aplicado()
-            if variavel == True:
-                self.__itens_dropados.remove(pocao)
+        for item in self.__itens:
+            if rect_jogador.colliderect(item.rect):
+                self.__jogador.receber_item(item)
+                self.__itens.remove(item)
+                self.__itens_to_duration.pop(item)
 
     def validar_movimento(self, personagem: AbstractPersonagem, posicao: tuple) -> bool:
         if not isinstance(personagem, AbstractPersonagem):
@@ -181,6 +142,27 @@ class AbstractTerreno(ABC):
             x += step
         return True
 
+    def is_line_of_sight_clear_to_walk(self, p1, p2) -> bool:
+        equação_vetorial = gerar_equação_vetorial_reta(p1, p2)
+        distancia = distancia_dois_pontos(p1, p2)
+
+        distancia_entre_pixels_checados = 4
+        step = 1 / (distancia // distancia_entre_pixels_checados)
+
+        x = 0
+        while x < 1:
+            ponto = equação_vetorial(x)
+            # Código exclusivo para testes
+            self.__pontos.append(ponto)
+
+            if self._posicao_bloqueia_visao(ponto):
+                return False
+            if self._posicao_bloqueia_movimento(ponto):
+                return False
+
+            x += step
+        return True
+
     def get_path(self, hitbox: Hitbox, p2: tuple) -> list:
         p1 = self._remove_offset_from_point(hitbox.posicao)
         p2 = self._remove_offset_from_point(p2)
@@ -227,7 +209,22 @@ class AbstractTerreno(ABC):
             inimigo.update(self.__jogador.hitbox)
 
             if inimigo.morreu:
+                self.__handle_item_drop(inimigo.hitbox.posicao)
                 self.__remover_inimigo(inimigo)
+
+        for item in self.__itens:
+            duration = self.__itens_to_duration[item]
+            self.__itens_to_duration[item] = duration - 1
+            if duration < 0:
+                self.__itens_to_duration.pop(item)
+                self.__itens.remove(item)
+
+    def __handle_item_drop(self, position: tuple) -> None:
+        item = self._get_item_to_drop()
+        if isinstance(item, AbstractItem):
+            item.posicao = position
+            self.__itens.append(item)
+            self.__itens_to_duration[item] = 500
 
     def lidar_ataques(self, tela: TelaJogo) -> None:
         if self.__jogador.verificar_ataque():
@@ -348,29 +345,6 @@ class AbstractTerreno(ABC):
 
         return True
 
-    def __validate_reduced_ponto_for_obstaculo(self, ponto: tuple) -> bool:
-        x = int(ponto[0])
-        y = int(ponto[1])
-
-        if x < 0 or x >= len(self.__matrix):
-            print(f'Acesso indevido a matriz em [{x}][{y}] - 3')
-            return False
-
-        if y < 0 or y >= len(self.__matrix[0]):
-            print(f'Acesso indevido a matriz em [{x}][{y}] - 4')
-            return False
-
-        if self.__matrix[x][y] == 'P':
-            return False
-
-        return True
-
-    def __validate_normal_ponto_for_obstaculo(self, ponto: tuple) -> bool:
-        ponto = self._remove_offset_from_point(ponto)
-        ponto = self._reduzir_ponto(ponto)
-        ponto = self._inverter_ponto(ponto)
-        return self.__validate_reduced_ponto_for_obstaculo(ponto)
-
     def _remove_offset_from_point(self, ponto: tuple) -> tuple:
         return (ponto[0], ponto[1] - self.__opcoes.POSICAO_MAPAS[1])
 
@@ -422,7 +396,6 @@ class AbstractTerreno(ABC):
 
     def __remover_inimigo(self, inimigo):
         self.__inimigos.remove(inimigo)
-        self.criar_item(inimigo.hitbox.posicao)
 
     def __desenhar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
         rect_arma = personagem.get_rect_arma()
@@ -491,4 +464,8 @@ class AbstractTerreno(ABC):
 
     @abstractmethod
     def _posicao_index_valido() -> bool:
+        pass
+
+    @abstractmethod
+    def _get_item_to_drop() -> AbstractItem:
         pass

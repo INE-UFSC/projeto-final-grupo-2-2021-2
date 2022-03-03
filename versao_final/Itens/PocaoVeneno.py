@@ -1,37 +1,46 @@
-from Abstractions.AbstractItem import AbstractItem
+from Itens.PocaoGenerica import PocaoGenerica
 from Personagens.Status import Status
-import pygame
+from pygame import Rect, Surface
 
 
-class PocaoVeneno(AbstractItem):
-    def __init__(self) -> None:
+class PocaoVeneno(PocaoGenerica):
+    __PATH = 'Assets/pocoes/pocao_veneno.png'
+    __SIZE = (30, 30)
+
+    def __init__(self, position=(0, 0)) -> None:
+        super().__init__(PocaoVeneno.__PATH, PocaoVeneno.__SIZE)
         self.__status: Status = None
         self.__potencia = 3
         self.__pronto = False
         self.__aplicado = False
         self.__BUFF_TIMER = 100
-        self.__imagem = pygame.image.load('Assets/pocoes/pocao_veneno.png')
-        self.__posicao = ()
-    
+        self.__posicao = position
+        self.__image = self._get_image()
+        self.__rect = self.__image.get_rect(center=self.__posicao)
+
     @property
-    def imagem(self):
-        return self.__imagem
-    
+    def rect(self) -> Rect:
+        return self.__rect
+
     @property
-    def posicao(self):
+    def image(self) -> Surface:
+        return self.__image
+
+    @property
+    def posicao(self) -> tuple:
         return self.__posicao
-    
+
     @posicao.setter
     def posicao(self, posicao):
         self.__posicao = posicao
-    
+        self.__rect = self.__image.get_rect(center=self.__posicao)
+
     def modificar_status(self, status: Status) -> None:
         self.__status = status
         if not self.__aplicado:
             status.vel -= self.__potencia
             status.vida -= self.__potencia
             self.__aplicado = True
-
 
     def check_aplicado(self) -> bool:
         if self.__pronto:
@@ -44,10 +53,9 @@ class PocaoVeneno(AbstractItem):
         if self.__pronto:
             self.__status.vel += self.__potencia
             self.__pronto = False
-        
+
     def __update_timer(self):
         if self.__BUFF_TIMER > 0:
             self.__BUFF_TIMER -= 1
         else:
             self.__pronto = True
-        
