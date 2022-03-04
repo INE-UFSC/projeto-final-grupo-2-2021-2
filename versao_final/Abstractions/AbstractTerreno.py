@@ -76,9 +76,6 @@ class AbstractTerreno(ABC):
         rect = Rect(posicao, tamanho)
         draw.rect(tela.janela, color, rect)
 
-        surface = self.__jogador.status_tela.vida()
-        tela.janela.blit(surface, (0, 0))
-
     def pegar_item(self) -> AbstractItem:
         rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
         for item in self.__itens:

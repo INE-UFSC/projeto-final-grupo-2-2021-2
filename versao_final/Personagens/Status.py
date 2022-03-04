@@ -52,8 +52,16 @@ class Status():
 
     @vida.setter
     def vida(self, value: int) -> None:
+        if value < self.__vida and self.__invencibilidade:
+            return
+
         if type(value) == int:
-            self.__vida = value
+            if value > self.__vida_maxima:
+                self.__vida = self.__vida_maxima
+            elif value < 0:
+                self.__vida = 0
+            else:
+                self.__vida = value
 
     @property
     def vel(self) -> int:

@@ -22,7 +22,7 @@ class DungeonMap(AbstractTerreno):
 
         self.__image = import_single_sprite(DungeonMap.__SPRITE_PATH, self._opcoes.TAMANHO_MAPAS)
         self.__rect = self.__image.get_rect(center=self.hitbox.center)
-        self.__itens_e_chances = [(PocaoDefesa, 0.1), (PocaoMedia, 0.15), (PocaoPequena, 0.35)]
+        self.__itens_e_chances = [(PocaoDefesa, 0.15), (PocaoMedia, 0.15), (PocaoPequena, 0.35)]
 
     @classmethod
     def __setup_mapa(cls, self: Self) -> None:

@@ -3,11 +3,10 @@ import pygame
 from Abstractions.AbstractPersonagem import AbstractPersonagem
 from Abstractions.AbstractItem import AbstractItem
 from Enums.Enums import Direction
-from Personagens.Jogador.StatusJogador import StatusJogador
 
 
 JogadorStats = {
-    'vida': 10,
+    'vida': 8,
     'ataque': 3,
     'defesa': 2,
     'vel': 4,
@@ -22,7 +21,6 @@ class Jogador(AbstractPersonagem):
     def __init__(self, posicao: tuple, tamanho: tuple, nome: str, terreno=None) -> None:
         self.__itens: List[AbstractItem] = []
         self.__nome = nome
-        self.__status_tela = StatusJogador(self)
         self.__direction = Direction.MEIO_CIMA
 
         super().__init__(stats=JogadorStats, posicao=posicao, tamanho=tamanho, terreno=terreno)
@@ -30,10 +28,6 @@ class Jogador(AbstractPersonagem):
     @property
     def direction(self) -> Direction:
         return self.__direction
-
-    @property
-    def status_tela(self):
-        return self.__status_tela
 
     def lidar_inputs(self) -> None:
         keys = pygame.key.get_pressed()
@@ -63,12 +57,14 @@ class Jogador(AbstractPersonagem):
         return rect
 
     def receber_item(self, item: AbstractItem) -> None:
+        self.__itens.append(item)
         item.modificar_status(self.status)
 
     def update(self) -> None:
         self.arma.update()
         for item in self.__itens:
-            pass
+            if item.check_aplicado():
+                self.__itens.remove(item)
 
     def __atualizar_frente(self, x_movement, y_movement):
         if x_movement < 0:
