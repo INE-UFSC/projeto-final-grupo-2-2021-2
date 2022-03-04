@@ -29,12 +29,17 @@ class Jogo:
         clock = pygame.time.Clock()
         main_loop = True
         while main_loop:
+            self.__pause = False
             clock.tick(self.__FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     main_loop = False
+                
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        self.__pause = not self.__pause
 
-            self.__fase_atual.ciclo(self.__tela)
+            self.__fase_atual.ciclo(self.__tela, self.__pause)
 
             if self.__fase_atual.is_player_dead():
                 main_loop = False
