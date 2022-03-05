@@ -13,7 +13,7 @@ class AbstractFase(ABC):
         self.__dificuldade = self.__opcoes.dificuldade
         self.__terreno = None
 
-    def is_player_dead(self) -> bool:
+    def player_has_lost(self) -> bool:
         if self.__jogador.vida <= 0:
             return True
         else:

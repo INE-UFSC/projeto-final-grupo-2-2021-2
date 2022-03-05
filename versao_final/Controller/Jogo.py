@@ -8,6 +8,7 @@ from Abstractions.AbstractFase import AbstractFase
 
 class Jogo:
     def __init__(self):
+        pygame.init()  # Temporariamente enquanto não mexo nas telas
         self.__tela = TelaJogo()
         self.__opcoes = Opcoes()
         self.__jogador = None
@@ -36,7 +37,7 @@ class Jogo:
 
             self.__fase_atual.ciclo(self.__tela)
 
-            if self.__fase_atual.is_player_dead():
+            if self.__fase_atual.player_has_lost():
                 main_loop = False
                 print('Você perdeu :/')
 

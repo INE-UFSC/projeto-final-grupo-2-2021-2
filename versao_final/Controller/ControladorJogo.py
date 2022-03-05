@@ -1,7 +1,7 @@
 import pygame
 import sys
 from Config.Opcoes import Opcoes
-from Enums.Enums import ComandosEnum, Dificuldade
+from Enums.Enums import ComandosEnum
 from Config.TelaJogo import TelaJogo
 from Views.Telas.TelaJogar import TelaJogar
 from Views.Telas.TelaMenu import TelaMenuPrincipal
@@ -13,6 +13,7 @@ from Controller.Jogo import Jogo
 
 class ControladorJogo():
     def __init__(self):
+        pygame.init()
         self.__tela = TelaJogo()
         self.__MENU_FPS = 40
 

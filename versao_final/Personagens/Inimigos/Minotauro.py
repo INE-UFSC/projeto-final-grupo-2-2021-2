@@ -1,28 +1,28 @@
-from Enums.Enums import Dificuldade, Direction, Estado
+from Config.Opcoes import Opcoes
+from Enums.Enums import Direction, Estado
 from Abstractions.AbstractInimigo import AbstractInimigo
 from Abstractions.AbstractTerreno import AbstractTerreno
 from Utils.Folder import import_fliped_folder, import_folder
 from Utils.Hitbox import Hitbox
 from random import random
-from pygame import sprite, Surface, Rect
+from pygame import Surface, Rect
 
 
-class Minotauro(AbstractInimigo, sprite.Sprite):
+class Minotauro(AbstractInimigo):
     __ANIMACOES_IMPORTADAS = False
-    __CHANCE_DAMAGE_STOP_ATTACK = 0.6
+    __CHANCE_DAMAGE_STOP_ATTACK = 0.3
     __TAMANHO_IMAGEM = (80, 65)
     __TAMANHO = (36, 48)
     __SPRITE_PATH = 'Assets/Personagens/Minotauro/'
-    __STATS_FACIL = {'vida': 6, 'ataque': 3, 'defesa': 1, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 1,
-                     'arma_alcance': 10, 'view_distance': 150, 'transpassavel': False}
-    __STATS_MEDIO = {'vida': 8, 'ataque': 2, 'defesa': 2, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 2,
-                     'arma_alcance': 10, 'view_distance': 150, 'transpassavel': False}
-    __STATS_DIFICIL = {'vida': 10, 'ataque': 6, 'defesa': 3, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 4,
-                       'arma_alcance': 10, 'view_distance': 150, 'transpassavel': False}
+    __STATS_FACIL = {'vida': 15, 'ataque': 4, 'defesa': 3, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 3,
+                     'arma_alcance': 11, 'view_distance': 150, 'transpassavel': False}
+    __STATS_MEDIO = {'vida': 20, 'ataque': 5, 'defesa': 4, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 4,
+                     'arma_alcance': 12, 'view_distance': 150, 'transpassavel': False}
+    __STATS_DIFICIL = {'vida': 25, 'ataque': 6, 'defesa': 5, 'vel': 3, 'vel_ataque': 1, 'arma_dano': 5,
+                       'arma_alcance': 13, 'view_distance': 150, 'transpassavel': False}
 
-    def __init__(self, posicao: tuple, dificuldade: Dificuldade, terreno: AbstractTerreno) -> None:
-        stats = Minotauro.__calibrar_dificuldade(dificuldade)
-
+    def __init__(self, terreno: AbstractTerreno, posicao=(0, 0)) -> None:
+        stats = Minotauro.__calibrar_dificuldade()
         super().__init__(stats=stats, posicao=posicao, tamanho=Minotauro.__TAMANHO, terreno=terreno)
 
         if not Minotauro.__ANIMACOES_IMPORTADAS:
@@ -58,7 +58,8 @@ class Minotauro(AbstractInimigo, sprite.Sprite):
             cls.__animations_length[animation] = len(normal_images)
 
     @classmethod
-    def __calibrar_dificuldade(cls, dificuldade: Dificuldade) -> dict:
+    def __calibrar_dificuldade(cls) -> dict:
+        dificuldade = Opcoes().dificuldade
         if dificuldade.medio:
             return cls.__STATS_MEDIO
         elif dificuldade.dificil:

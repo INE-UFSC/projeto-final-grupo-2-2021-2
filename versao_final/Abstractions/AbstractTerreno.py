@@ -3,7 +3,10 @@ from math import ceil
 from typing import List
 from Abstractions.AbstractInimigo import AbstractInimigo
 from Abstractions.AbstractItem import AbstractItem
+from Abstractions.AbstractMap import AbstractMap
 from Abstractions.AbstractObjeto import AbstractObjeto
+from Obstaculos.ObstaculoInvisivel import ObjetoInvisivel
+from Utils.Adapter import Adapter
 from Utils.Hitbox import Hitbox
 from Personagens.Jogador.Jogador import Jogador
 from Config.Opcoes import Opcoes
@@ -19,6 +22,7 @@ from Views.HUD import HUD
 
 class AbstractTerreno(ABC):
     def __init__(self, inimigos: list, jogador: Jogador):
+        self.__adapter = Adapter()
         self.__inimigos: List[AbstractInimigo] = inimigos
         self.__objetos: List[AbstractObjeto] = []
         self.__itens: List[AbstractItem] = []
@@ -33,8 +37,37 @@ class AbstractTerreno(ABC):
         self.__HUD = HUD(self.__jogador.status)
 
     def _setup_mapa(self, matriz_terreno: list) -> None:
-        self.__matrix = matriz_terreno
+        self.__proporcao_to_matrix = {}
+        self.__proporcao_to_pathfinders = {}
+        self.__objetos.clear()
+
+        self._room = AbstractMap(matriz_terreno)
+        self.__setup_room()
+        self.__matrix = self._room.get_matrix_only_obstacles()
         self.__configure_pathfinders()
+
+    def __setup_room(self) -> None:
+        player_pos = self._room.player_start_position
+        player_pos = self.__adapter.matrix_index_to_pygame_pos(player_pos)
+        self.jogador.hitbox.posicao = player_pos
+
+        menor = self._opcoes.MENOR_UNIDADE
+
+        for position_map in self._room.positions_blocking_movement_and_vision:
+            position = self.__adapter.matrix_index_to_pygame_pos(position_map)
+            self.__objetos.append(ObjetoInvisivel(position, (menor, menor), False, True))
+
+        for position_map in self._room.positions_blocking_only_vision:
+            position = self.__adapter.matrix_index_to_pygame_pos(position_map)
+            self.__objetos.append(ObjetoInvisivel(position, (menor, menor), True, True))
+
+        for position_map in self._room.positions_blocking_only_movement:
+            position = self.__adapter.matrix_index_to_pygame_pos(position_map)
+            self.__objetos.append(ObjetoInvisivel(position, (menor, menor), False, False))
+
+        for position_map in self._room.positions_blocking_nothing:
+            position = self.__adapter.matrix_index_to_pygame_pos(position_map)
+            self.__objetos.append(ObjetoInvisivel(position, (menor, menor), True, False))
 
     def iniciar_rodada(self, tela: TelaJogo, jogador) -> None:
         self.desenhar(tela, jogador)
@@ -91,10 +124,11 @@ class AbstractTerreno(ABC):
         if personagem.hitbox.posicao == posicao:
             return True
 
-        if not self._posicao_index_valido(posicao):
+        posicao_matrix = self.__adapter.pygame_pos_to_matrix_index(posicao)
+        if not self._room.is_position_valid(posicao_matrix):
             return False
 
-        if self._posicao_bloqueia_movimento(posicao):
+        if posicao_matrix in self._room.positions_blocking_movement:
             return False
 
         if not self._hitbox_cabe_na_posicao(personagem.hitbox, posicao):
@@ -130,10 +164,11 @@ class AbstractTerreno(ABC):
         x = 0
         while x < 1:
             ponto = equação_vetorial(x)
+            ponto = self.__adapter.pygame_pos_to_matrix_index(ponto)
             # Código exclusivo para testes
             self.__pontos.append(ponto)
 
-            if self._posicao_bloqueia_visao(ponto):
+            if ponto in self._room.positions_blocking_vision:
                 return False
 
             x += step
@@ -149,50 +184,37 @@ class AbstractTerreno(ABC):
         x = 0
         while x < 1:
             ponto = equação_vetorial(x)
+            ponto = self.__adapter.pygame_pos_to_matrix_index(ponto)
             # Código exclusivo para testes
             self.__pontos.append(ponto)
 
-            if self._posicao_bloqueia_visao(ponto):
-                return False
-            if self._posicao_bloqueia_movimento(ponto):
+            if ponto in self._room.positions_blocking_movement:
                 return False
 
             x += step
         return True
 
     def get_path(self, hitbox: Hitbox, p2: tuple) -> list:
-        p1 = self._remove_offset_from_point(hitbox.posicao)
-        p2 = self._remove_offset_from_point(p2)
-        p1 = self._reduzir_ponto(p1)
-        p2 = self._reduzir_ponto(p2)
-        p1 = self._inverter_ponto(p1)
-        p2 = self._inverter_ponto(p2)
+        p1 = self.__adapter.pygame_pos_to_matrix_index(hitbox.posicao)
+        p2 = self.__adapter.pygame_pos_to_matrix_index(p2)
 
         pathfinder = self.__get_AStar_pathfinder_for_hitbox(hitbox)
         caminho = pathfinder.search_path(p1, p2, True)
         for index, ponto in enumerate(caminho):
-            ponto = self._inverter_ponto(ponto)
-            ponto = self._aumentar_ponto(ponto)
-            ponto = self._apply_offset_to_point(ponto)
-            caminho[index] = ponto
+            caminho[index] = self.__adapter.matrix_index_to_pygame_pos(ponto)
 
         return caminho
 
     def get_random_path(self, hitbox: Hitbox) -> list:
         ponto_destino = self.__get_valid_destiny_point_for_hitbox(hitbox)
         while True:
-            p1 = self._remove_offset_from_point(hitbox.posicao)
-            p1 = self._reduzir_ponto(p1)
-            p1 = self._inverter_ponto(p1)
+            p1 = self.__adapter.pygame_pos_to_matrix_index(hitbox.posicao)
 
             pathfinder = self.__get_AStar_pathfinder_for_hitbox(hitbox)
             caminho = pathfinder.search_path(p1, ponto_destino, True)
             if len(caminho) > 0:
                 for index, ponto in enumerate(caminho):
-                    ponto = self._inverter_ponto(ponto)
-                    ponto = self._aumentar_ponto(ponto)
-                    ponto = self._apply_offset_to_point(ponto)
-                    caminho[index] = ponto
+                    caminho[index] = self.__adapter.matrix_index_to_pygame_pos(ponto)
 
             return caminho
 
@@ -206,7 +228,7 @@ class AbstractTerreno(ABC):
             inimigo.update(self.__jogador.hitbox)
 
             if inimigo.morreu:
-                self.__handle_item_drop(inimigo.hitbox.posicao)
+                self.__handle_item_drop(inimigo.hitbox.center)
                 self.__remover_inimigo(inimigo)
 
         for item in self.__itens:
@@ -271,7 +293,7 @@ class AbstractTerreno(ABC):
     def __configure_pathfinders(self):
         self.__proporcao_to_matrix = {}
         self.__proporcao_to_pathfinders = {}
-        self.__MapUpdater = MapUpdater(self.__matrix, 'X', [' '], ['P', '0', '1', '2'])
+        self.__MapUpdater = MapUpdater(self.__matrix)
 
         matrix_1_1 = self._get_reduced_matrix_for_proporsion((1, 1))
         matrix_1_2 = self._get_reduced_matrix_for_proporsion((1, 2))
@@ -316,7 +338,7 @@ class AbstractTerreno(ABC):
             y = randint(1, len(self.__matrix[0]) - 1)
             x = randint(1, len(self.__matrix) - 1)
 
-            if self._validate_inverted_ponto_in_matrix((x, y), matrix):
+            if self.__MapUpdater.validate_ponto_in_matrix((x, y), matrix):
                 return (x, y)
 
     def _get_proporsion_for_hitbox(self, hitbox: Hitbox) -> tuple:
@@ -325,36 +347,12 @@ class AbstractTerreno(ABC):
 
         return (ceil(proporsion_x), ceil(proporsion_y))
 
-    def _validate_inverted_ponto_in_matrix(self, ponto: tuple, matrix: list) -> bool:
-        x = int(ponto[0])
-        y = int(ponto[1])
-
-        if x < 0 or x >= len(matrix):
-            print(f'Acesso indevido a matriz em [{x}][{y}] - 1')
-            return False
-
-        if y < 0 or y >= len(matrix[0]):
-            print(f'Acesso indevido a matriz em [{x}][{y}] - 2')
-            return False
-
-        if matrix[x][y] != ' ' and matrix[x][y] != 'J':
-            return False
-
-        return True
-
-    def _remove_offset_from_point(self, ponto: tuple) -> tuple:
-        return (ponto[0], ponto[1] - self.__opcoes.POSICAO_MAPAS[1])
-
-    def _apply_offset_to_point(self, position: tuple) -> tuple:
-        return (position[0], position[1] + self.__opcoes.POSICAO_MAPAS[1])
-
     def _hitbox_cabe_na_posicao(self, hitbox: Hitbox, posicao: tuple) -> bool:
         proporsion = self._get_proporsion_for_hitbox(hitbox)
         matrix = self._get_reduced_matrix_for_proporsion(proporsion)
-        ponto = self._remove_offset_from_point(posicao)
-        ponto = self._reduzir_ponto(ponto)
-        ponto = self._inverter_ponto(ponto)
-        return self._validate_inverted_ponto_in_matrix(ponto, matrix)
+        ponto = self.__adapter.pygame_pos_to_matrix_index(posicao)
+
+        return self.__MapUpdater.validate_ponto_in_matrix(ponto, matrix)
 
     # Código exclusivo para testes
     def __desenhar_pontos(self, tela: TelaJogo):
@@ -366,11 +364,9 @@ class AbstractTerreno(ABC):
 
     # Código exclusivo para testes
     def __desenhar_quadrados(self, tela: TelaJogo):
-        return
         for index, linha in enumerate(self.__matrix):
             for index_column, coluna in enumerate(linha):
-                posicao = self.__aumentar_ponto((index_column, index))
-                posicao = self.__apply_offset_to_point(posicao)
+                posicao = self.__adapter.matrix_index_to_pygame_pos((index, index_column))
 
                 if index % 2 == 0:
                     if index_column % 2 == 0:
@@ -401,24 +397,8 @@ class AbstractTerreno(ABC):
         color = (255, 255, 255)
         draw.circle(tela.janela, color, rect_arma.center, alcance)
 
-    def _reduzir_ponto(self, ponto: tuple) -> tuple:
-        x = ponto[0] // self.__opcoes.MENOR_UNIDADE
-        y = ponto[1] // self.__opcoes.MENOR_UNIDADE
-
-        return (int(x), int(y))
-
-    def _aumentar_ponto(self, ponto: tuple) -> tuple:
-        x = ponto[0] * self.__opcoes.MENOR_UNIDADE
-        y = ponto[1] * self.__opcoes.MENOR_UNIDADE
-
-        return (x, y)
-
-    def _inverter_ponto(self, ponto: tuple) -> tuple:
-        return (ponto[1], ponto[0])
-
     @property
     def jogador(self) -> Jogador:
-        """Retorna a instância do Jogador que está no Terreno"""
         return self.__jogador
 
     @property
@@ -449,18 +429,6 @@ class AbstractTerreno(ABC):
     @property
     @abstractmethod
     def rect(self) -> Rect:
-        pass
-
-    @abstractmethod
-    def _posicao_bloqueia_visao() -> bool:
-        pass
-
-    @abstractmethod
-    def _posicao_bloqueia_movimento() -> bool:
-        pass
-
-    @abstractmethod
-    def _posicao_index_valido() -> bool:
         pass
 
     @abstractmethod

@@ -302,11 +302,12 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             [self.hitbox.topleft, hit_jogador.topleft],
             [self.hitbox.bottomleft, hit_jogador.bottomleft],
             [self.hitbox.bottomright, hit_jogador.bottomright],
-            [self.hitbox.topright, hit_jogador.topright]
+            [self.hitbox.topright, hit_jogador.topright],
+            [self.hitbox.center, hit_jogador.center]
         ]
         quant = 0
         for par_ponto in pares_pontos:
-            if self.terreno.is_line_of_sight_clear(par_ponto[0], par_ponto[1]):
+            if self.terreno.is_line_of_sight_clear_to_walk(par_ponto[0], par_ponto[1]):
                 quant += 1
 
         if quant == 4:

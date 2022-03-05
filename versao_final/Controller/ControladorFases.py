@@ -9,8 +9,8 @@ class ControladorFases():
     def __init__(self, jogador: Jogador) -> None:
         self.__fases = []
         self.__fases.append(DungeonFase(jogador))
-        self.__fases.append(Fase2(jogador))
-        self.__fases.append(Fase3(jogador))
+        # self.__fases.append(Fase2(jogador))
+        # self.__fases.append(Fase3(jogador))
 
     def proxima_fase(self) -> AbstractFase:
         if len(self.__fases) > 0:

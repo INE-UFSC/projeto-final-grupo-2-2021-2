@@ -5,25 +5,24 @@ from Abstractions.AbstractItem import AbstractItem
 from Enums.Enums import Direction
 
 
-JogadorStats = {
-    'vida': 8,
-    'ataque': 3,
-    'defesa': 2,
-    'vel': 4,
-    'vel_ataque': 1,
-    'arma_dano': 3,
-    'arma_alcance': 20,
-    'transpassavel': False
-}
-
-
 class Jogador(AbstractPersonagem):
+    __STATS = {
+        'vida': 30,
+        'ataque': 5,
+        'defesa': 5,
+        'vel': 3,
+        'vel_ataque': 1,
+        'arma_dano': 3,
+        'arma_alcance': 17,
+        'transpassavel': False
+    }
+
     def __init__(self, posicao: tuple, tamanho: tuple, nome: str, terreno=None) -> None:
         self.__itens: List[AbstractItem] = []
         self.__nome = nome
         self.__direction = Direction.MEIO_CIMA
 
-        super().__init__(stats=JogadorStats, posicao=posicao, tamanho=tamanho, terreno=terreno)
+        super().__init__(stats=Jogador.__STATS, posicao=posicao, tamanho=tamanho, terreno=terreno)
 
     @property
     def direction(self) -> Direction:

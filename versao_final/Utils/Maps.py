@@ -1,9 +1,10 @@
-class MapUpdater():
-    def __init__(self, matrix: list, invalid_char: str, valid_chars: list, invalid_not_updated_chars: list) -> None:
+class MapUpdater:
+    def __init__(self, matrix: list) -> None:
         self.__matrix = matrix
-        self.__invalid_char = invalid_char
-        self.__valid_chars = valid_chars
-        self.__not_updated_invalid_chars = invalid_not_updated_chars
+        self.__invalid_char = 'X'
+        self.__valid_chars = [' ']
+        self.__not_updated_invalid_chars = ['P', '0', '1', '2']
+        self.__points_blocking_movement = ['P', '0']
 
     def update_map_for_size(self, size) -> list:
         matrix = self.__matrix.copy()
@@ -14,23 +15,40 @@ class MapUpdater():
 
         for x, linha in enumerate(matrix):
             for y, ponto in enumerate(linha):
-                pontos_laterais = []
-                pontos_laterais.extend(
+                lateral_points = []
+                lateral_points.extend(
                     self.__get_lateral_points_x_with_proporsion((x, y), x_proporsion))
-                pontos_laterais.extend(
+                lateral_points.extend(
                     self.__get_lateral_points_y_with_proporsion((x, y), y_proporsion))
-                pontos_laterais.extend(
+                lateral_points.extend(
                     self.__get_lateral_points_diagonal_with_proporsion((x, y), diagonal_proporsion))
 
-                for ponto_lateral in pontos_laterais:
+                for ponto_lateral in lateral_points:
                     if self.__ponto_ocupado(ponto_lateral):
                         if ponto not in self.__not_updated_invalid_chars:
-                            antes = matrix[x][0:y]
-                            depois = matrix[x][y+1:]
-                            matrix[x] = f'{antes}{self.__invalid_char}{depois}'
+
+                            matrix[x] = self.__trocar_char_in_string(matrix[x], y)
+
                             break
 
         return matrix
+
+    def validate_ponto_in_matrix(self, ponto: tuple, matrix: list) -> bool:
+        x = int(ponto[0])
+        y = int(ponto[1])
+
+        if x < 0 or x >= len(matrix):
+            print(f'Acesso indevido a matriz em [{x}][{y}] - 1')
+            return False
+
+        if y < 0 or y >= len(matrix[0]):
+            print(f'Acesso indevido a matriz em [{x}][{y}] - 2')
+            return False
+
+        if matrix[x][y] not in self.__valid_chars:
+            return False
+
+        return True
 
     def __ponto_ocupado(self, ponto: tuple):
         x = int(ponto[0])
@@ -40,6 +58,9 @@ class MapUpdater():
             return False
 
         if y < 0 or y >= len(self.__matrix[0]):
+            return False
+
+        if self.__matrix[x][y] not in self.__points_blocking_movement:
             return False
 
         if self.__matrix[x][y] in self.__valid_chars:
@@ -68,3 +89,8 @@ class MapUpdater():
                 pontos_laterais.append((ponto[0] + x, ponto[1] + y))
 
         return pontos_laterais
+
+    def __trocar_char_in_string(self, string_input: str, pos: int) -> str:
+        antes = string_input[0:pos]
+        depois = string_input[pos+1:]
+        return f'{antes}{self.__invalid_char}{depois}'

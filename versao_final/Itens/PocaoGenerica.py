@@ -5,11 +5,13 @@ from Utils.Folder import import_single_sprite
 
 class PocaoGenerica(AbstractItem):
     __PATH_TO_SPRITE = {}
+    __SIZE_TO_SPRITE = {}
 
     def __init__(self, path: str, size: tuple) -> None:
-        if size not in PocaoGenerica.__PATH_TO_SPRITE:
+        if path not in PocaoGenerica.__PATH_TO_SPRITE or size not in PocaoGenerica.__SIZE_TO_SPRITE:
             self.__image = self.__load_image(path, size)
-            self.__PATH_TO_SPRITE[path] = self.__image
+            PocaoGenerica.__PATH_TO_SPRITE[path] = self.__image
+            PocaoGenerica.__SIZE_TO_SPRITE[size] = self.__image
         else:
             self.__image = self.__PATH_TO_SPRITE[path]
 
