@@ -97,17 +97,22 @@ class AbstractTerreno(ABC):
 
             inimigo.animate()
             tela.janela.blit(inimigo.image, inimigo.rect)
+            if inimigo.checar_atacando():
+                self.__desenhar_ataque(tela, inimigo)
 
         # Código para desenhar ataque realizado, será removido posteriormente
         if jogador.checar_atacando():
             self.__desenhar_ataque(tela, jogador)
 
         # self.__desenhar_pontos(tela)
-        tamanho = jogador.hitbox.tamanho
-        posicao = jogador.hitbox.posicao
-        color = (0, 255, 0)
-        rect = Rect(posicao, tamanho)
-        draw.rect(tela.janela, color, rect)
+        # tamanho = jogador.hitbox.tamanho
+        #  posicao = jogador.hitbox.posicao
+        # color = (0, 255, 0)
+        # rect = Rect(posicao, tamanho)
+        # draw.rect(tela.janela, color, rect)
+
+        self.__jogador.animate()
+        tela.janela.blit(self.__jogador.image, self.__jogador.rect)
 
     def pegar_item(self) -> AbstractItem:
         rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
@@ -146,6 +151,12 @@ class AbstractTerreno(ABC):
             inimigo_rect = Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
             if personagem_rect.colliderect(inimigo_rect):
                 return False
+
+        for objeto in self.__objetos:
+            if not objeto.transpassavel:
+                objeto_rect = Rect(objeto.hitbox.posicao, objeto.hitbox.tamanho)
+                if objeto_rect.colliderect(personagem_rect):
+                    return False
 
         # Validação com o Jogador
         if personagem != self.__jogador:
@@ -246,7 +257,7 @@ class AbstractTerreno(ABC):
             self.__itens_to_duration[item] = 500
 
     def lidar_ataques(self, tela: TelaJogo) -> None:
-        if self.__jogador.verificar_ataque():
+        if self.__jogador.atacar():
             self.__executar_ataque(tela, self.__jogador)
 
         for inimigo in self.__inimigos:

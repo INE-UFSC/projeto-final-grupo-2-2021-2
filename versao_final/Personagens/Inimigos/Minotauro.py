@@ -10,7 +10,7 @@ from pygame import Surface, Rect
 
 class Minotauro(AbstractInimigo):
     __ANIMACOES_IMPORTADAS = False
-    __CHANCE_DAMAGE_STOP_ATTACK = 0.3
+    __CHANCE_DAMAGE_STOP_ATTACK = 0.5
     __TAMANHO_IMAGEM = (80, 65)
     __TAMANHO = (36, 48)
     __SPRITE_PATH = 'Assets/Personagens/Minotauro/'
@@ -137,6 +137,7 @@ class Minotauro(AbstractInimigo):
             # Se não está atacando e não tomou hit
             if distancia < self.alcance - 3:  # Se está perto troca animação para atacar
                 self.__set_animation('Attacking')
+                self.arma.atacar()
 
         # Update para cancelar ataque caso jogador saia do range ou caso tome hit
         if self.__animation == 'Attacking':

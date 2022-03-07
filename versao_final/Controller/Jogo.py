@@ -52,5 +52,5 @@ class Jogo:
             pygame.display.update()
 
     def __carregar_dados(self) -> None:
-        self.__jogador = Jogador((0, 0), (50, 50), self.__opcoes.nome)
+        self.__jogador = Jogador((0, 0), self.__opcoes.nome)
         self.__controlador = ControladorFases(self.__jogador)
