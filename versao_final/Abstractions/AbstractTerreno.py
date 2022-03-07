@@ -88,10 +88,10 @@ class AbstractTerreno(ABC):
                     tela.janela.blit(item.image, item.rect)
 
         for inimigo in self.__inimigos:
-            # posicao = inimigo.hitbox.posicao
-            # tamanho = inimigo.hitbox.tamanho
-            # color = (0, 0, 125)
-            # rect = Rect(posicao, tamanho)
+            posicao = inimigo.hitbox.posicao
+            tamanho = inimigo.hitbox.tamanho
+            color = (0, 0, 125)
+            rect = Rect(posicao, tamanho)
             # Desenha os hitbox deles
             # draw.rect(tela.janela, color, rect)
 
@@ -105,10 +105,10 @@ class AbstractTerreno(ABC):
             self.__desenhar_ataque(tela, jogador)
 
         # self.__desenhar_pontos(tela)
-        # tamanho = jogador.hitbox.tamanho
-        #  posicao = jogador.hitbox.posicao
-        # color = (0, 255, 0)
-        # rect = Rect(posicao, tamanho)
+        tamanho = jogador.hitbox.tamanho
+        posicao = jogador.hitbox.posicao
+        color = (0, 255, 0)
+        rect = Rect(posicao, tamanho)
         # draw.rect(tela.janela, color, rect)
 
         self.__jogador.animate()

@@ -15,7 +15,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__HISTORY_POINTS_MAX = 20
         self.__len_caminho = 0
         self.__estava_vendo_jogador = False
-        self.__PERTO = 10
+        self.__PERTO = 18
         self.__MINIMO_PASSOS_DADOS = 2
         self.__MINIMO_PASSOS_NO_CAMINHO = 0
         self.__TRAVADO = False
@@ -310,7 +310,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             if self.terreno.is_line_of_sight_clear_to_walk(par_ponto[0], par_ponto[1]):
                 quant += 1
 
-        if quant == 4:
+        if quant == len(pares_pontos):
             return True
         else:
             return False
@@ -357,22 +357,21 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         return dist
 
     def __hitbox_encostado(self, hitbox: Hitbox) -> bool:
-        # Alinhados na horizontal
-        if self.hitbox.left == hitbox.right or self.hitbox.right == hitbox.left:
-            if self.hitbox.top > hitbox.top and self.hitbox.top < hitbox.bottom:
+        outro_rect = Rect(hitbox.posicao, hitbox.tamanho)
+        pontos = [
+            (self.hitbox.topleft[0] - 2, self.hitbox.topleft[1] - 2),
+            (self.hitbox.midleft[0] - 2, self.hitbox.midleft[1]),
+            (self.hitbox.bottomleft[0] - 2, self.hitbox.bottomleft[1] + 2),
+            (self.hitbox.midtop[0], self.hitbox.midtop[1] - 2),
+            (self.hitbox.midbottom[0], self.hitbox.midbottom[1] + 2),
+            (self.hitbox.topright[0] + 2, self.hitbox.topright[1] - 2),
+            (self.hitbox.midright[0] + 2, self.hitbox.midright[1]),
+            (self.hitbox.bottomright[0] + 2, self.hitbox.bottomright[1] + 2),
+        ]
+
+        for ponto in pontos:
+            if outro_rect.collidepoint(ponto):
                 return True
-            elif hitbox.top > self.hitbox.top and hitbox.top < self.hitbox.bottom:
-                return True
-            else:
-                return False
-        # Alinhados na vertical
-        elif self.hitbox.top == hitbox.bottom or self.hitbox.bottom == hitbox.top:
-            if self.hitbox.right > hitbox.left and self.hitbox.right < hitbox.right:
-                return True
-            elif hitbox.right > self.hitbox.left and hitbox.right < self.hitbox.left:
-                return True
-            else:
-                return False
         return False
 
     def __determinar_posicoes_mais_proximas(self, hit_jogador: Hitbox):
