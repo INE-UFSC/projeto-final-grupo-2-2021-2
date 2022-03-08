@@ -40,6 +40,7 @@ class AbstractTerreno(ABC):
         self.__proporcao_to_matrix = {}
         self.__proporcao_to_pathfinders = {}
         self.__objetos.clear()
+        self.__itens.clear()
 
         self._room = AbstractMap(matriz_terreno)
         self.__setup_room()
@@ -50,6 +51,7 @@ class AbstractTerreno(ABC):
         player_pos = self._room.player_start_position
         player_pos = self.__adapter.matrix_index_to_pygame_pos(player_pos)
         self.jogador.hitbox.posicao = player_pos
+        self.__itens.clear()
 
         menor = self._opcoes.MENOR_UNIDADE
 
@@ -69,10 +71,10 @@ class AbstractTerreno(ABC):
             position = self.__adapter.matrix_index_to_pygame_pos(position_map)
             self.__objetos.append(ObjetoInvisivel(position, (menor, menor), True, False))
 
-    def iniciar_rodada(self, tela: TelaJogo, jogador) -> None:
-        self.desenhar(tela, jogador)
+    def iniciar_rodada(self, tela: TelaJogo) -> None:
+        self.desenhar(tela)
 
-    def desenhar(self, tela: TelaJogo, jogador) -> None:
+    def desenhar(self, tela: TelaJogo) -> None:
         tela.janela.blit(self.image, self.rect)
         self.__HUD.desenhar(tela)
 
@@ -88,27 +90,27 @@ class AbstractTerreno(ABC):
                     tela.janela.blit(item.image, item.rect)
 
         for inimigo in self.__inimigos:
-            posicao = inimigo.hitbox.posicao
-            tamanho = inimigo.hitbox.tamanho
-            color = (0, 0, 125)
-            rect = Rect(posicao, tamanho)
+            #posicao = inimigo.hitbox.posicao
+            #tamanho = inimigo.hitbox.tamanho
+            #color = (0, 0, 125)
+            #rect = Rect(posicao, tamanho)
             # Desenha os hitbox deles
             # draw.rect(tela.janela, color, rect)
 
             inimigo.animate()
             tela.janela.blit(inimigo.image, inimigo.rect)
-            if inimigo.checar_atacando():
-                self.__desenhar_ataque(tela, inimigo)
+            # if inimigo.checar_atacando():
+            #    self.__desenhar_ataque(tela, inimigo)
 
         # Código para desenhar ataque realizado, será removido posteriormente
-        if jogador.checar_atacando():
-            self.__desenhar_ataque(tela, jogador)
+        # if jogador.checar_atacando():
+        #    self.__desenhar_ataque(tela, jogador)
 
-        # self.__desenhar_pontos(tela)
-        tamanho = jogador.hitbox.tamanho
-        posicao = jogador.hitbox.posicao
-        color = (0, 255, 0)
-        rect = Rect(posicao, tamanho)
+        self.__desenhar_pontos(tela)
+        #tamanho = self.__jogador.hitbox.tamanho
+        #posicao = self.__jogador.hitbox.posicao
+        #color = (0, 255, 0)
+        #rect = Rect(posicao, tamanho)
         # draw.rect(tela.janela, color, rect)
 
         self.__jogador.animate()
@@ -147,6 +149,8 @@ class AbstractTerreno(ABC):
             # Inimigos não se batem
             if personagem != self.__jogador:
                 break
+            if inimigo.hitbox.transpassavel:
+                break
 
             inimigo_rect = Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
             if personagem_rect.colliderect(inimigo_rect):
@@ -175,9 +179,10 @@ class AbstractTerreno(ABC):
         x = 0
         while x < 1:
             ponto = equação_vetorial(x)
-            ponto = self.__adapter.pygame_pos_to_matrix_index(ponto)
             # Código exclusivo para testes
-            self.__pontos.append(ponto)
+            # self.__pontos.append(ponto)
+
+            ponto = self.__adapter.pygame_pos_to_matrix_index(ponto)
 
             if ponto in self._room.positions_blocking_vision:
                 return False
@@ -195,10 +200,10 @@ class AbstractTerreno(ABC):
         x = 0
         while x < 1:
             ponto = equação_vetorial(x)
-            ponto = self.__adapter.pygame_pos_to_matrix_index(ponto)
             # Código exclusivo para testes
-            self.__pontos.append(ponto)
+            # self.__pontos.append(ponto)
 
+            ponto = self.__adapter.pygame_pos_to_matrix_index(ponto)
             if ponto in self._room.positions_blocking_movement:
                 return False
 
@@ -254,39 +259,72 @@ class AbstractTerreno(ABC):
         if isinstance(item, AbstractItem):
             item.posicao = position
             self.__itens.append(item)
-            self.__itens_to_duration[item] = 500
+            self.__itens_to_duration[item] = self.__opcoes.ITENS_DROPPED_DURATION
 
-    def lidar_ataques(self, tela: TelaJogo) -> None:
+    def lidar_ataques(self) -> None:
         if self.__jogador.atacar():
-            self.__executar_ataque(tela, self.__jogador)
+            self.__executar_ataque(self.__jogador)
 
         for inimigo in self.__inimigos:
             if inimigo.atacar():
-                self.__executar_ataque_inimigo(tela, inimigo)
+                self.__executar_ataque_inimigo(inimigo)
 
     def load_inimigos(self, inimigos: list) -> None:
         self.__inimigos.extend(inimigos)
 
-    def __executar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
-        self.__desenhar_ataque(tela, personagem)
+    def __executar_ataque(self, personagem: AbstractPersonagem):
+        ponto1 = personagem.hitbox.center
+        pontos_2 = personagem.pontos_para_ataque()
 
-        rect_arma = personagem.get_rect_arma()
+        pontos = []
+        for ponto2 in pontos_2:
+            func = gerar_equação_vetorial_reta(ponto1, ponto2)
+
+            x = 1
+            step = 0.2
+            alcance = self.__adapter.alcance_to_vector_dist(personagem.alcance)
+            while x < alcance:
+                ponto = func(x)
+
+                # Código para testes
+                self.__pontos.append(ponto)
+                pontos.append(ponto)
+                x += step
+
         for inimigo in self.__inimigos:
             rect_inimigo = Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
 
-            if rect_arma.colliderect(rect_inimigo):
-                dano = personagem.dano
-                dano_causado = inimigo.tomar_dano(dano)
+            for ponto in pontos:
+                if rect_inimigo.collidepoint(ponto):
+                    dano = personagem.dano
+                    dano_causado = inimigo.tomar_dano(dano)
+                    break
 
-    def __executar_ataque_inimigo(self, tela: TelaJogo, personagem: AbstractPersonagem):
-        self.__desenhar_ataque(tela, personagem)
+    def __executar_ataque_inimigo(self, personagem: AbstractPersonagem):
+        ponto1 = personagem.hitbox.center
+        pontos_2 = personagem.pontos_para_ataque()
 
-        rect_arma = personagem.get_rect_arma()
+        pontos = []
+        for ponto2 in pontos_2:
+            func = gerar_equação_vetorial_reta(ponto1, ponto2)
+
+            x = 1
+            step = 0.2
+            alcance = self.__adapter.alcance_to_vector_dist(personagem.alcance)
+            while x < alcance:
+                ponto = func(x)
+
+                # Código para testes
+                self.__pontos.append(ponto)
+                pontos.append(ponto)
+                x += step
+
         rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
-
-        if rect_arma.colliderect(rect_jogador):
-            dano = personagem.dano
-            dano_causado = self.__jogador.tomar_dano(dano)
+        for ponto in pontos:
+            if rect_jogador.collidepoint(ponto):
+                dano = personagem.dano
+                dano_causado = self.__jogador.tomar_dano(dano)
+                break
 
     def __get_AStar_pathfinder_for_hitbox(self, hitbox: Hitbox) -> AStar:
         proporcao = self._get_proporsion_for_hitbox(hitbox)
@@ -400,13 +438,6 @@ class AbstractTerreno(ABC):
 
     def __remover_inimigo(self, inimigo):
         self.__inimigos.remove(inimigo)
-
-    def __desenhar_ataque(self, tela: TelaJogo, personagem: AbstractPersonagem):
-        rect_arma = personagem.get_rect_arma()
-        alcance = personagem.alcance
-
-        color = (255, 255, 255)
-        draw.circle(tela.janela, color, rect_arma.center, alcance)
 
     @property
     def jogador(self) -> Jogador:

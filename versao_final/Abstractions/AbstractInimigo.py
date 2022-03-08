@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 from Utils.Hitbox import Hitbox
 from Abstractions.AbstractPersonagem import AbstractPersonagem
-from Enums.Enums import Direction, Estado
+from Enums.Enums import Estado
 from pygame import Rect, Surface
 
 
 class AbstractInimigo(AbstractPersonagem, ABC):
     def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno) -> None:
-        self.__direction = Direction.MEIO_BAIXO
         self.__estado = Estado.REPOUSO
 
         self.__caminho = []
@@ -27,10 +26,6 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def _estado(self) -> Estado:
         return self.__estado
 
-    @property
-    def direction(self) -> Direction:
-        return self.__direction
-
     @abstractmethod
     def update(self, hit_jogador: Hitbox) -> None:
         if self.vida <= 0:
@@ -48,19 +43,12 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         elif self.__estado == Estado.ATACANDO:
             self.__seguir_jogador(hit_jogador)
 
-    def get_rect_arma(self) -> Rect:
-        posicao_frente = self.__determinar_posicao_frente()
-
-        rect = Rect(posicao_frente, (self.alcance * 2, self.alcance * 2))
-        rect.center = posicao_frente
-        return rect
+    def pontos_para_ataque(self) -> list:
+        return super().pontos_para_ataque()
 
     @abstractmethod
     def atacar(self):
-        if self.arma.atacar():
-            return True
-        else:
-            return False
+        pass
 
     @abstractmethod
     def morreu(self) -> bool:
@@ -231,7 +219,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
                 self.hitbox.posicao = nova_posicao_y
 
-        self.__atualizar_frente(x_movement, y_movement)
+        self._atualizar_frente(x_movement, y_movement)
         self.__atualizar_bug_handler()
 
     def __mover_para_ponto(self, ponto: tuple) -> None:
@@ -263,7 +251,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
                 self.hitbox.posicao = nova_posicao_y
 
-        self.__atualizar_frente(x_movement, y_movement)
+        self._atualizar_frente(x_movement, y_movement)
         self.__atualizar_bug_handler()
 
     def __update_visao(self, hit_jogador: Hitbox) -> None:
@@ -324,26 +312,6 @@ class AbstractInimigo(AbstractPersonagem, ABC):
                 return True
         return False
 
-    def __atualizar_frente(self, x_movement, y_movement):
-        if x_movement < 0:
-            if y_movement < 0:
-                self.__direction = Direction.ESQUERDA_CIMA
-            elif y_movement > 0:
-                self.__direction = Direction.ESQUERDA_BAIXO
-            else:
-                self.__direction = Direction.ESQUERDA_MEIO
-        elif x_movement > 0:
-            if y_movement < 0:
-                self.__direction = Direction.DIREITA_CIMA
-            elif y_movement > 0:
-                self.__direction = Direction.DIREITA_BAIXO
-            else:
-                self.__direction = Direction.DIREITA_MEIO
-        elif y_movement > 0:
-            self.__direction = Direction.MEIO_BAIXO
-        elif y_movement < 0:
-            self.__direction = Direction.MEIO_CIMA
-
     def _calcular_distancia(self, outro_hitbox: Hitbox):
         if self.__hitbox_encostado(outro_hitbox):
             return 0
@@ -395,23 +363,3 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             return self.hitbox.midtop, hit_jogador.midbottom
         else:  # Abaixo
             return self.hitbox.midbottom, hit_jogador.midtop
-
-    def __determinar_posicao_frente(self):
-        if self.__direction == Direction.DIREITA_BAIXO:
-            return self.hitbox.bottomright
-        elif self.__direction == Direction.DIREITA_MEIO:
-            return self.hitbox.midright
-        elif self.__direction == Direction.DIREITA_CIMA:
-            return self.hitbox.topright
-        elif self.__direction == Direction.ESQUERDA_BAIXO:
-            return self.hitbox.bottomleft
-        elif self.__direction == Direction.ESQUERDA_MEIO:
-            return self.hitbox.midleft
-        elif self.__direction == Direction.ESQUERDA_CIMA:
-            return self.hitbox.topleft
-        elif self.__direction == Direction.MEIO_BAIXO:
-            return self.hitbox.midbottom
-        elif self.__direction == Direction.MEIO_CIMA:
-            return self.hitbox.midtop
-        else:
-            return self.hitbox.midtop

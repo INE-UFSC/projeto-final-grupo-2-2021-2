@@ -21,6 +21,12 @@ class Adapter(Singleton):
 
         return position
 
+    def alcance_to_vector_dist(self, alcance: int) -> int:
+        ratio = 100 / (self.__opcoes.MAX_ALCANCE - self.__opcoes.MIN_ALCANCE)
+        aumento = alcance / ratio
+
+        return self.__opcoes.MIN_ALCANCE + aumento
+
     def __inverter_ponto(self, position: tuple) -> tuple:
         return (position[1], position[0])
 

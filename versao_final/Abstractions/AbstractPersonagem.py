@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from Enums.Enums import Direction
 from Utils.Hitbox import Hitbox
 from Personagens.Arma import Arma
 from Personagens.Status import Status
@@ -8,6 +9,7 @@ class AbstractPersonagem(ABC):
     def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: None) -> None:
         """Recebe um dicionário com os stats iniciais, tuplas com a posição e tamanho do personagem"""
         self.__status = Status(stats)
+        self.__direction = Direction.MEIO_BAIXO
 
         dano = stats['arma_dano'] if 'arma_dano' in stats.keys() else 2
         alcance = stats['arma_alcance'] if 'arma_alcance' in stats.keys() else 10
@@ -16,6 +18,15 @@ class AbstractPersonagem(ABC):
         self.__ACABOU_DE_TOMAR_DANO = False
         self.__hitbox = Hitbox(posicao, tamanho)
         self.__terreno = terreno
+
+    @property
+    def direction(self) -> Direction:
+        return self.__direction
+
+    @direction.setter
+    def direction(self, value) -> Direction:
+        if type(value) == Direction:
+            self.__direction = value
 
     @property
     def _tomou_dano(self) -> bool:
@@ -37,11 +48,68 @@ class AbstractPersonagem(ABC):
         else:
             return 0
 
-    def update(self):
-        self.__arma.update()
+    def _atualizar_frente(self, x_movement: int, y_movement: int) -> None:
+        if x_movement < 0:
+            if y_movement < 0:
+                self.direction = Direction.ESQUERDA_CIMA
+            elif y_movement > 0:
+                self.direction = Direction.ESQUERDA_BAIXO
+            else:
+                self.direction = Direction.ESQUERDA_MEIO
+        elif x_movement > 0:
+            if y_movement < 0:
+                self.direction = Direction.DIREITA_CIMA
+            elif y_movement > 0:
+                self.direction = Direction.DIREITA_BAIXO
+            else:
+                self.direction = Direction.DIREITA_MEIO
+        elif y_movement > 0:
+            self.direction = Direction.MEIO_BAIXO
+        elif y_movement < 0:
+            self.direction = Direction.MEIO_CIMA
 
-    def checar_atacando(self) -> bool:
-        return self.__arma.desenhando_ataque
+    @abstractmethod
+    def pontos_para_ataque(self) -> list:
+        if self.__direction == Direction.DIREITA_BAIXO:
+            return [self.hitbox.bottomright, self.hitbox.midrightbottom, self.hitbox.midbottomright]
+        elif self.__direction == Direction.DIREITA_MEIO:
+            return [self.hitbox.midright, self.hitbox.midtopright, self.hitbox.midbottomright]
+        elif self.__direction == Direction.DIREITA_CIMA:
+            return [self.hitbox.midright, self.hitbox.midrighttop, self.hitbox.midtopright]
+        elif self.__direction == Direction.ESQUERDA_BAIXO:
+            return [self.hitbox.bottomleft, self.hitbox.midbottomleft, self.hitbox.midleftbottom]
+        elif self.__direction == Direction.ESQUERDA_MEIO:
+            return [self.hitbox.midleft, self.hitbox.midbottomleft, self.hitbox.midtopleft]
+        elif self.__direction == Direction.ESQUERDA_CIMA:
+            return [self.hitbox.topleft, self.hitbox.midtopleft, self.hitbox.midlefttop]
+        elif self.__direction == Direction.MEIO_BAIXO:
+            return [self.hitbox.midbottom, self.hitbox.midrightbottom, self.hitbox.midleftbottom]
+        elif self.__direction == Direction.MEIO_CIMA:
+            return [self.hitbox.midtop, self.hitbox.midlefttop, self.hitbox.midrighttop]
+
+    def _determinar_posicao_frente(self) -> Direction:
+        if self.__direction == Direction.DIREITA_BAIXO:
+            return self.hitbox.bottomright
+        elif self.__direction == Direction.DIREITA_MEIO:
+            return self.hitbox.midright
+        elif self.__direction == Direction.DIREITA_CIMA:
+            return self.hitbox.topright
+        elif self.__direction == Direction.ESQUERDA_BAIXO:
+            return self.hitbox.bottomleft
+        elif self.__direction == Direction.ESQUERDA_MEIO:
+            return self.hitbox.midleft
+        elif self.__direction == Direction.ESQUERDA_CIMA:
+            return self.hitbox.topleft
+        elif self.__direction == Direction.MEIO_BAIXO:
+            return self.hitbox.midbottom
+        elif self.__direction == Direction.MEIO_CIMA:
+            return self.hitbox.midtop
+        else:
+            return self.hitbox.midtop
+
+    @abstractmethod
+    def update(self):
+        pass
 
     @property
     def alcance(self) -> int:

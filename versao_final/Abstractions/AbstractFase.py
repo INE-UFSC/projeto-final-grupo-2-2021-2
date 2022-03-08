@@ -7,8 +7,8 @@ from Abstractions.AbstractTerreno import AbstractTerreno
 
 
 class AbstractFase(ABC):
-    def __init__(self, jogador) -> None:
-        self.__jogador = jogador
+    def __init__(self, jogador: Jogador) -> None:
+        self.__jogador: Jogador = jogador
         self.__opcoes = Opcoes()
         self.__dificuldade = self.__opcoes.dificuldade
         self.__terreno = None
@@ -20,19 +20,19 @@ class AbstractFase(ABC):
             return False
 
     def start(self, tela: TelaJogo):
-        self.jogador.terreno = self.__terreno
-        self.__terreno.iniciar_rodada(tela, self.jogador)
+        self.__jogador.terreno = self.__terreno
+        self.__terreno.iniciar_rodada(tela)
 
     def has_ended(self) -> bool:
         return self.__terreno.has_ended()
 
     def ciclo(self, tela: TelaJogo) -> None:
         """Função para ser executada em todo ciclo do main loop"""
-        self.__jogador.lidar_inputs()
+        self.__jogador.processar_inputs()
         self.__terreno.mover_inimigos()
-        self.__terreno.lidar_ataques(tela)
+        self.__terreno.lidar_ataques()
         self.__terreno.update()
-        self.__terreno.desenhar(tela, self.__jogador)
+        self.__terreno.desenhar(tela)
 
     @property
     def jogador(self) -> Jogador:

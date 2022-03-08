@@ -18,6 +18,9 @@ class Opcoes(Singleton):
                 1128 / self.__menor_unidade, 624 / self.__menor_unidade)
             self.__TAMANHO_MAPAS = (1128, 624)
             self.__GAME_TITLE = 'The Binding of Isaac'
+            self.__MAX_ALCANCE = 3.5
+            self.__MIN_ALCANCE = 1.2
+            self.__ITENS_DROPPED_DURATION = 500
 
     @property
     def tocar_musica(self) -> bool:
@@ -73,3 +76,15 @@ class Opcoes(Singleton):
     @property
     def POSICAO_HUD(self) -> str:
         return self.__POSICAO_HUD
+
+    @property
+    def MAX_ALCANCE(self) -> int:
+        return self.__MAX_ALCANCE
+
+    @property
+    def MIN_ALCANCE(self) -> int:
+        return self.__MIN_ALCANCE
+
+    @property
+    def ITENS_DROPPED_DURATION(self) -> int:
+        return self.__ITENS_DROPPED_DURATION

@@ -7,6 +7,7 @@ from Abstractions.AbstractTerreno import AbstractTerreno
 from Itens.PocaoDefesa import PocaoDefesa
 from Itens.PocaoMedia import PocaoMedia
 from Itens.PocaoPequena import PocaoPequena
+from Itens.PocaoVeneno import PocaoVeneno
 from Personagens.Jogador.Jogador import Jogador
 from Utils.Adapter import Adapter
 from Utils.Folder import import_single_sprite
@@ -28,7 +29,10 @@ class DungeonMap(AbstractTerreno):
         self.__image = import_single_sprite(self.__SPRITE_PATH, self._opcoes.TAMANHO_MAPAS)
         self.__rect = self.__image.get_rect(center=self.hitbox.center)
         self.__itens: List[Type[AbstractItem]] = [PocaoDefesa, PocaoMedia, PocaoPequena]
-        self.__itens_to_chance = {PocaoDefesa: 0.85, PocaoMedia: 0.15, PocaoPequena: 0.4}
+        self.__itens_to_chance = {PocaoDefesa: 0.3,
+                                  PocaoMedia: 0.15,
+                                  PocaoPequena: 0.45,
+                                  PocaoVeneno: 0.1}
 
     def update(self) -> None:
         if self.__has_ended_current_room():

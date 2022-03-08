@@ -15,11 +15,11 @@ class Minotauro(AbstractInimigo):
     __TAMANHO = (36, 48)
     __SPRITE_PATH = 'Assets/Personagens/Minotauro/'
     __STATS_FACIL = {'vida': 15, 'ataque': 4, 'defesa': 3, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 3,
-                     'arma_alcance': 11, 'view_distance': 150, 'transpassavel': False}
+                     'arma_alcance': 18, 'view_distance': 150, 'transpassavel': False}
     __STATS_MEDIO = {'vida': 20, 'ataque': 5, 'defesa': 4, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 4,
-                     'arma_alcance': 12, 'view_distance': 150, 'transpassavel': False}
+                     'arma_alcance': 18, 'view_distance': 150, 'transpassavel': False}
     __STATS_DIFICIL = {'vida': 25, 'ataque': 6, 'defesa': 5, 'vel': 3, 'vel_ataque': 1, 'arma_dano': 5,
-                       'arma_alcance': 13, 'view_distance': 150, 'transpassavel': False}
+                       'arma_alcance': 18, 'view_distance': 150, 'transpassavel': False}
 
     def __init__(self, terreno: AbstractTerreno, posicao=(0, 0)) -> None:
         stats = Minotauro.__calibrar_dificuldade()
@@ -36,6 +36,7 @@ class Minotauro(AbstractInimigo):
         self.__MORREU = False
         self.__LAST_ANIMATION = 'Idle'
         self.__ANIMACAO_RESETADA = False
+        self.__DIST_PARA_ATAQUE = 8
         self.__animations = Minotauro.__normal_animations
 
     @classmethod
@@ -135,9 +136,8 @@ class Minotauro(AbstractInimigo):
         # Update quanto a animação de atacar
         if self.__animation != 'Attacking' and self.__animation != 'Hurt':
             # Se não está atacando e não tomou hit
-            if distancia < self.alcance - 3:  # Se está perto troca animação para atacar
+            if distancia < self.__DIST_PARA_ATAQUE:  # Se está perto troca animação para atacar
                 self.__set_animation('Attacking')
-                self.arma.atacar()
 
         # Update para cancelar ataque caso jogador saia do range ou caso tome hit
         if self.__animation == 'Attacking':
@@ -153,6 +153,7 @@ class Minotauro(AbstractInimigo):
     def morreu(self) -> bool:
         if self.vida <= 0:
             if not self.__MORREU:
+                self.hitbox.transpassavel = True
                 self.__set_animation('Dying')
             else:
                 if self.__ANIMACAO_RESETADA:

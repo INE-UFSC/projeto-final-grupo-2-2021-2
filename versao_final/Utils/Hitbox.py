@@ -1,7 +1,17 @@
-class Hitbox():
-    def __init__(self, posicao: tuple, tamanho: tuple) -> None:
+class Hitbox:
+    def __init__(self, posicao: tuple, tamanho: tuple, transpassavel=False) -> None:
         self.__posicao = posicao
         self.__tamanho = tamanho
+        self.__transpassavel = transpassavel
+
+    @property
+    def transpassavel(self) -> bool:
+        return self.__transpassavel
+
+    @transpassavel.setter
+    def transpassavel(self, value) -> None:
+        if type(value) == bool:
+            self.__transpassavel = value
 
     @property
     def center(self) -> tuple:
@@ -36,6 +46,54 @@ class Hitbox():
         x = self.__posicao[0] + self.__tamanho[0]
         y = self.__posicao[1] + self.__tamanho[1] // 2
         return (x, y)
+
+    @property
+    def midbottomright(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0]
+        y = self.__posicao[1] + self.__tamanho[1] * (3/4)
+        return (int(x), int(y))
+
+    @property
+    def midtopright(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0]
+        y = self.__posicao[1] + self.__tamanho[1] * (1/4)
+        return (int(x), int(y))
+
+    @property
+    def midbottomleft(self) -> tuple:
+        x = self.__posicao[0]
+        y = self.__posicao[1] + self.__tamanho[1] * (3/4)
+        return (int(x), int(y))
+
+    @property
+    def midtopleft(self) -> tuple:
+        x = self.__posicao[0]
+        y = self.__posicao[1] + self.__tamanho[1] * (1/4)
+        return (int(x), int(y))
+
+    @property
+    def midlefttop(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0] * (1/4)
+        y = self.__posicao[1]
+        return (int(x), int(y))
+
+    @property
+    def midrighttop(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0] * (3/4)
+        y = self.__posicao[1]
+        return (int(x), int(y))
+
+    @property
+    def midleftbottom(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0] * (1/4)
+        y = self.__posicao[1] + self.__tamanho[1]
+        return (int(x), int(y))
+
+    @property
+    def midrightbottom(self) -> tuple:
+        x = self.__posicao[0] + self.__tamanho[0] * (3/4)
+        y = self.__posicao[1] + self.__tamanho[1]
+        return (int(x), int(y))
 
     @property
     def midbottom(self) -> tuple:
