@@ -61,6 +61,7 @@ class ControladorJogo():
     def __invoke_game(self, *args, **kwargs):
         self.__jogo = Jogo()
         self.__jogo.start()
+        self.__invoke_menu()
 
     def __invoke_saves(self, *args, **kwargs):
         pass
