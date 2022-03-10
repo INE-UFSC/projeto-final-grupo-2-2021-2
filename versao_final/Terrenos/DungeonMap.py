@@ -17,7 +17,9 @@ from random import random
 class DungeonMap(AbstractTerreno):
     def __init__(self, jogador: Jogador, enemies_quant: int, enemies_types: List[Type[AbstractInimigo]]):
         self.__adapter = Adapter()
-        self.__rooms = [matrix_dungeon, matrix_dungeon]
+        self.__rooms = [matrix_dungeon1, matrix_dungeon2]
+        self.__end_paths = ['sala1', 'sala2']
+
         self.__HAS_ENDED = False
         self.__enemies_quant = enemies_quant
         self.__enemies_types: List[Type[AbstractInimigo]] = enemies_types
@@ -25,9 +27,6 @@ class DungeonMap(AbstractTerreno):
         super().__init__([], jogador)
         self.__set_next_room()
 
-        self.__SPRITE_PATH = 'Assets/Mapas/Dungeon/fundo.png'
-        self.__image = import_single_sprite(self.__SPRITE_PATH, self._opcoes.TAMANHO_MAPAS)
-        self.__rect = self.__image.get_rect(center=self.hitbox.center)
         self.__itens: List[Type[AbstractItem]] = [PocaoDefesa, PocaoMedia, PocaoPequena]
         self.__itens_to_chance = {PocaoDefesa: 0.3,
                                   PocaoMedia: 0.15,
@@ -43,7 +42,12 @@ class DungeonMap(AbstractTerreno):
     def __set_next_room(self):
         if len(self.__rooms) > 0:
             room = self.__rooms.pop(0)
+            end_path = self.__end_paths.pop(0)
             super()._setup_mapa(room)
+
+            self.__SPRITE_PATH = f'Assets/Mapas/Dungeon/{end_path}.png'
+            self.__image = import_single_sprite(self.__SPRITE_PATH, self._opcoes.TAMANHO_MAPAS)
+            self.__rect = self.__image.get_rect(center=self.hitbox.center)
 
             inimigos = self.__criar_inimigos(self.__enemies_quant)
             self.load_inimigos(inimigos)
@@ -87,7 +91,7 @@ class DungeonMap(AbstractTerreno):
         return self.__HAS_ENDED
 
 
-matrix_dungeon = [
+matrix_dungeon1 = [
     #          X         X         X         X
     # 01234567890123456789012345678901234567890123456
     'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 0
@@ -116,5 +120,36 @@ matrix_dungeon = [
     'PP             000     PP                  00PP',  # 23
     'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 24
     'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP']  # 25
+
+matrix_dungeon2 = [
+    #          X         X         X         X
+    # 01234567890123456789012345678901234567890123456
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 0
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 1
+    'PPPPPPPPPP                   000PP        0 0PP',  # 2
+    'PPPPPPPPPP                      PP 5      0 0PP',  # 3
+    'PPPPPPPPPP         5            PP     5     PP',  # 4
+    'PPPPPPPPPP                      PP 5         PP',
+    'PP                              PP           PP',  # 6
+    'PP                 5            PP          0PP',  # 7
+    'PP                              PP   PPPPPPPPPP',  # 8
+    'PP                              PP   PPPPPPPPPP',  # 9c
+    'PP         PPPPPPPPPPPPPP                    PP',  # 10
+    'PP  5  5   PPPPPPPPPPPPPP                    PP',  # 11
+    'PP         PP00      5                       PP',  # 12
+    'PP         PP0    5                           PP',  # 13
+    'PP         PP                                PP',  # 14
+    'PP         PP  5     5          PPPPPPPPPPPPPPPP',  # 1
+    'PP         PP     000           PPPPPPPPPPPPPPP',  # 16
+    'PP         PP     000   P       PPPPPPPPPPPPPPP',  # 17
+    'PP         PP 5   000   P       PPPPPPPPPPPPPPP',  # 18
+    'PP         PP           P       P   5        PP',  # 19
+    'PP         PP           P       P      5     PP',  # 20
+    'PP   J     PP     5     P                    PP',  # 21
+    'PPPP       PP00         P          5         PP',  # 22
+    'PPPP       PP00         P                    PP',  # 23
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 24
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP']  # 25
+
 
 # A parede no canto inferior direito fica nos quadrados 46x25

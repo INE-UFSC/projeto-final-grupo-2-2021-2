@@ -37,12 +37,12 @@ class Jogo:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     main_loop = False
-                
+
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_p:
                         self.tela_pause()
-                        
-            if self.__menuprincipal: #volta para o menu principal, quando o jogo é rodado pelo ControladorJogo
+
+            if self.__menuprincipal:  # volta para o menu principal, quando o jogo é rodado pelo ControladorJogo
                 main_loop = False
 
             self.__fase_atual.ciclo(self.__tela)
@@ -64,18 +64,18 @@ class Jogo:
     def __carregar_dados(self) -> None:
         self.__jogador = Jogador((0, 0), self.__opcoes.nome)
         self.__controlador = ControladorFases(self.__jogador)
-    
+
     def tela_pause(self, *args) -> None:
         telaPause = TelaPause({
             ComandosEnum.TELA_JOGAR: self.__voltar_jogo,
             ComandosEnum.TELA_OPCOES: self.__opcoes_pause,
             ComandosEnum.TELA_MENU: self.__menu_principal
-            })
+        })
         telaPause.run()
 
     def __voltar_jogo(self, *args):
         pass
-    
+
     def __opcoes_pause(self, *args):
         pass
 
