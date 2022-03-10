@@ -4,10 +4,12 @@ from pygame import Rect, Surface
 from Personagens.Inimigos.AbstractInimigo import AbstractInimigo
 from Itens.AbstractItem import AbstractItem
 from Terrenos.AbstractTerreno import AbstractTerreno
+from Itens.Pocoes.PocaoForca import PocaoForca
 from Itens.Pocoes.PocaoDefesa import PocaoDefesa
 from Itens.Pocoes.PocaoMedia import PocaoMedia
 from Itens.Pocoes.PocaoPequena import PocaoPequena
 from Itens.Pocoes.PocaoVeneno import PocaoVeneno
+from Itens.Pocoes.PocaoVelocidade import PocaoVelocidade
 from Personagens.Jogador import Jogador
 from Utils.Adapter import Adapter
 from Utils.Folder import import_single_sprite
@@ -28,11 +30,10 @@ class DungeonMap(AbstractTerreno):
         super().__init__([], jogador)
         self.__set_next_room()
 
-        self.__itens: List[Type[AbstractItem]] = [PocaoDefesa, PocaoMedia, PocaoPequena]
-        self.__itens_to_chance = {PocaoDefesa: 0.3,
-                                  PocaoMedia: 0.15,
-                                  PocaoPequena: 0.45,
-                                  PocaoVeneno: 0.1}
+        self.__itens: List[Type[AbstractItem]] = [PocaoVeneno, PocaoDefesa, PocaoForca,
+                                                  PocaoMedia, PocaoPequena, PocaoVelocidade]
+        self.__itens_to_chance = {PocaoDefesa: 0.15, PocaoMedia: 0.15, PocaoPequena: 0.45,
+                                  PocaoVeneno: 0.15, PocaoVelocidade: 0.15, PocaoForca: 0.15}
 
     def update(self) -> None:
         if self.__logic_room_ended():
@@ -84,10 +85,10 @@ class DungeonMap(AbstractTerreno):
         if not self.__all_enemies_dead():
             return False
 
-        rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
         posicao_end_matrix = self._room.position_end_room
         posicao_end_screen = self.__adapter.matrix_index_to_pygame_pos(posicao_end_matrix)
 
+        rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
         if rect_jogador.collidepoint(posicao_end_screen):
             return True
 
@@ -108,7 +109,7 @@ class DungeonMap(AbstractTerreno):
 matrix_dungeon1 = [
     'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
     'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
-    'PP00      00PP00                PP0          PP',
+    'PP        00PP00                PP0          PP',
     'PP E      00PP00                PP  5        PP',
     'PP    5     PP     5   5   5    PP           PP',
     'PP          PP                  PP       5   PP',
@@ -125,10 +126,10 @@ matrix_dungeon1 = [
     'PP    PPPPPPPP      PPPPPPPP         PPPPPPPPPP',
     'PP    PPPPPPPP      PPPPPPPP         PPPPPPPPPP',
     'PP                     PP            PPPPPPPPPP',
-    'PP     5       5       PP            P J     PP',
+    'PP     5       5       PP            P       PP',
     'PP                     PP            P       PP',
     'PP             000     PP                    PP',
-    'PP    5        000     PP                  00PP',
+    'PP    5        000     PP                J 00PP',
     'PP             000     PP                  00PP',
     'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
     'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP']
@@ -136,9 +137,9 @@ matrix_dungeon1 = [
 matrix_dungeon2 = [
     'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
     'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
-    'PPPPPPPPPP                   000PP        000PP',
-    'PPPPPPPPPP                      PP 5      000PP',
-    'PPPPPPPPPP         5            PP     5   E PP',
+    'PPPPPPPPPP                   000PP           PP',
+    'PPPPPPPPPP                      PP 5       E PP',
+    'PPPPPPPPPP         5            PP     5     PP',
     'PPPPPPPPPP                      PP 5         PP',
     'PP                              PP           PP',
     'PP                 5            PP          0PP',
@@ -155,7 +156,7 @@ matrix_dungeon2 = [
     'PP         PP 5   000   P       PPPPPPPPPPPPPPP',
     'PP         PP           P       P   5        PP',
     'PP         PP           P       P      5     PP',
-    'PP   J     PP     5     P                    PP',
+    'PP  J      PP     5     P                    PP',
     'PPPP       PP00         P          5         PP',
     'PPPP       PP00         P                    PP',
     'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',

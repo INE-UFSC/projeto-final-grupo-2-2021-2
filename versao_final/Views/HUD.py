@@ -136,20 +136,20 @@ class HUD:
         if self.__status.defesa > self.__status_inicial.defesa:
             rect = self.__arrow_up.get_rect(center=HUD.__DEFENSE_ARROW_POS)
             tela.janela.blit(self.__arrow_up, rect)
-        elif self.__status.defesa > self.__status_inicial.defesa:
+        elif self.__status.defesa < self.__status_inicial.defesa:
             rect = self.__arrow_down.get_rect(center=HUD.__DEFENSE_ARROW_POS)
             tela.janela.blit(self.__arrow_down, rect)
 
         if self.__status.ataque > self.__status_inicial.ataque:
             rect = self.__arrow_up.get_rect(center=HUD.__STRENGTH_ARROW_POS)
             tela.janela.blit(self.__arrow_up, rect)
-        elif self.__status.ataque > self.__status_inicial.ataque:
+        elif self.__status.ataque < self.__status_inicial.ataque:
             rect = self.__arrow_down.get_rect(center=HUD.__STRENGTH_ARROW_POS)
             tela.janela.blit(self.__arrow_down, rect)
 
         if self.__status.vel > self.__status_inicial.vel:
             rect = self.__arrow_up.get_rect(center=HUD.__VEL_ARROW_POS)
             tela.janela.blit(self.__arrow_up, rect)
-        elif self.__status.vel > self.__status_inicial.vel:
+        elif self.__status.vel < self.__status_inicial.vel:
             rect = self.__arrow_down.get_rect(center=HUD.__VEL_ARROW_POS)
             tela.janela.blit(self.__arrow_down, rect)
