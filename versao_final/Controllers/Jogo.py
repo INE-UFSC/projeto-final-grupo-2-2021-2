@@ -1,11 +1,11 @@
 import pygame
 from Config.TelaJogo import TelaJogo
-from Personagens.Jogador.Jogador import Jogador
+from Personagens.Jogador import Jogador
 from Config.Opcoes import Opcoes
-from Controller.ControladorFases import ControladorFases
-from Abstractions.AbstractFase import AbstractFase
+from Controllers.ControladorFases import ControladorFases
+from Fases.AbstractFase import AbstractFase
 from Views.Telas.TelaPause import TelaPause
-from Enums.Enums import ComandosEnum
+from Config.Enums import ComandosEnum
 
 
 class Jogo:

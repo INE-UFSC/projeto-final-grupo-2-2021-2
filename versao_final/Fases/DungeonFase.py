@@ -1,8 +1,8 @@
-from Personagens.Jogador.Jogador import Jogador
+from Personagens.Jogador import Jogador
 from Config.Opcoes import Dificuldade
 from Terrenos.DungeonMap import DungeonMap
 from Personagens.Inimigos.Minotauro import Minotauro
-from Abstractions.AbstractFase import AbstractFase
+from Fases.AbstractFase import AbstractFase
 
 
 class DungeonFase(AbstractFase):
@@ -21,6 +21,6 @@ class DungeonFase(AbstractFase):
         if dificuldade == Dificuldade.facil:
             return 5
         elif dificuldade == Dificuldade.medio:
-            return 8
+            return 3
         elif dificuldade == Dificuldade.dificil:
             return 10

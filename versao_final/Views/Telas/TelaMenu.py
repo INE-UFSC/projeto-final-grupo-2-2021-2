@@ -2,8 +2,8 @@ from typing import List
 from Views.Components.Botao import Botao
 from Views.Components.Imagem import Imagem
 from Views.Components.Texto import Texto
-from Enums.Enums import ComandosEnum
-from Abstractions.AbstractTela import AbstractTela
+from Config.Enums import ComandosEnum
+from Views.Telas.AbstractTela import AbstractTela
 from Config.TelaJogo import TelaJogo
 import pygame
 
@@ -18,7 +18,7 @@ class TelaMenuPrincipal(AbstractTela):
     def __init__(self, comandos: dict):
         self.__comandos = comandos
         self.__tela = TelaJogo()
-        self.__sprite_fundo = 'imagens/FundoFloresta.png'
+        self.__sprite_fundo = 'Assets/Telas/FundoFloresta.png'
 
         self.__MENU_FPS = 40
 
@@ -93,7 +93,7 @@ class TelaMenuPrincipal(AbstractTela):
         self.__botoes.append(Botao(POS_BOTOES[2], TAM_BOTAO, 'Sair', funcSair))
 
     def __criar_cursor(self):
-        self.__cursor = Imagem(POS_BOTOES[0], (50, 40), 'imagens/seta.png')
+        self.__cursor = Imagem(POS_BOTOES[0], (50, 40), 'Assets/Telas/seta.png')
         self.__pos_cursor = 0
 
     def __subir_cursor(self):

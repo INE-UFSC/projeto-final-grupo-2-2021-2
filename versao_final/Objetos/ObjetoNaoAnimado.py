@@ -1,5 +1,5 @@
 from pygame import Rect, Surface
-from Abstractions.AbstractObjeto import AbstractObjeto
+from Objetos.AbstractObjeto import AbstractObjeto
 from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
 

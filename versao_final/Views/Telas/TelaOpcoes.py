@@ -1,9 +1,9 @@
 from typing import List
 from Config.Opcoes import Opcoes
 from Views.Components.Botao import Botao
-from Enums.Enums import ComandosEnum, Dificuldade
+from Config.Enums import ComandosEnum, Dificuldade
 from Views.Components.Imagem import Imagem
-from Abstractions.AbstractTela import AbstractTela
+from Views.Telas.AbstractTela import AbstractTela
 from Views.Components.Texto import Texto
 from Config.TelaJogo import TelaJogo
 import pygame
@@ -23,7 +23,7 @@ class TelaOpcoes(AbstractTela):
         self.__FPS = 40
         self.__tela = TelaJogo()
         self.__botoes: List[Botao] = []
-        self.__sprite_fundo = 'imagens/FundoFloresta.png'
+        self.__sprite_fundo = 'Assets/Telas/FundoFloresta.png'
         self.__opcoes = Opcoes()
 
         self.__botoes: List[Botao] = []
@@ -113,7 +113,7 @@ class TelaOpcoes(AbstractTela):
         self.__textos.append(Texto(POS_DIFICULDADE, TAM_DIFICULDADE, 'Dificuldade: ', 30, preto))
 
     def __criar_cursor(self):
-        self.__cursor = Imagem(POS_BOTOES[0], (50, 40), 'imagens/seta.png')
+        self.__cursor = Imagem(POS_BOTOES[0], (50, 40), 'Assets/Telas/seta.png')
         self.__pos_cursor = 0
 
     def __subir_cursor(self):

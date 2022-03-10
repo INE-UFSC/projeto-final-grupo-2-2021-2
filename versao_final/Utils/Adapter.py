@@ -1,5 +1,5 @@
 from Config.Opcoes import Opcoes
-from Singleton.Singleton import Singleton
+from Config.Singleton import Singleton
 
 
 class Adapter(Singleton):

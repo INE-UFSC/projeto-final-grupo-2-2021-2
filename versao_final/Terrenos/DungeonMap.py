@@ -1,14 +1,14 @@
 from random import choice
 from typing import List, Type
 from pygame import Rect, Surface
-from Abstractions.AbstractInimigo import AbstractInimigo
-from Abstractions.AbstractItem import AbstractItem
-from Abstractions.AbstractTerreno import AbstractTerreno
-from Itens.PocaoDefesa import PocaoDefesa
-from Itens.PocaoMedia import PocaoMedia
-from Itens.PocaoPequena import PocaoPequena
-from Itens.PocaoVeneno import PocaoVeneno
-from Personagens.Jogador.Jogador import Jogador
+from Personagens.Inimigos.AbstractInimigo import AbstractInimigo
+from Itens.AbstractItem import AbstractItem
+from Terrenos.AbstractTerreno import AbstractTerreno
+from Itens.Pocoes.PocaoDefesa import PocaoDefesa
+from Itens.Pocoes.PocaoMedia import PocaoMedia
+from Itens.Pocoes.PocaoPequena import PocaoPequena
+from Itens.Pocoes.PocaoVeneno import PocaoVeneno
+from Personagens.Jogador import Jogador
 from Utils.Adapter import Adapter
 from Utils.Folder import import_single_sprite
 from random import random
@@ -17,6 +17,7 @@ from random import random
 class DungeonMap(AbstractTerreno):
     def __init__(self, jogador: Jogador, enemies_quant: int, enemies_types: List[Type[AbstractInimigo]]):
         self.__adapter = Adapter()
+        self.__jogador = jogador
         self.__rooms = [matrix_dungeon1, matrix_dungeon2]
         self.__end_paths = ['sala1', 'sala2']
 
@@ -34,7 +35,7 @@ class DungeonMap(AbstractTerreno):
                                   PocaoVeneno: 0.1}
 
     def update(self) -> None:
-        if self.__has_ended_current_room():
+        if self.__logic_room_ended():
             self.__set_next_room()
 
         super().update()
@@ -73,11 +74,24 @@ class DungeonMap(AbstractTerreno):
             if chance > random():
                 return item()
 
-    def __has_ended_current_room(self) -> bool:
+    def __all_enemies_dead(self) -> bool:
         for inimigo in self.inimigos:
             if not inimigo.morreu:
                 return False
         return True
+
+    def __logic_room_ended(self) -> bool:
+        if not self.__all_enemies_dead():
+            return False
+
+        rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
+        posicao_end_matrix = self._room.position_end_room
+        posicao_end_screen = self.__adapter.matrix_index_to_pygame_pos(posicao_end_matrix)
+
+        if rect_jogador.collidepoint(posicao_end_screen):
+            return True
+
+        return False
 
     @property
     def image(self) -> Surface:
@@ -92,64 +106,60 @@ class DungeonMap(AbstractTerreno):
 
 
 matrix_dungeon1 = [
-    #          X         X         X         X
-    # 01234567890123456789012345678901234567890123456
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 0
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 1
-    'PP00      00PP00                PP0          PP',  # 2
-    'PP        00PP00                PP  5        PP',  # 3
-    'PP    5     PP     5   5   5    PP           PP',  # 4
-    'PP          PP                  PP       5   PP',  # 5
-    'PP   5      PP                  PP           PP',  # 6
-    'PP         0PP                  PP           PP',  # 7
-    'PP5   PPPPPPPP                  PP   PPPPPPPPPP',  # 8
-    'PP    PPPPPPPP                  PP   PPPPPPPPPP',  # 9c
-    'PP         0PP      5                        PP',  # 10
-    'PP    5     PP                            5  PP',  # 11
-    'PP          PP      PPPPPPPP 5               PP',  # 12
-    'PP          PP      PPPPPPPP              5  PP',  # 13
-    'PP 5        PP      PPPPPPPP                 PP',  # 14
-    'PP        00PP      PPPPPPPP 5       PPPPPPPPPP',  # 15
-    'PP    PPPPPPPP      PPPPPPPP         PPPPPPPPPP',  # 16
-    'PP    PPPPPPPP      PPPPPPPP         PPPPPPPPPP',  # 17
-    'PP                     PP            PPPPPPPPPP',  # 18
-    'PP     5       5       PP            P J     PP',  # 19
-    'PP                     PP            P       PP',  # 20
-    'PP             000     PP                    PP',  # 21
-    'PP    5        000     PP                  00PP',  # 22
-    'PP             000     PP                  00PP',  # 23
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 24
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP']  # 25
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
+    'PP00      00PP00                PP0          PP',
+    'PP E      00PP00                PP  5        PP',
+    'PP    5     PP     5   5   5    PP           PP',
+    'PP          PP                  PP       5   PP',
+    'PP   5      PP                  PP           PP',
+    'PP         0PP                  PP           PP',
+    'PP5   PPPPPPPP                  PP   PPPPPPPPPP',
+    'PP    PPPPPPPP                  PP   PPPPPPPPPP',
+    'PP         0PP      5                        PP',
+    'PP    5     PP                            5  PP',
+    'PP          PP      PPPPPPPP 5               PP',
+    'PP          PP      PPPPPPPP              5  PP',
+    'PP 5        PP      PPPPPPPP                 PP',
+    'PP        00PP      PPPPPPPP 5       PPPPPPPPPP',
+    'PP    PPPPPPPP      PPPPPPPP         PPPPPPPPPP',
+    'PP    PPPPPPPP      PPPPPPPP         PPPPPPPPPP',
+    'PP                     PP            PPPPPPPPPP',
+    'PP     5       5       PP            P J     PP',
+    'PP                     PP            P       PP',
+    'PP             000     PP                    PP',
+    'PP    5        000     PP                  00PP',
+    'PP             000     PP                  00PP',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP']
 
 matrix_dungeon2 = [
-    #          X         X         X         X
-    # 01234567890123456789012345678901234567890123456
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 0
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 1
-    'PPPPPPPPPP                   000PP        0 0PP',  # 2
-    'PPPPPPPPPP                      PP 5      0 0PP',  # 3
-    'PPPPPPPPPP         5            PP     5     PP',  # 4
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
+    'PPPPPPPPPP                   000PP        000PP',
+    'PPPPPPPPPP                      PP 5      000PP',
+    'PPPPPPPPPP         5            PP     5   E PP',
     'PPPPPPPPPP                      PP 5         PP',
-    'PP                              PP           PP',  # 6
-    'PP                 5            PP          0PP',  # 7
-    'PP                              PP   PPPPPPPPPP',  # 8
-    'PP                              PP   PPPPPPPPPP',  # 9c
-    'PP         PPPPPPPPPPPPPP                    PP',  # 10
-    'PP  5  5   PPPPPPPPPPPPPP                    PP',  # 11
-    'PP         PP00      5                       PP',  # 12
-    'PP         PP0    5                           PP',  # 13
-    'PP         PP                                PP',  # 14
-    'PP         PP  5     5          PPPPPPPPPPPPPPPP',  # 1
-    'PP         PP     000           PPPPPPPPPPPPPPP',  # 16
-    'PP         PP     000   P       PPPPPPPPPPPPPPP',  # 17
-    'PP         PP 5   000   P       PPPPPPPPPPPPPPP',  # 18
-    'PP         PP           P       P   5        PP',  # 19
-    'PP         PP           P       P      5     PP',  # 20
-    'PP   J     PP     5     P                    PP',  # 21
-    'PPPP       PP00         P          5         PP',  # 22
-    'PPPP       PP00         P                    PP',  # 23
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 24
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP']  # 25
+    'PP                              PP           PP',
+    'PP                 5            PP          0PP',
+    'PP                              PP   PPPPPPPPPP',
+    'PP  5  5                        PP   PPPPPPPPPP',
+    'PP         PPPPPPPPPPPPPP                    PP',
+    'PP         PPPPPPPPPPPPPP                    PP',
+    'PP         PP00      5                       PP',
+    'PP         PP0    5                          PP',
+    'PP         PP                                PP',
+    'PP         PP  5     5          PPPPPPPPPPPPPPP',
+    'PP         PP     000           PPPPPPPPPPPPPPP',
+    'PP         PP     000   P       PPPPPPPPPPPPPPP',
+    'PP         PP 5   000   P       PPPPPPPPPPPPPPP',
+    'PP         PP           P       P   5        PP',
+    'PP         PP           P       P      5     PP',
+    'PP   J     PP     5     P                    PP',
+    'PPPP       PP00         P          5         PP',
+    'PPPP       PP00         P                    PP',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP']
 
 
 # A parede no canto inferior direito fica nos quadrados 46x25

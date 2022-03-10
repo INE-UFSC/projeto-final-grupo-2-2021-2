@@ -1,7 +1,7 @@
 import pygame
 from Views.Components.Imagem import Imagem
 
-BOTAO_IMAGEM_PATH = 'imagens/botao.png'
+BOTAO_IMAGEM_PATH = 'Assets/Telas/botao.png'
 
 
 class Botao(Imagem):
@@ -13,7 +13,7 @@ class Botao(Imagem):
 
         self.__renderizar_texto()
         self.__text_rect = self.__text.get_rect(center=self.hitbox.posicao)
-        
+
         self.__function = function
         self.__args = args
 

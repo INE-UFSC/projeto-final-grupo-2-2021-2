@@ -1,18 +1,18 @@
-from Itens.PocaoGenerica import PocaoGenerica
+from Itens.Pocoes.PocaoGenerica import PocaoGenerica
 from Personagens.Status import Status
-from pygame import Rect, Surface
+from pygame import Surface, Rect
 
 
-class PocaoVeneno(PocaoGenerica):
-    __PATH = 'Assets/pocoes/pocao_veneno.png'
+class PocaoInvencivel(PocaoGenerica):
+    __PATH = 'Assets/pocoes/pocao_invencivel.png'
     __SIZE = (30, 30)
 
     def __init__(self, position=(0, 0)) -> None:
-        super().__init__(PocaoVeneno.__PATH, PocaoVeneno.__SIZE)
+        super().__init__(PocaoInvencivel.__PATH, PocaoInvencivel.__SIZE)
         self.__status: Status = None
         self.__pronto = False
         self.__aplicado = False
-        self.__BUFF_TIMER = 200
+        self.__BUFF_TIMER = 300
         self.__posicao = position
         self.__image = self._get_image()
         self.__rect = self.__image.get_rect(center=self.__posicao)
@@ -31,15 +31,14 @@ class PocaoVeneno(PocaoGenerica):
 
     @posicao.setter
     def posicao(self, posicao):
-        self.__posicao = posicao
         self.__rect = self.__image.get_rect(center=self.__posicao)
+        self.__posicao = posicao
 
     def modificar_status(self, status: Status) -> None:
         if not self.__aplicado:
             self.__status = status
-            self.__status.vel -= 1
-            self.__status.vida -= 3
             self.__aplicado = True
+            self.__status.invencibilidade = True
 
     def check_aplicado(self) -> bool:
         if self.__pronto:
@@ -50,7 +49,7 @@ class PocaoVeneno(PocaoGenerica):
             return False
 
     def __remover_status(self) -> None:
-        self.__status.vel += 1
+        self.__status.invencibilidade = False
 
     def __update_timer(self) -> None:
         if self.__BUFF_TIMER > 0:

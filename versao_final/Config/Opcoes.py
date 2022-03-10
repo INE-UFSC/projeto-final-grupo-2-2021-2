@@ -1,5 +1,5 @@
-from Enums.Enums import Dificuldade
-from Singleton.Singleton import Singleton
+from Config.Enums import Dificuldade
+from Config.Singleton import Singleton
 
 
 class Opcoes(Singleton):

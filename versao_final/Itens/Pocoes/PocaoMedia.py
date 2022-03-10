@@ -1,15 +1,15 @@
-from Itens.PocaoGenerica import PocaoGenerica
+from Itens.Pocoes.PocaoGenerica import PocaoGenerica
 from Personagens.Status import Status
 from pygame import Rect, Surface
 
 
-class PocaoPequena(PocaoGenerica):
-    __PATH = 'Assets/pocoes/pocao_pequena.png'
+class PocaoMedia(PocaoGenerica):
+    __PATH = 'Assets/pocoes/pocao_media.png'
     __SIZE = (30, 30)
 
     def __init__(self, position=(0, 0)) -> None:
-        super().__init__(PocaoPequena.__PATH, PocaoPequena.__SIZE)
-        self.__potencia = 3
+        super().__init__(PocaoMedia.__PATH, PocaoMedia.__SIZE)
+        self.__potencia = 5
         self.__pronto = False
         self.__posicao = position
         self.__image = self._get_image()
@@ -38,4 +38,4 @@ class PocaoPequena(PocaoGenerica):
             self.__pronto = True
 
     def check_aplicado(self) -> bool:
-        return True
+        return self.__pronto

@@ -1,4 +1,4 @@
-from Abstractions.AbstractObjeto import AbstractObjeto
+from Objetos.AbstractObjeto import AbstractObjeto
 from Config.TelaJogo import TelaJogo
 
 

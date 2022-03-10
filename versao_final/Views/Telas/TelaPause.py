@@ -2,8 +2,8 @@ from typing import List
 from Views.Components.Botao import Botao
 from Views.Components.Imagem import Imagem
 from Views.Components.Texto import Texto
-from Enums.Enums import ComandosEnum
-from Abstractions.AbstractTela import AbstractTela
+from Config.Enums import ComandosEnum
+from Views.Telas.AbstractTela import AbstractTela
 from Config.TelaJogo import TelaJogo
 import pygame
 
@@ -14,12 +14,11 @@ TAM_BOTAO = (150, 50)
 TAM_TEXTO = (400, 100)
 
 
-
 class TelaPause(AbstractTela):
-    def __init__(self, comandos: dict ):
+    def __init__(self, comandos: dict):
         self.__comandos = comandos
         self.__tela = TelaJogo()
-        self.__sprite_fundo = 'imagens/FundoFloresta.png'
+        self.__sprite_fundo = 'Assets/Telas/FundoFloresta.png'
         self.__MENUPAUSE_FPS = 40
         self.__botoes: List[Botao] = []
         self.__textos: List[Texto] = []
@@ -27,7 +26,6 @@ class TelaPause(AbstractTela):
         self.__criar_botoes()
         self.__criar_cursor()
         self.__criar_textos()
-        
 
     def run(self):
         clock = pygame.time.Clock()
@@ -45,7 +43,7 @@ class TelaPause(AbstractTela):
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:  # Subir
                         self.__subir_cursor()
-                    elif event.key == pygame.K_DOWN:  # Descer               
+                    elif event.key == pygame.K_DOWN:  # Descer
                         self.__descer_cursor()
                     elif event.key == pygame.K_RETURN:  # Enter
                         self.__executar_comando()
@@ -62,7 +60,7 @@ class TelaPause(AbstractTela):
     def __desenhar_elementos(self):
         for botao in self.__botoes:
             botao.desenhar(self.__tela)
-        
+
         for texto in self.__textos:
             texto.desenhar(self.__tela)
 
@@ -87,13 +85,14 @@ class TelaPause(AbstractTela):
         funcVoltarJogo = self.__comandos[ComandosEnum.TELA_JOGAR]
         funcTelaOpcoes = self.__comandos[ComandosEnum.TELA_OPCOES]
         funcVoltarMenu = self.__comandos[ComandosEnum.TELA_MENU]
-        
-        self.__botoes.append(Botao(POS_BOTOES[0], TAM_BOTAO, 'Voltar', funcVoltarJogo,(True,) ))
+
+        self.__botoes.append(Botao(POS_BOTOES[0], TAM_BOTAO, 'Voltar', funcVoltarJogo, (True,)))
         self.__botoes.append(Botao(POS_BOTOES[1], TAM_BOTAO, 'Opções', funcTelaOpcoes))
-        self.__botoes.append(Botao(POS_BOTOES[2], TAM_BOTAO, 'Menu', funcVoltarMenu, (True,))) #arrumar warning libpng
-    
+        # arrumar warning libpng
+        self.__botoes.append(Botao(POS_BOTOES[2], TAM_BOTAO, 'Menu', funcVoltarMenu, (True,)))
+
     def __criar_cursor(self):
-        self.__cursor = Imagem(POS_BOTOES[0], (50, 40), 'imagens/seta.png')
+        self.__cursor = Imagem(POS_BOTOES[0], (50, 40), 'Assets/Telas/seta.png')
         self.__pos_cursor = 0
 
     def __subir_cursor(self):

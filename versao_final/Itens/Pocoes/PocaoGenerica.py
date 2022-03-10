@@ -1,4 +1,4 @@
-from Abstractions.AbstractItem import AbstractItem
+from Itens.AbstractItem import AbstractItem
 from pygame import Surface
 from Utils.Folder import import_single_sprite
 

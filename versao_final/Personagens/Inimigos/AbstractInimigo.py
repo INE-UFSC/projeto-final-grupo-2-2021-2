@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from Utils.Hitbox import Hitbox
-from Abstractions.AbstractPersonagem import AbstractPersonagem
-from Enums.Enums import Estado
+from Personagens.AbstractPersonagem import AbstractPersonagem
+from Config.Enums import Estado
 from pygame import Rect, Surface
 
 

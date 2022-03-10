@@ -1,7 +1,7 @@
 from pygame import Rect, Surface
 from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_folder
-from Abstractions.AbstractObjeto import AbstractObjeto
+from Objetos.AbstractObjeto import AbstractObjeto
 
 
 class ObjetoAnimado(AbstractObjeto):

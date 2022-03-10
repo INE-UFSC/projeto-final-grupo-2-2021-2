@@ -1,4 +1,4 @@
-from Itens.PocaoGenerica import PocaoGenerica
+from Itens.Pocoes.PocaoGenerica import PocaoGenerica
 from Personagens.Status import Status
 from pygame import Rect, Surface
 

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from Enums.Enums import Direction
+from Config.Enums import Direction
 from Utils.Hitbox import Hitbox
 from Personagens.Arma import Arma
 from Personagens.Status import Status

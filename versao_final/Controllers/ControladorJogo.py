@@ -1,14 +1,14 @@
 import pygame
 import sys
 from Config.Opcoes import Opcoes
-from Enums.Enums import ComandosEnum
+from Config.Enums import ComandosEnum
 from Config.TelaJogo import TelaJogo
 from Views.Telas.TelaJogar import TelaJogar
 from Views.Telas.TelaMenu import TelaMenuPrincipal
 from Views.Telas.TelaNew import TelaNewGame
 from Views.Telas.TelaOpcoes import TelaOpcoes
 from Views.Telas.TelaWait import TelaWait
-from Controller.Jogo import Jogo
+from Controllers.Jogo import Jogo
 
 
 class ControladorJogo():

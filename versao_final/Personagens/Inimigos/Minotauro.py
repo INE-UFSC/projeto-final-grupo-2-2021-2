@@ -1,7 +1,7 @@
 from Config.Opcoes import Opcoes
-from Enums.Enums import Direction, Estado
-from Abstractions.AbstractInimigo import AbstractInimigo
-from Abstractions.AbstractTerreno import AbstractTerreno
+from Config.Enums import Direction, Estado
+from Personagens.Inimigos.AbstractInimigo import AbstractInimigo
+from Terrenos.AbstractTerreno import AbstractTerreno
 from Utils.Folder import import_fliped_folder, import_folder
 from Utils.Hitbox import Hitbox
 from random import random

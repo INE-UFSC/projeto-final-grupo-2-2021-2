@@ -1,8 +1,8 @@
 from typing import List
 import pygame
-from Abstractions.AbstractPersonagem import AbstractPersonagem
-from Abstractions.AbstractItem import AbstractItem
-from Enums.Enums import Direction
+from Personagens.AbstractPersonagem import AbstractPersonagem
+from Itens.AbstractItem import AbstractItem
+from Config.Enums import Direction
 from Utils.Folder import import_folder
 
 

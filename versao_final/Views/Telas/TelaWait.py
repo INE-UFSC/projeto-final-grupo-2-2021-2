@@ -8,7 +8,7 @@ class TelaWait():
         self.__WAIT_FPS = 40
         self.__done = False
 
-        self.__sprite_fundo = 'imagens/capa.png'
+        self.__sprite_fundo = 'Assets/Telas/capa.png'
 
     def run(self):
         clock = pygame.time.Clock()

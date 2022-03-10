@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
 from math import ceil
 from typing import List
-from Abstractions.AbstractInimigo import AbstractInimigo
-from Abstractions.AbstractItem import AbstractItem
-from Abstractions.AbstractMap import AbstractMap
-from Abstractions.AbstractObjeto import AbstractObjeto
-from Obstaculos.ObstaculoInvisivel import ObjetoInvisivel
+from Personagens.Inimigos.AbstractInimigo import AbstractInimigo
+from Itens.AbstractItem import AbstractItem
+from Terrenos.Room import Room
+from Objetos.AbstractObjeto import AbstractObjeto
+from Objetos.ObstaculoInvisivel import ObjetoInvisivel
 from Utils.Adapter import Adapter
 from Utils.Hitbox import Hitbox
-from Personagens.Jogador.Jogador import Jogador
+from Personagens.Jogador import Jogador
 from Config.Opcoes import Opcoes
 from Config.TelaJogo import TelaJogo
-from Abstractions.AbstractPersonagem import AbstractPersonagem
+from Personagens.AbstractPersonagem import AbstractPersonagem
 from Utils.Maps import MapUpdater
 from Utils.Movement import AStar, distancia_dois_pontos, gerar_equação_vetorial_reta
 from Utils.Movement import gerar_equação_vetorial_reta
@@ -42,7 +42,7 @@ class AbstractTerreno(ABC):
         self.__objetos.clear()
         self.__itens.clear()
 
-        self._room = AbstractMap(matriz_terreno)
+        self._room = Room(matriz_terreno)
         self.__setup_room()
         self.__matrix = self._room.get_matrix_only_obstacles()
         self.__configure_pathfinders()

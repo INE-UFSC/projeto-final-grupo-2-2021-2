@@ -1,7 +1,7 @@
 from random import choice
 
 
-class AbstractMap:
+class Room:
     def __init__(self, matrix: list) -> None:
         self.__input_matrix = matrix.copy()
         self.__obstacles_char = ['P', '0', '1', '2']
@@ -9,10 +9,12 @@ class AbstractMap:
         self.__block_only_movement_char = '0'
         self.__block_only_vision_char = '1'
         self.__non_block_char = '2'
+        self.__end_room_char = 'E'
 
+        self.__matrix = self.__get_matrix_with_only_obstacles(matrix)
         self.__start_player_position = self.__get_start_player_position()
         self.__enemies_start_position = self.__get_all_enemies_position()
-        self.__matrix = self.__get_matrix_with_only_obstacles(matrix)
+        self.__position_end_room = self.__get_position_end_room()
 
         self.__set_all_positions_blocking()
 
@@ -49,6 +51,10 @@ class AbstractMap:
     @property
     def positions_blocking_vision(self) -> list:
         return self.__position_blocking_vision
+
+    @property
+    def position_end_room(self) -> tuple:
+        return self.__position_end_room
 
     def is_position_valid(self, posicao: tuple) -> bool:
         x = int(posicao[0])
@@ -105,6 +111,12 @@ class AbstractMap:
 
         return matrix
 
+    def __get_position_end_room(self) -> tuple:
+        for pos_x, linha in enumerate(self.__input_matrix):
+            for pos_y, cell in enumerate(linha):
+                if cell == self.__end_room_char:
+                    return (pos_x, pos_y)
+
     def __get_all_enemies_position(self) -> list:
         enemies_positions = []
 
@@ -127,36 +139,3 @@ class AbstractMap:
         antes = string_input[0:pos]
         depois = string_input[pos+1:]
         return f'{antes}{new_char}{depois}'
-
-
-matrix_dungeon = [
-    #          X         X         X         X
-    # 01234567890123456789012345678901234567890123456
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 0
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 1
-    'PP00      00PP00                PP0          PP',  # 2
-    'PP        00PP00                PP  5        PP',  # 3
-    'PP    5     PP     5   5   5    PP           PP',  # 4
-    'PP          PP                  PP       5   PP',  # 5
-    'PP   5      PP                  PP           PP',  # 6
-    'PP         0PP                  PP           PP',  # 7
-    'PP5   PPPPPPPP                  PP   PPPPPPPPPP',  # 8
-    'PP    PPPPPPPP                  PP   PPPPPPPPPP',  # 9c
-    'PP         0PP      5                        PP',  # 10
-    'PP    5     PP                            5  PP',  # 11
-    'PP          PP      PPPPPPPP 5               PP',  # 12
-    'PP          PP      PPPPPPPP              5  PP',  # 13
-    'PP 5        PP      PPPPPPPP                 PP',  # 14
-    'PP        00PP      PPPPPPPP 5       PPPPPPPPPP',  # 15
-    'PP    PPPPPPPP      PPPPPPPP         PPPPPPPPPP',  # 16
-    'PP    PPPPPPPP      PPPPPPPP         PPPPPPPPPP',  # 17
-    'PP                     PP            PPPPPPPPPP',  # 18
-    'PP     5       5       PP            P       PP',  # 19
-    'PP                     PP            P       PP',  # 20
-    'PP             000     PP                 J  PP',  # 21
-    'PP    5        000     PP                  00PP',  # 22
-    'PP             000     PP                  00PP',  # 23
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',  # 24
-    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP']  # 25
-
-# A parede no canto inferior direito fica nos quadrados 46x25
