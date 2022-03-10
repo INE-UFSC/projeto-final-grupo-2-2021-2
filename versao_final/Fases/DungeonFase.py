@@ -10,17 +10,18 @@ class DungeonFase(AbstractFase):
         super().__init__(jogador)
 
     def load(self) -> None:
-        inimigos_quant = self.__determinar_inimigos(self.dificuldade)
+        inimigos_quant = self.__determinar_inimigos()
         inimigos_tipos = [Minotauro]
 
-        self.terreno = DungeonMap(enemies_quant=inimigos_quant,
-                                  enemies_types=inimigos_tipos,
-                                  jogador=self.jogador)
+        terreno = DungeonMap(enemies_quant=inimigos_quant,
+                             enemies_types=inimigos_tipos,
+                             jogador=self._jogador)
+        super()._set_terreno(terreno)
 
-    def __determinar_inimigos(self, dificuldade: Dificuldade) -> None:
-        if dificuldade == Dificuldade.facil:
+    def __determinar_inimigos(self) -> None:
+        if self._dificuldade == Dificuldade.facil:
             return 5
-        elif dificuldade == Dificuldade.medio:
+        elif self._dificuldade == Dificuldade.medio:
             return 3
-        elif dificuldade == Dificuldade.dificil:
+        elif self._dificuldade == Dificuldade.dificil:
             return 10

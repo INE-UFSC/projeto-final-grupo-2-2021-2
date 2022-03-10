@@ -1,17 +1,18 @@
 from abc import ABC, abstractmethod
 from Config.Enums import Dificuldade
+from Config.Opcoes import Opcoes
 from Personagens.Jogador import Jogador
 from Config.TelaJogo import TelaJogo
-from Config.Opcoes import Opcoes
 from Terrenos.AbstractTerreno import AbstractTerreno
 
 
 class AbstractFase(ABC):
     def __init__(self, jogador: Jogador) -> None:
         self.__jogador: Jogador = jogador
+        self.__terreno: AbstractTerreno = None
         self.__opcoes = Opcoes()
         self.__dificuldade = self.__opcoes.dificuldade
-        self.__terreno = None
+        self.__jogador = jogador
 
     def player_has_lost(self) -> bool:
         if self.__jogador.morreu:
@@ -26,30 +27,32 @@ class AbstractFase(ABC):
     def has_ended(self) -> bool:
         return self.__terreno.has_ended()
 
-    def ciclo(self, tela: TelaJogo) -> None:
+    def desenhar(self, tela: TelaJogo) -> None:
+        self.__terreno.desenhar(tela)
+
+    def run(self) -> None:
         """Função para ser executada em todo ciclo do main loop"""
+        self.__terreno.animate()
         self.__jogador.processar_inputs()
         self.__terreno.mover_inimigos()
         self.__terreno.lidar_ataques()
         self.__terreno.update()
-        self.__terreno.desenhar(tela)
 
     @property
-    def jogador(self) -> Jogador:
+    def _dificuldade(self) -> Dificuldade:
+        return self.__dificuldade
+
+    @property
+    def _jogador(self) -> Jogador:
         return self.__jogador
 
     @property
-    def terreno(self) -> AbstractTerreno:
+    def _terreno(self) -> AbstractTerreno:
         return self.__terreno
 
-    @terreno.setter
-    def terreno(self, value) -> None:
-        if isinstance(value, AbstractTerreno):
-            self.__terreno = value
-
-    @property
-    def dificuldade(self) -> Dificuldade:
-        return self.__dificuldade
+    def _set_terreno(self, terreno: AbstractTerreno) -> None:
+        if isinstance(terreno, AbstractTerreno):
+            self.__terreno = terreno
 
     @abstractmethod
     def load(self) -> None:

@@ -179,3 +179,7 @@ class AbstractPersonagem(ABC):
     @abstractmethod
     def atacar(self):
         pass
+
+    @abstractmethod
+    def animate(self) -> None:
+        pass

@@ -74,6 +74,11 @@ class AbstractTerreno(ABC):
     def iniciar_rodada(self, tela: TelaJogo) -> None:
         self.desenhar(tela)
 
+    def animate(self) -> None:
+        for inimigo in self.__inimigos:
+            inimigo.animate()
+        self.__jogador.animate()
+
     def desenhar(self, tela: TelaJogo) -> None:
         tela.janela.blit(self.image, self.rect)
         self.__HUD.desenhar(tela)
@@ -97,7 +102,6 @@ class AbstractTerreno(ABC):
             # Desenha os hitbox deles
             # draw.rect(tela.janela, color, rect)
 
-            inimigo.animate()
             tela.janela.blit(inimigo.image, inimigo.rect)
             # if inimigo.checar_atacando():
             #    self.__desenhar_ataque(tela, inimigo)
@@ -113,7 +117,6 @@ class AbstractTerreno(ABC):
         #rect = Rect(posicao, tamanho)
         # draw.rect(tela.janela, color, rect)
 
-        self.__jogador.animate()
         tela.janela.blit(self.__jogador.image, self.__jogador.rect)
 
     def pegar_item(self) -> AbstractItem:

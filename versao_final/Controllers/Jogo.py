@@ -26,38 +26,42 @@ class Jogo:
 
     def __rodar_fase(self, fase: AbstractFase) -> None:
         self.__fase_atual = fase
+        self.__tela_pause = self.__criar_tela_pause()
         fase.start(self.__tela)
         pygame.display.update()
 
         clock = pygame.time.Clock()
-        main_loop = True
-        self.__menuprincipal = False
-        while main_loop:
+        self.__paused = False
+        self.__GAME_LOOP = True
+        while self.__GAME_LOOP:
             clock.tick(self.__FPS)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    main_loop = False
+            eventos = pygame.event.get()
 
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_p:
-                        self.tela_pause()
+            for evento in eventos:
+                if evento.type == pygame.QUIT:
+                    self.__GAME_LOOP = False
 
-            if self.__menuprincipal:  # volta para o menu principal, quando o jogo é rodado pelo ControladorJogo
-                main_loop = False
+                if evento.type == pygame.KEYDOWN:
+                    if evento.key == pygame.K_ESCAPE:
+                        self.__paused = not self.__paused
 
-            self.__fase_atual.ciclo(self.__tela)
+            self.__fase_atual.desenhar(self.__tela)
+            if self.__paused:
+                self.__tela_pause.desenhar()
+                self.__tela_pause.run(eventos)
+            else:
+                self.__fase_atual.run()
+                if self.__fase_atual.player_has_lost():
+                    self.__GAME_LOOP = False
+                    print('Você perdeu :/')
 
-            if self.__fase_atual.player_has_lost():
-                main_loop = False
-                print('Você perdeu :/')
-
-            if self.__fase_atual.has_ended():
-                main_loop = False
-                proxima_fase = self.__controlador.proxima_fase()
-                if proxima_fase != None:
-                    self.__rodar_fase(proxima_fase)
-                else:
-                    print('Você venceu :3')
+                if self.__fase_atual.has_ended():
+                    self.__GAME_LOOP = False
+                    proxima_fase = self.__controlador.proxima_fase()
+                    if proxima_fase != None:
+                        self.__rodar_fase(proxima_fase)
+                    else:
+                        print('Você venceu :3')
 
             pygame.display.update()
 
@@ -65,20 +69,18 @@ class Jogo:
         self.__jogador = Jogador((0, 0), self.__opcoes.nome)
         self.__controlador = ControladorFases(self.__jogador)
 
-    def tela_pause(self, *args) -> None:
-        telaPause = TelaPause({
+    def __criar_tela_pause(self, *args) -> TelaPause:
+        return TelaPause({
             ComandosEnum.TELA_JOGAR: self.__voltar_jogo,
             ComandosEnum.TELA_OPCOES: self.__opcoes_pause,
             ComandosEnum.TELA_MENU: self.__menu_principal
         })
-        telaPause.run()
 
     def __voltar_jogo(self, *args):
-        pass
+        self.__paused = False
 
     def __opcoes_pause(self, *args):
-        pass
+        print('aoba')
 
     def __menu_principal(self, *args):
-        voltar = args[0][0]
-        self.__menuprincipal = voltar
+        self.__GAME_LOOP = False

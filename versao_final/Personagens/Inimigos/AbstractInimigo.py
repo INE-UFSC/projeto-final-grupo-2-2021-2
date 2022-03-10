@@ -32,6 +32,10 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             self.__estado = Estado.MORRENDO
         super().update()
 
+    @abstractmethod
+    def animate(self) -> None:
+        pass
+
     def mover(self, hit_jogador: Hitbox) -> None:
         if self.__estado == Estado.MORRENDO:
             return None

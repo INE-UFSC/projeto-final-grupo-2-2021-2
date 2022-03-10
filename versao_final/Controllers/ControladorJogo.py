@@ -7,7 +7,6 @@ from Views.Telas.TelaJogar import TelaJogar
 from Views.Telas.TelaMenu import TelaMenuPrincipal
 from Views.Telas.TelaNew import TelaNewGame
 from Views.Telas.TelaOpcoes import TelaOpcoes
-from Views.Telas.TelaWait import TelaWait
 from Controllers.Jogo import Jogo
 
 
@@ -20,12 +19,7 @@ class ControladorJogo():
     def start(self):
         self.__tela.mostrar_fundo()
 
-        self.__invoke_tela_wait()
         self.__invoke_menu()
-
-    def __invoke_tela_wait(self, *args, **kwargs):
-        telaWait = TelaWait()
-        telaWait.run()
 
     def __invoke_menu(self, *args, **kwargs):
         telaMenu = TelaMenuPrincipal({
