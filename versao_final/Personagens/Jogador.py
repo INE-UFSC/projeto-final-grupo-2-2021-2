@@ -11,7 +11,7 @@ class Jogador(AbstractPersonagem):
     __ANIMACOES_IMPORTADAS = False
     __IMAGE_SIZE = (60, 65)
     __STATS = {
-        'vida': 40,
+        'vida': 100,
         'ataque': 5,
         'defesa': 5,
         'vel': 3,

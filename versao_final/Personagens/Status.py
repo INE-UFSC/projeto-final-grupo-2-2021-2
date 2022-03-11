@@ -5,6 +5,7 @@ class Status():
         self.__defesa = status['defesa'] if 'defesa' in status.keys() else 0
         self.__alcance = status['alcance'] if 'alcance' in status.keys() else 0
         self.__vel = status['vel'] if 'vel' in status.keys() else 0
+        self.__vel_ataque = status['vel_ataque'] if 'vel_ataque' in status.keys() else 0
         self.__vida = self.__vida_maxima
         self.__invencibilidade = False
         self.__transpassavel = status['transpassavel'] if 'transpassavel' in status.keys(
@@ -71,6 +72,15 @@ class Status():
     def vel(self, value: int) -> None:
         if type(value) == int:
             self.__vel = value
+
+    @property
+    def vel_ataque(self) -> int:
+        return self.__vel_ataque
+
+    @vel_ataque.setter
+    def vel_ataque(self, value: int) -> None:
+        if type(value) == int:
+            self.__vel_ataque = value
 
     @property
     def invencibilidade(self) -> bool:

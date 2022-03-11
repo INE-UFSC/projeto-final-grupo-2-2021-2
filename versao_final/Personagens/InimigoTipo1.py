@@ -4,6 +4,7 @@ from Config.Opcoes import Opcoes
 from Config.Enums import Direction, Estado
 from Personagens.AbstractInimigo import AbstractInimigo
 from Terrenos.AbstractTerreno import AbstractTerreno
+from Utils.Adapter import Adapter
 from Utils.Folder import import_fliped_folder, import_folder
 from Utils.Hitbox import Hitbox
 from random import random
@@ -15,6 +16,7 @@ class InimigoTipo1(AbstractInimigo):
 
     def __init__(self, terreno: AbstractTerreno, path: str, posicao=(0, 0)) -> None:
         stats = self.__calibrar_dificuldade()
+        self.__adapter = Adapter()
         super().__init__(stats=stats, posicao=posicao, tamanho=self._TAMANHO, terreno=terreno)
 
         if path not in self.__PATH_TO_SPRITES:
@@ -35,6 +37,8 @@ class InimigoTipo1(AbstractInimigo):
         self.__MORREU = False
         self.__LAST_ANIMATION = 'Idle'
         self.__ANIMACAO_RESETADA = False
+        self.__MAX_DELAY_ATAQUE = 60
+        self.__CURRENT_DELAY_ATAQUE = 0
 
     def __import_character_assets(self) -> List[Dict]:
         animations_length = {}
@@ -124,6 +128,9 @@ class InimigoTipo1(AbstractInimigo):
     def update(self, hit_jogador: Hitbox) -> None:
         distancia = self._calcular_distancia(hit_jogador)
 
+        if self.__CURRENT_DELAY_ATAQUE > 0:
+            self.__CURRENT_DELAY_ATAQUE -= 1
+
         # Update de qual a fonte de sprite, esquerda ou direita
         if self.direction == Direction.DIREITA_BAIXO or self.direction == Direction.DIREITA_CIMA or self.direction == Direction.DIREITA_MEIO:
             self._animations = self._normal_animations
@@ -134,7 +141,11 @@ class InimigoTipo1(AbstractInimigo):
         if self.__animation != 'Attacking' and self.__animation != 'Hurt':
             # Se não está atacando e não tomou hit
             if distancia < self._DIST_PARA_ATAQUE:  # Se está perto troca animação para atacar
-                self.__set_animation('Attacking')
+                if self.__CURRENT_DELAY_ATAQUE == 0:
+                    self.__set_animation('Attacking')
+                    self.__CURRENT_DELAY_ATAQUE = self.__MAX_DELAY_ATAQUE
+                else:
+                    self.__set_animation('Idle')
 
         # Update para cancelar ataque caso jogador saia do range ou caso tome hit
         if self.__animation == 'Attacking':

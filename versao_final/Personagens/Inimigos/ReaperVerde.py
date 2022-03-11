@@ -3,8 +3,8 @@ from Terrenos.AbstractTerreno import AbstractTerreno
 
 
 class ReaperVerde(InimigoTipo1):
-    __TAMANHO_IMAGEM = (100, 100)
-    __TAMANHO = (40, 45)
+    __TAMANHO_IMAGEM = (80, 80)
+    __TAMANHO = (35, 45)
     __SPRITE_PATH = 'Assets/Personagens/Reaper/ReaperVerde/'
     __STATS_FACIL = {'vida': 15, 'ataque': 4, 'defesa': 3, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 3,
                      'arma_alcance': 18, 'view_distance': 150, 'transpassavel': False}
@@ -14,7 +14,7 @@ class ReaperVerde(InimigoTipo1):
                        'arma_alcance': 18, 'view_distance': 150, 'transpassavel': False}
     __DIST_PARA_ATAQUE = 8
     __CHANCE_DAMAGE_STOP_ATTACK = 0.5
-    __FRAME_EXECUTAR_ATAQUE = 10
+    __FRAME_EXECUTAR_ATAQUE = 17
 
     def __init__(self, terreno: AbstractTerreno, posicao=(0, 0)) -> None:
         super().__init__(terreno, ReaperVerde.__SPRITE_PATH, posicao)

@@ -21,6 +21,8 @@ class Opcoes(Singleton):
             self.__MAX_ALCANCE = 3.5
             self.__MIN_ALCANCE = 1.2
             self.__ITENS_DROPPED_DURATION = 500
+            self.__MAX_DELAY_ATAQUE = 60
+            self.__MIN_DELAY_ATAQUE = 10
 
     @property
     def tocar_musica(self) -> bool:
@@ -84,6 +86,14 @@ class Opcoes(Singleton):
     @property
     def MIN_ALCANCE(self) -> int:
         return self.__MIN_ALCANCE
+
+    @property
+    def MAX_DELAY_ATAQUE(self) -> int:
+        return self.__MAX_DELAY_ATAQUE
+
+    @property
+    def MIN_DELAY_ATAQUE(self) -> int:
+        return self.__MIN_DELAY_ATAQUE
 
     @property
     def ITENS_DROPPED_DURATION(self) -> int:
