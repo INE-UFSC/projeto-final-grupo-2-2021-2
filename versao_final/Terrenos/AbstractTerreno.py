@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from math import ceil
 from typing import List
-from Personagens.Inimigos.AbstractInimigo import AbstractInimigo
+from Personagens.AbstractInimigo import AbstractInimigo
 from Itens.AbstractItem import AbstractItem
 from Terrenos.Room import Room
 from Objetos.AbstractObjeto import AbstractObjeto
@@ -95,12 +95,12 @@ class AbstractTerreno(ABC):
                     tela.janela.blit(item.image, item.rect)
 
         for inimigo in self.__inimigos:
-            #posicao = inimigo.hitbox.posicao
-            #tamanho = inimigo.hitbox.tamanho
-            #color = (0, 0, 125)
-            #rect = Rect(posicao, tamanho)
+            posicao = inimigo.hitbox.posicao
+            tamanho = inimigo.hitbox.tamanho
+            color = (0, 0, 125)
+            rect = Rect(posicao, tamanho)
             # Desenha os hitbox deles
-            # draw.rect(tela.janela, color, rect)
+            draw.rect(tela.janela, color, rect)
 
             tela.janela.blit(inimigo.image, inimigo.rect)
             # if inimigo.checar_atacando():
