@@ -1,7 +1,7 @@
 from random import choice
 from typing import List, Type
 from pygame import Rect, Surface
-from Personagens.Inimigos.AbstractInimigo import AbstractInimigo
+from Personagens.AbstractInimigo import AbstractInimigo
 from Itens.AbstractItem import AbstractItem
 from Terrenos.AbstractTerreno import AbstractTerreno
 from Itens.Pocoes.PocaoForca import PocaoForca

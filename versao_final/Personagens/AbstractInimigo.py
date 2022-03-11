@@ -15,7 +15,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__len_caminho = 0
         self.__estava_vendo_jogador = False
         self.__PERTO = 18
-        self.__MINIMO_PASSOS_DADOS = 2
+        self.__MUITO_PERTO = 4
         self.__MINIMO_PASSOS_NO_CAMINHO = 0
         self.__TRAVADO = False
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 150
@@ -70,14 +70,22 @@ class AbstractInimigo(AbstractPersonagem, ABC):
 
     def __seguir_jogador(self, hit_jogador: Hitbox) -> None:
         distancia = self._calcular_distancia(hit_jogador)
-        if distancia < self.__PERTO:
+        if distancia < self.__MUITO_PERTO:
+            return None
+        elif distancia < self.__PERTO:
             self.__dumb_movement(hit_jogador)
+            return None
 
         # Se está vendo completamente, faz caminho burro
         if self.__esta_vendo_jogador_completamente(hit_jogador):
             self.__estava_vendo_jogador = True
-            passos_dados = self.__len_caminho - len(self.__caminho)
-            if passos_dados < self.__MINIMO_PASSOS_DADOS and len(self.__caminho) > 0:
+            caminho_andado = self.__len_caminho - len(self.__caminho)
+
+            if distancia < 15:
+                self.__caminho = []
+                self.__MINIMO_PASSOS_NO_CAMINHO = 0
+                self.__dumb_movement(hit_jogador)
+            elif caminho_andado < self.__MINIMO_PASSOS_NO_CAMINHO and len(self.__caminho) > 0:
                 self.__mover_caminho()
             else:
                 # Reseta flags de forçar andar em caminho possivelmente já calculados

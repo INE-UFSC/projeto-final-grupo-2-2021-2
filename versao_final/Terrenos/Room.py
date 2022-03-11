@@ -5,7 +5,7 @@ class Room:
     def __init__(self, matrix: list) -> None:
         self.__input_matrix = matrix.copy()
         self.__obstacles_char = ['P', '0', '1', '2']
-        self.__block_position_and_vision_char = 'P'
+        self.__block_movement_and_vision_char = 'P'
         self.__block_only_movement_char = '0'
         self.__block_only_vision_char = '1'
         self.__non_block_char = '2'
@@ -80,7 +80,7 @@ class Room:
             for pos_x, cell in enumerate(linha):
                 position = (pos_y, pos_x)
 
-                if cell == self.__block_position_and_vision_char:
+                if cell == self.__block_movement_and_vision_char:
                     positions_blocking_both.append(position)
                 elif cell == self.__block_only_movement_char:
                     positions_blocking_movement.append(position)

@@ -140,6 +140,14 @@ class AbstractPersonagem(ABC):
         self.__status.vel = value
 
     @property
+    def vel_ataque(self) -> int:
+        return self.__status.vel_ataque
+
+    @vel_ataque.setter
+    def vel_ataque(self, value: int) -> None:
+        self.__status.vel_ataque = value
+
+    @property
     def dano(self) -> int:
         return self.__status.ataque + self.__arma.dano
 
