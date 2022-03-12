@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from math import ceil
-from typing import List
+from typing import List, Type
+from xml.sax.handler import property_encoding
 from Personagens.AbstractInimigo import AbstractInimigo
 from Itens.AbstractItem import AbstractItem
-from Terrenos.Room import Room
+from Mapas.MapInterpreter import MapInterpreter
 from Objetos.AbstractObjeto import AbstractObjeto
 from Objetos.ObstaculoInvisivel import ObjetoInvisivel
 from Utils.Adapter import Adapter
@@ -20,54 +21,54 @@ from random import randint
 from Views.HUD import HUD
 
 
-class AbstractTerreno(ABC):
-    def __init__(self, inimigos: list, jogador: Jogador):
+class AbstractMapa(ABC):
+    def __init__(self, jogador: Jogador, enemies: List[Type[AbstractInimigo]]):
         self.__adapter = Adapter()
-        self.__inimigos: List[AbstractInimigo] = inimigos
+        self.__opcoes = Opcoes()
+        self.__enemies_types: List[Type[AbstractInimigo]] = enemies
+
+        self.__inimigos: List[AbstractInimigo] = []
         self.__objetos: List[AbstractObjeto] = []
         self.__itens: List[AbstractItem] = []
         self.__itens_to_duration = {}
-
         self.__matrix = []
         self.__pontos = []
-
-        self.__opcoes = Opcoes()
-        self.__hitbox = Hitbox(self.__opcoes.POSICAO_MAPAS, self.__opcoes.TAMANHO_MAPAS)
         self.__jogador = jogador
+
+        self.__hitbox = Hitbox(self.__opcoes.POSICAO_MAPAS, self.__opcoes.TAMANHO_MAPAS)
         self.__HUD = HUD(self.__jogador.status)
 
-    def _setup_mapa(self, matriz_terreno: list) -> None:
+    @abstractmethod
+    def load(self):
+        self.__inimigos.extend(self.__create_enemies(self.__enemies_types))
+
+    def _setup_mapa(self, mapa_matrix: list) -> None:
         self.__proporcao_to_matrix = {}
         self.__proporcao_to_pathfinders = {}
-        self.__objetos.clear()
-        self.__itens.clear()
 
-        self._room = Room(matriz_terreno)
-        self.__setup_room()
-        self.__matrix = self._room.get_matrix_only_obstacles()
+        self.__map = MapInterpreter(mapa_matrix)
+        self.__matrix = self.__map.get_matrix_only_obstacles()
         self.__configure_pathfinders()
 
-    def __setup_room(self) -> None:
-        player_pos = self._room.player_start_position
+        player_pos = self.__map.player_start_position
         player_pos = self.__adapter.matrix_index_to_pygame_pos(player_pos)
-        self.jogador.hitbox.posicao = player_pos
-        self.__itens.clear()
+        self.__jogador.hitbox.posicao = player_pos
 
         menor = self._opcoes.MENOR_UNIDADE
 
-        for position_map in self._room.positions_blocking_movement_and_vision:
+        for position_map in self.__map.positions_blocking_movement_and_vision:
             position = self.__adapter.matrix_index_to_pygame_pos(position_map)
             self.__objetos.append(ObjetoInvisivel(position, (menor, menor), False, True))
 
-        for position_map in self._room.positions_blocking_only_vision:
+        for position_map in self.__map.positions_blocking_only_vision:
             position = self.__adapter.matrix_index_to_pygame_pos(position_map)
             self.__objetos.append(ObjetoInvisivel(position, (menor, menor), True, True))
 
-        for position_map in self._room.positions_blocking_only_movement:
+        for position_map in self.__map.positions_blocking_only_movement:
             position = self.__adapter.matrix_index_to_pygame_pos(position_map)
             self.__objetos.append(ObjetoInvisivel(position, (menor, menor), False, False))
 
-        for position_map in self._room.positions_blocking_nothing:
+        for position_map in self.__map.positions_blocking_nothing:
             position = self.__adapter.matrix_index_to_pygame_pos(position_map)
             self.__objetos.append(ObjetoInvisivel(position, (menor, menor), True, False))
 
@@ -95,28 +96,9 @@ class AbstractTerreno(ABC):
                     tela.janela.blit(item.image, item.rect)
 
         for inimigo in self.__inimigos:
-            posicao = inimigo.hitbox.posicao
-            tamanho = inimigo.hitbox.tamanho
-            color = (0, 0, 125)
-            rect = Rect(posicao, tamanho)
-            # Desenha os hitbox deles
-            draw.rect(tela.janela, color, rect)
-
             tela.janela.blit(inimigo.image, inimigo.rect)
-            # if inimigo.checar_atacando():
-            #    self.__desenhar_ataque(tela, inimigo)
-
-        # Código para desenhar ataque realizado, será removido posteriormente
-        # if jogador.checar_atacando():
-        #    self.__desenhar_ataque(tela, jogador)
 
         self.__desenhar_pontos(tela)
-        #tamanho = self.__jogador.hitbox.tamanho
-        #posicao = self.__jogador.hitbox.posicao
-        #color = (0, 255, 0)
-        #rect = Rect(posicao, tamanho)
-        # draw.rect(tela.janela, color, rect)
-
         tela.janela.blit(self.__jogador.image, self.__jogador.rect)
 
     def pegar_item(self) -> AbstractItem:
@@ -135,10 +117,10 @@ class AbstractTerreno(ABC):
             return True
 
         posicao_matrix = self.__adapter.pygame_pos_to_matrix_index(posicao)
-        if not self._room.is_position_valid(posicao_matrix):
+        if not self.__map.is_position_valid(posicao_matrix):
             return False
 
-        if posicao_matrix in self._room.positions_blocking_movement:
+        if posicao_matrix in self.__map.positions_blocking_movement:
             return False
 
         if not self._hitbox_cabe_na_posicao(personagem.hitbox, posicao):
@@ -187,7 +169,7 @@ class AbstractTerreno(ABC):
 
             ponto = self.__adapter.pygame_pos_to_matrix_index(ponto)
 
-            if ponto in self._room.positions_blocking_vision:
+            if ponto in self.__map.positions_blocking_vision:
                 return False
 
             x += step
@@ -207,7 +189,7 @@ class AbstractTerreno(ABC):
             # self.__pontos.append(ponto)
 
             ponto = self.__adapter.pygame_pos_to_matrix_index(ponto)
-            if ponto in self._room.positions_blocking_movement:
+            if ponto in self.__map.positions_blocking_movement:
                 return False
 
             x += step
@@ -263,6 +245,18 @@ class AbstractTerreno(ABC):
             item.posicao = position
             self.__itens.append(item)
             self.__itens_to_duration[item] = self.__opcoes.ITENS_DROPPED_DURATION
+
+    def change_player_position_entering_map(self):
+        init_map_position = self._map.init_map_position
+        init_map_position = self.__adapter.matrix_index_to_pygame_pos(init_map_position)
+
+        self.__jogador.hitbox.posicao = init_map_position
+
+    def change_player_position_returning_map(self):
+        end_map_position = self._map.end_map_position
+        end_map_position = self.__adapter.matrix_index_to_pygame_pos(end_map_position)
+
+        self.__jogador.hitbox.posicao = end_map_position
 
     def lidar_ataques(self) -> None:
         if self.__jogador.atacar():
@@ -406,6 +400,18 @@ class AbstractTerreno(ABC):
 
         return self.__MapUpdater.validate_ponto_in_matrix(ponto, matrix)
 
+    def __create_enemies(self, enemies_types: List[Type[AbstractInimigo]]) -> List[AbstractInimigo]:
+        enemies_list: List[AbstractInimigo] = []
+
+        for Enemy_Type in enemies_types:
+            position = self.__map.get_random_enemy_position()
+            position = self.__adapter.matrix_index_to_pygame_pos(position)
+
+            enemy = Enemy_Type(mapa=self, posicao=position)
+            enemies_list.append(enemy)
+
+        return enemies_list
+
     # Código exclusivo para testes
     def __desenhar_pontos(self, tela: TelaJogo):
         for ponto in self.__pontos:
@@ -413,31 +419,6 @@ class AbstractTerreno(ABC):
             color = (0, 255, 255)
             draw.rect(tela.janela, color, rect)
         self.__pontos = []
-
-    # Código exclusivo para testes
-    def __desenhar_quadrados(self, tela: TelaJogo):
-        for index, linha in enumerate(self.__matrix):
-            for index_column, coluna in enumerate(linha):
-                posicao = self.__adapter.matrix_index_to_pygame_pos((index, index_column))
-
-                if index % 2 == 0:
-                    if index_column % 2 == 0:
-                        color = (255, 125, 125)
-                    else:
-                        color = (125, 125, 255)
-                else:
-                    if index_column % 2 == 0:
-                        color = (125, 125, 255)
-                    else:
-                        color = (255, 125, 125)
-
-                text = f'{index_column} - {index}'
-                fonte = font.SysFont('arial', 8, True, False)
-                texto_formatado = fonte.render(text, True, (0, 0, 0))
-
-                rect = Rect(posicao, (self.__opcoes.MENOR_UNIDADE, self.__opcoes.MENOR_UNIDADE))
-                draw.rect(tela.janela, color, rect)
-                tela.janela.blit(texto_formatado, posicao)
 
     def __remover_inimigo(self, inimigo):
         self.__inimigos.remove(inimigo)
@@ -453,10 +434,6 @@ class AbstractTerreno(ABC):
     @property
     def objetos(self) -> List[AbstractObjeto]:
         return self.__objetos
-
-    @abstractmethod
-    def has_ended():
-        pass
 
     @property
     def _opcoes(self) -> Opcoes:
@@ -479,3 +456,20 @@ class AbstractTerreno(ABC):
     @abstractmethod
     def _get_item_to_drop() -> AbstractItem:
         pass
+
+    @abstractmethod
+    def go_next_map() -> bool:
+        pass
+
+    @abstractmethod
+    def go_previous_map() -> bool:
+        pass
+
+    @property
+    @abstractmethod
+    def loaded(self) -> bool:
+        pass
+
+    @property
+    def _map(self) -> MapInterpreter:
+        return self.__map

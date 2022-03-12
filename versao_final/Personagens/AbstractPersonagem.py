@@ -6,7 +6,7 @@ from Personagens.Status import Status
 
 
 class AbstractPersonagem(ABC):
-    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno: None) -> None:
+    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, mapa: None) -> None:
         """Recebe um dicionário com os stats iniciais, tuplas com a posição e tamanho do personagem"""
         self.__status = Status(stats)
         self.__direction = Direction.MEIO_BAIXO
@@ -17,7 +17,7 @@ class AbstractPersonagem(ABC):
 
         self.__ACABOU_DE_TOMAR_DANO = False
         self.__hitbox = Hitbox(posicao, tamanho)
-        self.__terreno = terreno
+        self.__mapa = mapa
 
     @property
     def direction(self) -> Direction:
@@ -169,12 +169,12 @@ class AbstractPersonagem(ABC):
             self.__arma = arma
 
     @property
-    def terreno(self):
-        return self.__terreno
+    def mapa(self):
+        return self.__mapa
 
-    @terreno.setter
-    def terreno(self, value) -> None:
-        self.__terreno = value
+    @mapa.setter
+    def mapa(self, value) -> None:
+        self.__mapa = value
 
     @property
     def hitbox(self) -> Hitbox:

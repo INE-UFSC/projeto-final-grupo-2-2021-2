@@ -10,7 +10,6 @@ class ControladorFases():
 
     def proxima_fase(self) -> AbstractFase:
         if len(self.__fases) > 0:
-            self.__fases[0].load()
             return self.__fases.pop(0)
         else:
             return None

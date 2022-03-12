@@ -3,7 +3,7 @@ from typing import Dict, List
 from Config.Opcoes import Opcoes
 from Config.Enums import Direction, Estado
 from Personagens.AbstractInimigo import AbstractInimigo
-from Terrenos.AbstractTerreno import AbstractTerreno
+from Mapas.AbstractMapa import AbstractMapa
 from Utils.Adapter import Adapter
 from Utils.Folder import import_fliped_folder, import_folder
 from Utils.Hitbox import Hitbox
@@ -14,10 +14,10 @@ from pygame import Surface, Rect
 class InimigoTipo1(AbstractInimigo):
     __PATH_TO_SPRITES = {}
 
-    def __init__(self, terreno: AbstractTerreno, path: str, posicao=(0, 0)) -> None:
+    def __init__(self, mapa: AbstractMapa, path: str, posicao=(0, 0)) -> None:
         stats = self.__calibrar_dificuldade()
         self.__adapter = Adapter()
-        super().__init__(stats=stats, posicao=posicao, tamanho=self._TAMANHO, terreno=terreno)
+        super().__init__(stats=stats, posicao=posicao, tamanho=self._TAMANHO, mapa=mapa)
 
         if path not in self.__PATH_TO_SPRITES:
             sprites = self.__import_character_assets()

@@ -391,7 +391,7 @@ class AStar:
         return None, None
 
 
-matriz_terreno_24 = [
+matriz_mapa_24 = [
     '                                               ', '                                               ',
     '                                               ', '                                               ',
     'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP', '                                               ',
@@ -417,30 +417,30 @@ def main():
     #inicio = (17, 13)
     #fim = (20, 19)
 
-    searcher = AStar(matriz_terreno_24, [' ', 'J'], [' '])
+    searcher = AStar(matriz_mapa_24, [' ', 'J'], [' '])
     path, abertos = searcher.search_path(inicio, fim, True)
 
     print(len(abertos) - len(path))
 
     for ponto in abertos:
-        antes = matriz_terreno_24[ponto[0]][0:ponto[1]]
-        depois = matriz_terreno_24[ponto[0]][ponto[1]+1:]
-        matriz_terreno_24[ponto[0]] = f'{antes}A{depois}'
+        antes = matriz_mapa_24[ponto[0]][0:ponto[1]]
+        depois = matriz_mapa_24[ponto[0]][ponto[1]+1:]
+        matriz_mapa_24[ponto[0]] = f'{antes}A{depois}'
 
     for ponto in path:
-        antes = matriz_terreno_24[ponto[0]][0:ponto[1]]
-        depois = matriz_terreno_24[ponto[0]][ponto[1]+1:]
-        matriz_terreno_24[ponto[0]] = f'{antes}X{depois}'
+        antes = matriz_mapa_24[ponto[0]][0:ponto[1]]
+        depois = matriz_mapa_24[ponto[0]][ponto[1]+1:]
+        matriz_mapa_24[ponto[0]] = f'{antes}X{depois}'
 
-    antes = matriz_terreno_24[inicio[0]][0:inicio[1]]
-    depois = matriz_terreno_24[inicio[0]][inicio[1]+1:]
-    matriz_terreno_24[inicio[0]] = f'{antes}I{depois}'
+    antes = matriz_mapa_24[inicio[0]][0:inicio[1]]
+    depois = matriz_mapa_24[inicio[0]][inicio[1]+1:]
+    matriz_mapa_24[inicio[0]] = f'{antes}I{depois}'
 
-    antes = matriz_terreno_24[fim[0]][0:fim[1]]
-    depois = matriz_terreno_24[fim[0]][fim[1]+1:]
-    matriz_terreno_24[fim[0]] = f'{antes}F{depois}'
+    antes = matriz_mapa_24[fim[0]][0:fim[1]]
+    depois = matriz_mapa_24[fim[0]][fim[1]+1:]
+    matriz_mapa_24[fim[0]] = f'{antes}F{depois}'
 
-    for linha in matriz_terreno_24:
+    for linha in matriz_mapa_24:
         print(linha)
 
 

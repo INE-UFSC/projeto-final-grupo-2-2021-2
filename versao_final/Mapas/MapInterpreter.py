@@ -1,7 +1,7 @@
 from random import choice
 
 
-class Room:
+class MapInterpreter:
     def __init__(self, matrix: list) -> None:
         self.__input_matrix = matrix.copy()
         self.__obstacles_char = ['P', '0', '1', '2']
@@ -9,13 +9,14 @@ class Room:
         self.__block_only_movement_char = '0'
         self.__block_only_vision_char = '1'
         self.__non_block_char = '2'
-        self.__end_room_char = 'E'
+        self.__end_map_char = 'E'
+        self.__init_map_char = 'I'
 
         self.__matrix = self.__get_matrix_with_only_obstacles(matrix)
         self.__start_player_position = self.__get_start_player_position()
         self.__enemies_start_position = self.__get_all_enemies_position()
-        self.__position_end_room = self.__get_position_end_room()
 
+        self.__set_init_and_end_map_positions()
         self.__set_all_positions_blocking()
 
     def get_matrix_only_obstacles(self) -> list:
@@ -53,8 +54,12 @@ class Room:
         return self.__position_blocking_vision
 
     @property
-    def position_end_room(self) -> tuple:
-        return self.__position_end_room
+    def end_map_position(self) -> tuple:
+        return self.__end_map_position
+
+    @property
+    def init_map_position(self) -> tuple:
+        return self.__init_map_position
 
     def is_position_valid(self, posicao: tuple) -> bool:
         x = int(posicao[0])
@@ -100,6 +105,14 @@ class Room:
         self.__position_blocking_vision = positions_blocking_vision
         self.__position_blocking_vision.extend(positions_blocking_both)
 
+    def __set_init_and_end_map_positions(self):
+        for pos_x, linha in enumerate(self.__input_matrix):
+            for pos_y, cell in enumerate(linha):
+                if cell == self.__end_map_char:
+                    self.__end_map_position = (pos_x, pos_y)
+                elif cell == self.__init_map_char:
+                    self.__init_map_position = (pos_x, pos_y)
+
     def __get_matrix_with_only_obstacles(self, matrix_input: list) -> list:
         matrix = matrix_input.copy()
 
@@ -110,12 +123,6 @@ class Room:
             matrix[pos_x] = linha
 
         return matrix
-
-    def __get_position_end_room(self) -> tuple:
-        for pos_x, linha in enumerate(self.__input_matrix):
-            for pos_y, cell in enumerate(linha):
-                if cell == self.__end_room_char:
-                    return (pos_x, pos_y)
 
     def __get_all_enemies_position(self) -> list:
         enemies_positions = []

@@ -55,7 +55,7 @@ class Jogo:
                     self.__GAME_LOOP = False
                     print('Você perdeu :/')
 
-                if self.__fase_atual.has_ended():
+                if self.__fase_atual.player_has_won():
                     self.__GAME_LOOP = False
                     proxima_fase = self.__controlador.proxima_fase()
                     if proxima_fase != None:

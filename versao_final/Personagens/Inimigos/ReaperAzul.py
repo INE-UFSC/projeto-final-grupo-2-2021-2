@@ -1,5 +1,5 @@
 from Personagens.InimigoTipo1 import InimigoTipo1
-from Terrenos.AbstractTerreno import AbstractTerreno
+from Mapas.AbstractMapa import AbstractMapa
 
 
 class ReaperAzul(InimigoTipo1):
@@ -16,8 +16,8 @@ class ReaperAzul(InimigoTipo1):
     __CHANCE_DAMAGE_STOP_ATTACK = 0.6
     __FRAME_EXECUTAR_ATAQUE = 17
 
-    def __init__(self, terreno: AbstractTerreno, posicao=(0, 0)) -> None:
-        super().__init__(terreno, ReaperAzul.__SPRITE_PATH, posicao)
+    def __init__(self, mapa: AbstractMapa, posicao=(0, 0)) -> None:
+        super().__init__(mapa, ReaperAzul.__SPRITE_PATH, posicao)
 
     @property
     def _SPRITE_PATH(self) -> str:

@@ -1,5 +1,5 @@
 from Personagens.InimigoTipo1 import InimigoTipo1
-from Terrenos.AbstractTerreno import AbstractTerreno
+from Mapas.AbstractMapa import AbstractMapa
 
 
 class MinotauroAzul(InimigoTipo1):
@@ -16,8 +16,8 @@ class MinotauroAzul(InimigoTipo1):
     __CHANCE_DAMAGE_STOP_ATTACK = 0.5
     __FRAME_EXECUTAR_ATAQUE = 12
 
-    def __init__(self, terreno: AbstractTerreno, posicao=(0, 0)) -> None:
-        super().__init__(terreno, MinotauroAzul.__SPRITE_PATH, posicao)
+    def __init__(self, mapa: AbstractMapa, posicao=(0, 0)) -> None:
+        super().__init__(mapa, MinotauroAzul.__SPRITE_PATH, posicao)
 
     @property
     def _SPRITE_PATH(self) -> str:

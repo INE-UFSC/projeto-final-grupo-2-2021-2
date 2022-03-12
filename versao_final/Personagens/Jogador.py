@@ -21,11 +21,11 @@ class Jogador(AbstractPersonagem):
         'transpassavel': False
     }
 
-    def __init__(self, posicao: tuple, nome: str, terreno=None) -> None:
+    def __init__(self, posicao: tuple, nome: str, mapa=None) -> None:
         self.__itens: List[AbstractItem] = []
         self.__nome = nome
 
-        super().__init__(stats=Jogador.__STATS, posicao=posicao, tamanho=(30, 48), terreno=terreno)
+        super().__init__(stats=Jogador.__STATS, posicao=posicao, tamanho=(30, 48), mapa=mapa)
 
         if not Jogador.__ANIMACOES_IMPORTADAS:
             Jogador.__import_character_assets()
@@ -58,7 +58,7 @@ class Jogador(AbstractPersonagem):
             return None
 
         if keys[pygame.K_e]:
-            self.terreno.pegar_item()
+            self.mapa.pegar_item()
         if keys[pygame.K_j]:
             if self.__atacar():
                 self.__set_animation('Attacking')
@@ -230,12 +230,12 @@ class Jogador(AbstractPersonagem):
 
         if x_movement != 0:
             nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
-            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
+            if self.mapa.validar_movimento(personagem=self, posicao=nova_posicao_x):
                 self.hitbox.posicao = nova_posicao_x
 
         if y_movement != 0:
             nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
-            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
+            if self.mapa.validar_movimento(personagem=self, posicao=nova_posicao_y):
                 self.hitbox.posicao = nova_posicao_y
 
         self._atualizar_frente(x_movement, y_movement)

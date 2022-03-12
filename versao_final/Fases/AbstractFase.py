@@ -1,18 +1,35 @@
-from abc import ABC, abstractmethod
-from Config.Enums import Dificuldade
-from Config.Opcoes import Opcoes
+from abc import ABC
+from typing import List
 from Personagens.Jogador import Jogador
 from Config.TelaJogo import TelaJogo
-from Terrenos.AbstractTerreno import AbstractTerreno
+from Mapas.AbstractMapa import AbstractMapa
 
 
 class AbstractFase(ABC):
-    def __init__(self, jogador: Jogador) -> None:
+    def __init__(self, jogador: Jogador, mapas: List[AbstractMapa]) -> None:
         self.__jogador: Jogador = jogador
-        self.__terreno: AbstractTerreno = None
-        self.__opcoes = Opcoes()
-        self.__dificuldade = self.__opcoes.dificuldade
         self.__jogador = jogador
+
+        self.__PLAYER_WON = False
+        self.__MAX_DELAY_CHANGE_MAP = 100
+        self.__CURRENT_DELAY_CHANGE_MAP = 0
+
+        self.__maps_list: List[AbstractMapa] = mapas
+        self.__current_map: AbstractMapa = self.__maps_list[0]
+        self.__current_map_index = 0
+        if not self.__current_map.loaded:
+            self.__current_map.load()
+
+    def run(self) -> None:
+        self.__update()
+        self.__current_map.animate()
+        self.__jogador.processar_inputs()
+        self.__current_map.mover_inimigos()
+        self.__current_map.lidar_ataques()
+        self.__current_map.update()
+
+    def player_has_won(self) -> bool:
+        return self.__PLAYER_WON
 
     def player_has_lost(self) -> bool:
         if self.__jogador.morreu:
@@ -21,39 +38,53 @@ class AbstractFase(ABC):
             return False
 
     def start(self, tela: TelaJogo):
-        self.__jogador.terreno = self.__terreno
-        self.__terreno.iniciar_rodada(tela)
-
-    def has_ended(self) -> bool:
-        return self.__terreno.has_ended()
+        self.__jogador.mapa = self.__current_map
+        self.__current_map.iniciar_rodada(tela)
 
     def desenhar(self, tela: TelaJogo) -> None:
-        self.__terreno.desenhar(tela)
+        self.__current_map.desenhar(tela)
 
-    def run(self) -> None:
-        """Função para ser executada em todo ciclo do main loop"""
-        self.__terreno.animate()
-        self.__jogador.processar_inputs()
-        self.__terreno.mover_inimigos()
-        self.__terreno.lidar_ataques()
-        self.__terreno.update()
+    def __update(self):
+        if self.__CURRENT_DELAY_CHANGE_MAP > 0:
+            self.__CURRENT_DELAY_CHANGE_MAP -= 1
 
-    @property
-    def _dificuldade(self) -> Dificuldade:
-        return self.__dificuldade
+        if self.__current_map.go_next_map:
+            if self.__current_map_index == len(self.__maps_list) - 1:
+                self.__PLAYER_WON = True
+            elif self.__CURRENT_DELAY_CHANGE_MAP == 0:
+                self.__set_next_map()
+                self.__CURRENT_DELAY_CHANGE_MAP = self.__MAX_DELAY_CHANGE_MAP
+
+        if self.__current_map.go_previous_map:
+            if self.__current_map_index != 0 and self.__CURRENT_DELAY_CHANGE_MAP == 0:
+                self.__set_previous_map()
+                self.__CURRENT_DELAY_CHANGE_MAP = self.__MAX_DELAY_CHANGE_MAP
+
+    def __set_previous_map(self):
+        previous_map = self.__maps_list[self.__current_map_index - 1]
+        self.__current_map = previous_map
+        self.__current_map_index -= 1
+        self.__current_map.change_player_position_returning_map()
+        self.__jogador.mapa = self.__current_map
+
+    def __set_next_map(self):
+        next_map = self.__maps_list[self.__current_map_index + 1]
+        self.__current_map = next_map
+        self.__current_map_index += 1
+        if not self.__current_map.loaded:
+            self.__current_map.load()
+        self.__current_map.change_player_position_entering_map()
+        self.__jogador.mapa = self.__current_map
 
     @property
     def _jogador(self) -> Jogador:
         return self.__jogador
 
     @property
-    def _terreno(self) -> AbstractTerreno:
-        return self.__terreno
+    def _mapa(self) -> AbstractMapa:
+        return self.__current_map
 
-    def _set_terreno(self, terreno: AbstractTerreno) -> None:
-        if isinstance(terreno, AbstractTerreno):
-            self.__terreno = terreno
-
-    @abstractmethod
-    def load(self) -> None:
-        pass
+    @property
+    def _set_mapa(self, mapa: AbstractMapa) -> None:
+        if isinstance(mapa, AbstractMapa):
+            self.__current_map = mapa

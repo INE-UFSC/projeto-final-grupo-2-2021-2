@@ -6,7 +6,7 @@ from pygame import Rect, Surface
 
 
 class AbstractInimigo(AbstractPersonagem, ABC):
-    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, terreno) -> None:
+    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, mapa) -> None:
         self.__estado = Estado.REPOUSO
 
         self.__caminho = []
@@ -20,7 +20,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__TRAVADO = False
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 150
 
-        super().__init__(stats, posicao, tamanho, terreno)
+        super().__init__(stats, posicao, tamanho, mapa)
 
     @property
     def _estado(self) -> Estado:
@@ -104,7 +104,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
                     self.__mover_caminho()
                 else:
                     # Busca um novo caminho
-                    novo_caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
+                    novo_caminho = self.mapa.get_path(self.hitbox, hit_jogador.posicao)
                     self.__set_caminho(novo_caminho)
                     self.__mover_caminho()
 
@@ -114,7 +114,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
                 if self.__estava_vendo_jogador:
                     self.__estava_vendo_jogador = False
 
-                    novo_caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
+                    novo_caminho = self.mapa.get_path(self.hitbox, hit_jogador.posicao)
                     self.__set_caminho(novo_caminho)
                     self.__mover_caminho()
                 else:  # Segue a ultima posição conhecida do jogador
@@ -134,7 +134,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def __procurar_jogador(self, hit_jogador: Hitbox) -> None:
         # Caso não tenha um caminho pega um aleatório
         if len(self.__caminho) == 0:
-            self.__caminho = self.terreno.get_random_path(self.hitbox)
+            self.__caminho = self.mapa.get_random_path(self.hitbox)
 
         # Procura o jogador
         if self.__encontrou_jogador_novamente(hit_jogador):
@@ -180,7 +180,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def __handle_travado(self, hit_jogador: Hitbox) -> None:
         if not self.__TRAVADO:
             self.__TRAVADO = True
-            novo_caminho = self.terreno.get_path(self.hitbox, hit_jogador.posicao)
+            novo_caminho = self.mapa.get_path(self.hitbox, hit_jogador.posicao)
             self.__set_caminho(novo_caminho)
             self.__mover_caminho()
             print(novo_caminho)
@@ -223,12 +223,12 @@ class AbstractInimigo(AbstractPersonagem, ABC):
 
         if x_movement != 0:
             nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
-            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
+            if self.mapa.validar_movimento(personagem=self, posicao=nova_posicao_x):
                 self.hitbox.posicao = nova_posicao_x
 
         if y_movement != 0:
             nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
-            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
+            if self.mapa.validar_movimento(personagem=self, posicao=nova_posicao_y):
                 self.hitbox.posicao = nova_posicao_y
 
         self._atualizar_frente(x_movement, y_movement)
@@ -255,12 +255,12 @@ class AbstractInimigo(AbstractPersonagem, ABC):
 
         if x_movement != 0:
             nova_posicao_x = (self.hitbox.x + x_movement, self.hitbox.y)
-            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_x):
+            if self.mapa.validar_movimento(personagem=self, posicao=nova_posicao_x):
                 self.hitbox.posicao = nova_posicao_x
 
         if y_movement != 0:
             nova_posicao_y = (self.hitbox.x, self.hitbox.y + y_movement)
-            if self.terreno.validar_movimento(personagem=self, posicao=nova_posicao_y):
+            if self.mapa.validar_movimento(personagem=self, posicao=nova_posicao_y):
                 self.hitbox.posicao = nova_posicao_y
 
         self._atualizar_frente(x_movement, y_movement)
@@ -292,7 +292,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             [self.hitbox.topright, hit_jogador.topright]
         ]
         for par_ponto in pares_pontos:
-            if self.terreno.is_line_of_sight_clear(par_ponto[0], par_ponto[1]):
+            if self.mapa.is_line_of_sight_clear(par_ponto[0], par_ponto[1]):
                 return True
 
         return False
@@ -307,7 +307,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         ]
         quant = 0
         for par_ponto in pares_pontos:
-            if self.terreno.is_line_of_sight_clear_to_walk(par_ponto[0], par_ponto[1]):
+            if self.mapa.is_line_of_sight_clear_to_walk(par_ponto[0], par_ponto[1]):
                 quant += 1
 
         if quant == len(pares_pontos):
@@ -320,7 +320,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
                   hit_jogador.bottomleft, hit_jogador.bottomright]
 
         for ponto in pontos:
-            if self.terreno.is_line_of_sight_clear(self.hitbox.center, ponto):
+            if self.mapa.is_line_of_sight_clear(self.hitbox.center, ponto):
                 return True
         return False
 
