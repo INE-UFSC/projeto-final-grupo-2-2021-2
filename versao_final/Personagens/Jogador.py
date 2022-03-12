@@ -38,6 +38,7 @@ class Jogador(AbstractPersonagem):
         self.__ANIMACAO_RESETADA = False
         self.__FRAME_TO_WAIT = 0
         self.__MORREU = False
+        self.__ACABOU_DE_TOMAR_DANO = False
 
         self.__str_direction = self.__get_direction_sprites()
         self.__animations = Jogador.__animations[self.__animation][self.__str_direction]
@@ -76,6 +77,17 @@ class Jogador(AbstractPersonagem):
             return True
         else:
             return False
+
+    def tomar_dano(self, dano: int) -> int:
+        if type(dano) == int:
+            dano_real = dano - self.status.defesa
+            if dano_real > 0:
+                self.status.vida -= dano_real
+                return dano_real
+            else:
+                return 0
+        else:
+            return 0
 
     def pontos_para_ataque(self) -> list:
         return super().pontos_para_ataque()

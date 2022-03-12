@@ -19,8 +19,8 @@ class DungeonMap1(AbstractMapa):
     __MATRIX = [
         'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
         'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
-        'PP        00PP00                PP0          PP',
-        'PP E      00PP00                PP  5        PP',
+        'PPEEE     00PP00                PP0          PP',
+        'PPEER     00PP00                PP  5        PP',
         'PP    5     PP     5   5   5    PP           PP',
         'PP          PP                  PP       5   PP',
         'PP   5      PP                  PP           PP',
@@ -38,8 +38,8 @@ class DungeonMap1(AbstractMapa):
         'PP                     PP            PPPPPPPPPP',
         'PP     5       5       PP            P       PP',
         'PP                     PP            P       PP',
-        'PP             000     PP                  I PP',
-        'PP    5        000     PP                J 00PP',
+        'PP             000     PP                 IIIPP',
+        'PP    5        000     PP                JI00PP',
         'PP             000     PP                  00PP',
         'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
         'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP']
@@ -67,15 +67,17 @@ class DungeonMap1(AbstractMapa):
             self.__LOADED = True
 
     def update(self) -> None:
-        if self.__all_enemies_dead():
-            position_end_map = self._map.end_map_position
-            position_end_map = self.__adapter.matrix_index_to_pygame_pos(position_end_map)
+        keys = key.get_pressed()
 
-            keys = key.get_pressed()
-            rect_jogador = Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
-            if rect_jogador.collidepoint(position_end_map):
-                if keys[K_e]:
-                    self.__GO_NEXT_MAP = True
+        if self.__all_enemies_dead():
+            if keys[K_e]:
+                positions_end_map = self._map.end_map_positions
+                positions = self.__adapter.matrix_index_list_to_pygame_pos_list(positions_end_map)
+
+                rect_jogador = Rect(self.jogador.hitbox.posicao, self.jogador.hitbox.tamanho)
+                for position in positions:
+                    if rect_jogador.collidepoint(position):
+                        self.__GO_NEXT_MAP = True
 
         super().update()
 

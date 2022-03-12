@@ -21,6 +21,18 @@ class Adapter(Singleton):
 
         return position
 
+    def matrix_index_list_to_pygame_pos_list(self, list: list) -> list:
+        changed_list = []
+        for position in list:
+            changed_list.append(self.matrix_index_to_pygame_pos(position))
+        return changed_list
+
+    def pygame_pos_list_to_matrix_index_list(self, list: list) -> list:
+        changed_list = []
+        for position in list:
+            changed_list.append(self.pygame_pos_to_matrix_index(position))
+        return changed_list
+
     def alcance_to_vector_dist(self, alcance: int) -> int:
         ratio = 100 / (self.__opcoes.MAX_ALCANCE - self.__opcoes.MIN_ALCANCE)
         aumento = alcance / ratio

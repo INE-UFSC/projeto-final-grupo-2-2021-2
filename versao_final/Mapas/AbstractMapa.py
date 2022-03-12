@@ -243,16 +243,16 @@ class AbstractMapa(ABC):
             self.__itens_to_duration[item] = self.__opcoes.ITENS_DROPPED_DURATION
 
     def change_player_position_entering_map(self):
-        init_map_position = self._map.init_map_position
-        init_map_position = self.__adapter.matrix_index_to_pygame_pos(init_map_position)
+        start_player_position = self.__map.player_start_position
+        start_player_position = self.__adapter.matrix_index_to_pygame_pos(start_player_position)
 
-        self.__jogador.hitbox.posicao = init_map_position
+        self.__jogador.hitbox.posicao = start_player_position
 
     def change_player_position_returning_map(self):
-        end_map_position = self._map.end_map_position
-        end_map_position = self.__adapter.matrix_index_to_pygame_pos(end_map_position)
+        return_player_position = self.__map.player_return_position
+        return_player_position = self.__adapter.matrix_index_to_pygame_pos(return_player_position)
 
-        self.__jogador.hitbox.posicao = end_map_position
+        self.__jogador.hitbox.posicao = return_player_position
 
     def lidar_ataques(self) -> None:
         if self.__jogador.atacar():
@@ -398,9 +398,15 @@ class AbstractMapa(ABC):
 
     def __create_enemies(self, enemies_types: List[Type[AbstractInimigo]]) -> List[AbstractInimigo]:
         enemies_list: List[AbstractInimigo] = []
+        posicoes = self.__map.get_enemies_positions()
+        index = 0
 
         for Enemy_Type in enemies_types:
-            position = self.__map.get_random_enemy_position()
+            position = posicoes[index]
+            index += 1
+            if index >= len(posicoes):
+                index = 0
+
             position = self.__adapter.matrix_index_to_pygame_pos(position)
 
             enemy = Enemy_Type(mapa=self, posicao=position)
