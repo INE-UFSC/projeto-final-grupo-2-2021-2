@@ -13,7 +13,7 @@ class ReaperAzul(InimigoTipo1):
     __STATS_DIFICIL = {'vida': 23, 'ataque': 5, 'defesa': 5, 'vel': 3, 'vel_ataque': 1, 'arma_dano': 5,
                        'arma_alcance': 16, 'view_distance': 100, 'transpassavel': False}
     __DIST_PARA_ATAQUE = 7
-    __CHANCE_DAMAGE_STOP_ATTACK = 0.6
+    __CHANCE_DAMAGE_STOP_ATTACK = 0.5
     __FRAME_EXECUTAR_ATAQUE = 17
 
     def __init__(self, mapa: AbstractMapa, posicao=(0, 0)) -> None:

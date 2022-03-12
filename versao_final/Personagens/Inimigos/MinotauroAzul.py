@@ -4,7 +4,7 @@ from Mapas.AbstractMapa import AbstractMapa
 
 class MinotauroAzul(InimigoTipo1):
     __TAMANHO_IMAGEM = (80, 65)
-    __TAMANHO = (36, 48)
+    __TAMANHO = (30, 42)
     __SPRITE_PATH = 'Assets/Personagens/Minotauro/MinotauroAzul/'
     __STATS_FACIL = {'vida': 15, 'ataque': 4, 'defesa': 3, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 3,
                      'arma_alcance': 18, 'view_distance': 150, 'transpassavel': False}
@@ -13,7 +13,7 @@ class MinotauroAzul(InimigoTipo1):
     __STATS_DIFICIL = {'vida': 25, 'ataque': 6, 'defesa': 5, 'vel': 3, 'vel_ataque': 1, 'arma_dano': 5,
                        'arma_alcance': 18, 'view_distance': 150, 'transpassavel': False}
     __DIST_PARA_ATAQUE = 8
-    __CHANCE_DAMAGE_STOP_ATTACK = 0.5
+    __CHANCE_DAMAGE_STOP_ATTACK = 0.4
     __FRAME_EXECUTAR_ATAQUE = 12
 
     def __init__(self, mapa: AbstractMapa, posicao=(0, 0)) -> None:
