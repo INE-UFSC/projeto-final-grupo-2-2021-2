@@ -3,12 +3,13 @@ from typing import List
 from Personagens.Jogador import Jogador
 from Config.TelaJogo import TelaJogo
 from Mapas.AbstractMapa import AbstractMapa
+from Personagens.HUD import HUD
 
 
 class AbstractFase(ABC):
     def __init__(self, jogador: Jogador, mapas: List[AbstractMapa]) -> None:
         self.__jogador: Jogador = jogador
-        self.__jogador = jogador
+        self.__hud = HUD(self.__jogador.status)
 
         self.__PLAYER_WON = False
         self.__MAX_DELAY_CHANGE_MAP = 100
@@ -43,6 +44,7 @@ class AbstractFase(ABC):
 
     def desenhar(self, tela: TelaJogo) -> None:
         self.__current_map.desenhar(tela)
+        self.__hud.desenhar(tela)
 
     def __update(self):
         if self.__CURRENT_DELAY_CHANGE_MAP > 0:

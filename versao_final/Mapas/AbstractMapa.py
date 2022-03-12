@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from math import ceil
 from typing import List, Type
-from xml.sax.handler import property_encoding
 from Personagens.AbstractInimigo import AbstractInimigo
 from Itens.AbstractItem import AbstractItem
 from Mapas.MapInterpreter import MapInterpreter
@@ -16,9 +15,8 @@ from Personagens.AbstractPersonagem import AbstractPersonagem
 from Utils.Maps import MapUpdater
 from Utils.Movement import AStar, distancia_dois_pontos, gerar_equação_vetorial_reta
 from Utils.Movement import gerar_equação_vetorial_reta
-from pygame import Surface, Rect, draw, font
+from pygame import Surface, Rect, draw
 from random import randint
-from Views.HUD import HUD
 
 
 class AbstractMapa(ABC):
@@ -36,7 +34,6 @@ class AbstractMapa(ABC):
         self.__jogador = jogador
 
         self.__hitbox = Hitbox(self.__opcoes.POSICAO_MAPAS, self.__opcoes.TAMANHO_MAPAS)
-        self.__HUD = HUD(self.__jogador.status)
 
     @abstractmethod
     def load(self):
@@ -82,7 +79,6 @@ class AbstractMapa(ABC):
 
     def desenhar(self, tela: TelaJogo) -> None:
         tela.janela.blit(self.image, self.rect)
-        self.__HUD.desenhar(tela)
 
         for objeto in self.__objetos:
             objeto.desenhar(tela)

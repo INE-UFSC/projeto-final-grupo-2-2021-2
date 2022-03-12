@@ -68,6 +68,8 @@ class AbstractPersonagem(ABC):
         elif y_movement < 0:
             self.direction = Direction.MEIO_CIMA
 
+        self.__LAST_POSITION = self.hitbox.posicao
+
     @abstractmethod
     def pontos_para_ataque(self) -> list:
         if self.__direction == Direction.DIREITA_BAIXO:
