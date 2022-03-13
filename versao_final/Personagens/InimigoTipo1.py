@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Dict, List
 from Config.Opcoes import Opcoes
-from Config.Enums import Direction, Estado
+from Config.Enums import Direction
 from Personagens.AbstractInimigo import AbstractInimigo
 from Mapas.AbstractMapa import AbstractMapa
 from Utils.Adapter import Adapter

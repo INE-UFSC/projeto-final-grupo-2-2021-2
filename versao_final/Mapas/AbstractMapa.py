@@ -9,6 +9,7 @@ from Mapas.MapInterpreter import MapInterpreter
 from Objetos.AbstractObjeto import AbstractObjeto
 from Objetos.ObstaculoInvisivel import ObjetoInvisivel
 from Personagens.AbstractSignal import AbstractSignal
+from Sounds.MusicHandler import MusicHandler
 from Utils.Adapter import Adapter
 from Utils.Hitbox import Hitbox
 from Personagens.Jogador import Jogador
@@ -26,6 +27,7 @@ class AbstractMapa(ABC):
         self.__adapter = Adapter()
         self.__opcoes = Opcoes()
         self.__enemies_types: List[Type[AbstractInimigo]] = enemies
+        self.__music = MusicHandler()
 
         self.__inimigos: List[AbstractInimigo] = []
         self.__objetos: List[AbstractObjeto] = []
@@ -121,6 +123,7 @@ class AbstractMapa(ABC):
                 self.__jogador.receber_item(item)
                 self.__itens.remove(item)
                 self.__itens_to_duration.pop(item)
+                self.__music.play_sound(item.sound_path)
 
     def validar_movimento(self, personagem: AbstractPersonagem, posicao: tuple) -> bool:
         if not isinstance(personagem, AbstractPersonagem):
@@ -516,3 +519,8 @@ class AbstractMapa(ABC):
     @property
     def _map(self) -> MapInterpreter:
         return self.__map
+
+    @property
+    @abstractmethod
+    def background_music_path(self):
+        pass

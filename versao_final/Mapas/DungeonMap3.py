@@ -44,6 +44,7 @@ class DungeonMap3(AbstractMapa):
         'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
         'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP']
     __SPRITE_PATH = 'Assets/Mapas/Dungeon/sala3.png'
+    __MUSIC_PATH = 'Sounds/musics/som_ambiente3.wav'
 
     def __init__(self, jogador: Jogador, enemies: List[Type[AbstractInimigo]]):
         super().__init__(jogador, enemies)
@@ -59,6 +60,10 @@ class DungeonMap3(AbstractMapa):
         self.__GO_NEXT_MAP = False
         self.__GO_PREVIOUS_MAP = False
         self.__LOADED = False
+
+    @property
+    def background_music_path(self):
+        return DungeonMap3.__MUSIC_PATH
 
     def load(self) -> None:
         if not self.__LOADED:

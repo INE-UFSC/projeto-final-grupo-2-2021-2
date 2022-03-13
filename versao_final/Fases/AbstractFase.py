@@ -1,15 +1,17 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import List
 from Personagens.Jogador import Jogador
 from Config.TelaJogo import TelaJogo
 from Mapas.AbstractMapa import AbstractMapa
 from Personagens.HUD import HUD
+from Sounds.MusicHandler import MusicHandler
 
 
 class AbstractFase(ABC):
     def __init__(self, jogador: Jogador, mapas: List[AbstractMapa]) -> None:
         self.__jogador: Jogador = jogador
         self.__hud = HUD(self.__jogador.status, self.__jogador.escudo, self.__jogador.arma)
+        self.__music = MusicHandler()
 
         self.__PLAYER_WON = False
         self.__MAX_DELAY_CHANGE_MAP = 100
@@ -41,6 +43,7 @@ class AbstractFase(ABC):
     def start(self, tela: TelaJogo):
         self.__jogador.mapa = self.__current_map
         self.__current_map.iniciar_rodada(tela)
+        self.__music.play_music(self.__current_map.background_music_path)
 
     def desenhar(self, tela: TelaJogo) -> None:
         self.__current_map.desenhar(tela)
@@ -55,12 +58,10 @@ class AbstractFase(ABC):
                 self.__PLAYER_WON = True
             elif self.__CURRENT_DELAY_CHANGE_MAP == 0:
                 self.__set_next_map()
-                self.__CURRENT_DELAY_CHANGE_MAP = self.__MAX_DELAY_CHANGE_MAP
 
         if self.__current_map.go_previous_map:
             if self.__current_map_index != 0 and self.__CURRENT_DELAY_CHANGE_MAP == 0:
                 self.__set_previous_map()
-                self.__CURRENT_DELAY_CHANGE_MAP = self.__MAX_DELAY_CHANGE_MAP
 
     def __set_previous_map(self):
         previous_map = self.__maps_list[self.__current_map_index - 1]
@@ -68,6 +69,8 @@ class AbstractFase(ABC):
         self.__current_map_index -= 1
         self.__current_map.change_player_position_returning_map()
         self.__jogador.mapa = self.__current_map
+        self.__CURRENT_DELAY_CHANGE_MAP = self.__MAX_DELAY_CHANGE_MAP
+        self.__music.play_music(self.__current_map.background_music_path)
 
     def __set_next_map(self):
         next_map = self.__maps_list[self.__current_map_index + 1]
@@ -77,6 +80,8 @@ class AbstractFase(ABC):
             self.__current_map.load()
         self.__current_map.change_player_position_entering_map()
         self.__jogador.mapa = self.__current_map
+        self.__CURRENT_DELAY_CHANGE_MAP = self.__MAX_DELAY_CHANGE_MAP
+        self.__music.play_music(self.__current_map.background_music_path)
 
     @property
     def _jogador(self) -> Jogador:

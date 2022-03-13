@@ -12,14 +12,22 @@ class AbstractItem(ABC):
     def check_aplicado(self) -> bool:
         pass
 
+    @property
     @abstractmethod
     def image(self) -> Surface:
         pass
 
+    @property
     @abstractmethod
     def rect(self) -> Rect:
         pass
 
+    @property
     @abstractmethod
     def posicao(self) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def sound_path(self) -> str:
         pass

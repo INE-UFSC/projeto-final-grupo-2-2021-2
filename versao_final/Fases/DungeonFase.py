@@ -11,12 +11,14 @@ from Personagens.Inimigos.MinotauroCinza import MinotauroCinza
 from Personagens.Inimigos.MinotauroMarrom import MinotauroMarrom
 from Personagens.Inimigos.ReaperVerde import ReaperVerde
 from Fases.AbstractFase import AbstractFase
+from Sounds.MusicHandler import MusicHandler
 
 
 class DungeonFase(AbstractFase):
     def __init__(self, jogador: Jogador) -> None:
         self.__opcoes = Opcoes()
         self.__dificuldade = self.__opcoes.dificuldade
+        self.__music = MusicHandler()
 
         first_enemies = self.__get_enemies_first_map()
         map1 = DungeonMap1(jogador, first_enemies)

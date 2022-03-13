@@ -6,6 +6,7 @@ from Utils.Folder import import_single_sprite
 class PocaoGenerica(AbstractItem):
     __PATH_TO_SPRITE = {}
     __SIZE_TO_SPRITE = {}
+    __GENERIC_POTION_SOUND_PATH = 'Sounds/sounds/potions.wav'
 
     def __init__(self, path: str, size: tuple) -> None:
         if path not in PocaoGenerica.__PATH_TO_SPRITE or size not in PocaoGenerica.__SIZE_TO_SPRITE:
@@ -21,3 +22,7 @@ class PocaoGenerica(AbstractItem):
     @classmethod
     def __load_image(cls, path: str, size: tuple) -> Surface:
         return import_single_sprite(path, size)
+
+    @property
+    def sound_path(self) -> str:
+        return PocaoGenerica.__GENERIC_POTION_SOUND_PATH

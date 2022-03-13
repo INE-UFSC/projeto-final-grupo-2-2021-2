@@ -52,6 +52,20 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def animate(self) -> None:
         pass
 
+    def tomar_dano(self, dano: int) -> int:
+        if self.__state.MORRENDO:
+            return 0
+
+        if type(dano) == int:
+            dano_real = dano - self.status.defesa
+            if dano_real > 0:
+                self.status.vida -= dano_real
+                return dano_real
+            else:
+                return 0
+        else:
+            return 0
+
     def mover(self, hit_jogador: Hitbox) -> None:
         if self.__state.MORRENDO:
             return None
