@@ -11,6 +11,7 @@ from Objetos.ObstaculoInvisivel import ObjetoInvisivel
 from Personagens.AbstractSignal import AbstractSignal
 from Sounds.MusicHandler import MusicHandler
 from Utils.Adapter import Adapter
+from Utils.Ataque import Ataque
 from Utils.Hitbox import Hitbox
 from Personagens.Jogador import Jogador
 from Config.Opcoes import Opcoes
@@ -288,79 +289,24 @@ class AbstractMapa(ABC):
         self.__inimigos.extend(inimigos)
 
     def __executar_ataque(self, personagem: AbstractPersonagem):
-        ponto1 = personagem.hitbox.center
-        pontos_2 = personagem.pontos_para_ataque()
-
-        pontos = []
-        for ponto2 in pontos_2:
-            func = GAHandler.gerar_equação_vetorial_reta(ponto1, ponto2)
-
-            x = 0.6
-            step = 0.2
-            alcance = self.__adapter.alcance_to_vector_dist(personagem.alcance)
-            while x < alcance:
-                ponto = func(x)
-
-                # Código para testes
-                self.__pontos.append(ponto)
-                pontos.append(ponto)
-                x += step
+        p1 = personagem.hitbox.center
+        p2 = personagem.pontos_para_ataque()
+        ataque = Ataque(p1, p2, personagem.alcance, personagem.dano)
 
         for inimigo in self.__inimigos:
-            rect_inimigo = Rect(inimigo.hitbox.posicao, inimigo.hitbox.tamanho)
-
-            for ponto in pontos:
-                if rect_inimigo.collidepoint(ponto):
-                    dano = personagem.dano
-                    dano_causado = inimigo.tomar_dano(dano)
-                    if dano_causado > 0:
-                        effect = DamageTaken(dano_causado, inimigo.hitbox.midtop)
-                        self.__effect_handler.add_effect(effect)
-                    break
+            dano_tomado = inimigo.receber_ataque(ataque)
+            if dano_tomado > 0:
+                effect = DamageTaken(dano_tomado, inimigo.hitbox.midtop)
+                self.__effect_handler.add_effect(effect)
 
     def __executar_ataque_inimigo(self, personagem: AbstractPersonagem):
-        ponto1 = personagem.hitbox.center
-        pontos_2 = personagem.pontos_para_ataque()
+        p1 = personagem.hitbox.center
+        p2 = personagem.pontos_para_ataque()
+        ataque = Ataque(p1, p2, personagem.alcance, personagem.dano)
 
-        pontos = []
-        for ponto2 in pontos_2:
-            func = GAHandler.gerar_equação_vetorial_reta(ponto1, ponto2)
-
-            x = 0.6
-            step = 0.2
-            alcance = self.__adapter.alcance_to_vector_dist(personagem.alcance)
-            while x < alcance:
-                ponto = func(x)
-
-                # Código para testes
-                self.__pontos.append(ponto)
-                pontos.append(ponto)
-                x += step
-
-        acertou_jogador = False
-        rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
-        for ponto in pontos:
-            if rect_jogador.collidepoint(ponto):
-                acertou_jogador = True
-                break
-
-        acertou_escudo = False
-        for ponto in pontos:
-            rect_escudo = self.__jogador.get_rect_escudo()
-            if rect_escudo.collidepoint(ponto):
-                acertou_escudo = True
-                break
-
-        dano_causado = 0
-        if acertou_escudo:
-            dano = personagem.dano
-            dano_causado = self.__jogador.tomar_dano_escudo(dano)
-        elif acertou_jogador:
-            dano = personagem.dano
-            dano_causado = self.__jogador.tomar_dano(dano)
-
-        if dano_causado > 0:
-            effect = DamageTaken(dano_causado, self.__jogador.hitbox.midtop)
+        dano_tomado = self.__jogador.receber_ataque(ataque)
+        if dano_tomado > 0:
+            effect = DamageTaken(dano_tomado, self.__jogador.hitbox.midtop)
             self.__effect_handler.add_effect(effect)
 
     def __get_AStar_pathfinder_for_hitbox(self, hitbox: Hitbox) -> AStar:

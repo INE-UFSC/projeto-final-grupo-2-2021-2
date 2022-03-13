@@ -33,18 +33,6 @@ class Adapter(Singleton):
             changed_list.append(self.pygame_pos_to_matrix_index(position))
         return changed_list
 
-    def alcance_to_vector_dist(self, alcance: int) -> int:
-        ratio = 100 / (self.__opcoes.MAX_ALCANCE - self.__opcoes.MIN_ALCANCE)
-        aumento = alcance / ratio
-
-        return self.__opcoes.MIN_ALCANCE + aumento
-
-    def vel_ataque_to_delay(self, vel_ataque: int) -> int:
-        ratio = 10 / (self.__opcoes.MAX_DELAY_ATAQUE - self.__opcoes.MIN_DELAY_ATAQUE)
-        velocidade = vel_ataque / ratio
-
-        return self.__opcoes.MAX_DELAY_ATAQUE - velocidade
-
     def __inverter_ponto(self, position: tuple) -> tuple:
         return (position[1], position[0])
 

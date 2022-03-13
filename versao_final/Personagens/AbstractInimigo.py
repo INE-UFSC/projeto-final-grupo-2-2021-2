@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from Config.Enums import Estado
+from Utils.Ataque import Ataque
 from Utils.Hitbox import Hitbox
 from Personagens.AbstractPersonagem import AbstractPersonagem
 from Personagens.EnemyState import EnemyState
@@ -51,6 +52,13 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     @abstractmethod
     def animate(self) -> None:
         pass
+
+    def receber_ataque(self, ataque: Ataque) -> int:
+        if ataque.acertou_hitbox(self.hitbox):
+            dano_tomado = self.tomar_dano(ataque.dano)
+            return dano_tomado
+        else:
+            return 0
 
     def tomar_dano(self, dano: int) -> int:
         if self.__state.MORRENDO:

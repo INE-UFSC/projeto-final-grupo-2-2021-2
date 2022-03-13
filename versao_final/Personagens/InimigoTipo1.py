@@ -5,6 +5,7 @@ from Config.Enums import Direction
 from Personagens.AbstractInimigo import AbstractInimigo
 from Mapas.AbstractMapa import AbstractMapa
 from Utils.Adapter import Adapter
+from Utils.Converter import Converter
 from Utils.Folder import import_fliped_folder, import_folder
 from Utils.Hitbox import Hitbox
 from random import random
@@ -37,7 +38,7 @@ class InimigoTipo1(AbstractInimigo):
         self.__MORREU = False
         self.__LAST_ANIMATION = 'Idle'
         self.__ANIMACAO_RESETADA = False
-        self.__MAX_DELAY_ATAQUE = self.__adapter.vel_ataque_to_delay(self.vel_ataque)
+        self.__MAX_DELAY_ATAQUE = Converter.vel_ataque_to_delay(self.vel_ataque)
         self.__CURRENT_DELAY_ATAQUE = 0
 
     def __import_character_assets(self) -> List[Dict]:

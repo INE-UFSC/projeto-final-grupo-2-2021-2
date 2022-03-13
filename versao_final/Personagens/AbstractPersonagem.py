@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from Config.Enums import Direction
 from Itens.Armas.AbstractArma import AbstractArma
+from Utils.Ataque import Ataque
 from Utils.Hitbox import Hitbox
 from Itens.Armas.EspadaBasica import EspadaBasica
 from Personagens.Status import Status
@@ -35,17 +36,9 @@ class AbstractPersonagem(ABC):
         else:
             return False
 
-    def tomar_dano(self, dano: int) -> int:
-        if type(dano) == int:
-            dano_real = dano - self.__status.defesa
-            if dano_real > 0:
-                self.__status.vida -= dano_real
-                self.__ACABOU_DE_TOMAR_DANO = True
-                return dano_real
-            else:
-                return 0
-        else:
-            return 0
+    @abstractmethod
+    def receber_ataque(self, ataque: Ataque) -> int:
+        pass
 
     def _atualizar_frente(self, x_movement: int, y_movement: int) -> None:
         if x_movement < 0:

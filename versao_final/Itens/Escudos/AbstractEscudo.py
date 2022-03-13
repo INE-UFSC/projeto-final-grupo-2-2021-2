@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from pygame import Rect
 from Config.Enums import Direction
 from Utils.Hitbox import Hitbox
 
@@ -18,7 +17,7 @@ class AbstractEscudo(ABC):
         pass
 
     @abstractmethod
-    def get_rect(self, direction: Direction) -> Rect:
+    def hitbox(self, direction: Direction) -> Hitbox:
         pass
 
     @property

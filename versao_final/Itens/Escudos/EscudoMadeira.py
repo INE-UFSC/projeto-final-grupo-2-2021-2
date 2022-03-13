@@ -43,18 +43,18 @@ class EscudoMadeira(AbstractEscudo):
         else:
             return dano
 
-    def get_rect(self, direction: Direction) -> Rect:
+    def hitbox(self, direction: Direction) -> Hitbox:
         direita = [Direction.DIREITA_BAIXO, Direction.DIREITA_CIMA, Direction.DIREITA_MEIO]
         esquerda = [Direction.ESQUERDA_BAIXO, Direction.ESQUERDA_MEIO, Direction.ESQUERDA_CIMA]
 
         if direction in direita:
-            return Rect(self.__hitbox.topright, (4, self.__hitbox.altura))
+            return Hitbox(self.__hitbox.topright, (4, self.__hitbox.altura))
         elif direction in esquerda:
-            return Rect(self.__hitbox.topleft, (4, self.__hitbox.altura))
+            return Hitbox(self.__hitbox.topleft, (4, self.__hitbox.altura))
         elif direction == Direction.MEIO_CIMA:
-            return Rect(self.__hitbox.topleft, (self.__hitbox.largura, 4))
+            return Hitbox(self.__hitbox.topleft, (self.__hitbox.largura, 4))
         else:
-            return Rect(self.__hitbox.bottomleft, (self.__hitbox.largura, 4))
+            return Hitbox(self.__hitbox.bottomleft, (self.__hitbox.largura, 4))
 
     @property
     def movement_slow(self) -> int:

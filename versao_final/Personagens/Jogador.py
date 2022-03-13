@@ -5,6 +5,7 @@ from Itens.Escudos.EscudoMadeira import EscudoMadeira
 from Personagens.AbstractPersonagem import AbstractPersonagem
 from Itens.AbstractItem import AbstractItem
 from Config.Enums import Direction
+from Utils.Ataque import Ataque
 from Utils.Folder import import_folder
 
 
@@ -99,6 +100,21 @@ class Jogador(AbstractPersonagem):
                 return dano_real
             else:
                 return 0
+        else:
+            return 0
+
+    def receber_ataque(self, ataque: Ataque) -> int:
+        if ataque.acertou_hitbox(self.escudo.hitbox(self.direction)):
+            dano_passado = self.__escudo.tomar_dano(ataque.dano)
+
+            if dano_passado > 0:
+                dano_tomado = self.tomar_dano(dano_passado)
+                return dano_tomado
+            else:
+                return 0
+        elif ataque.acertou_hitbox(self.hitbox):
+            dano_tomado = self.tomar_dano(ataque.dano)
+            return dano_tomado
         else:
             return 0
 
