@@ -2,6 +2,7 @@ from pygame import Rect, Surface, draw, font
 from copy import deepcopy
 from Config.Opcoes import Opcoes
 from Config.TelaJogo import TelaJogo
+from Itens.EscudoMadeira import EscudoMadeira
 from Personagens.Status import Status
 from Utils.Folder import import_single_sprite
 
@@ -19,6 +20,9 @@ class HUD:
     __LIFE_POS = (134, 48)
     __LIFE_SIZE = (297, 24)
 
+    __SHIELD_BAR_POS = (131, 75)
+    __SHIELD_BAR_SIZE = (300, 28)
+
     __ARROW_UP_PATH = 'Assets/HUD/ArrowUp.png'
     __ARROW_DOWN_PATH = 'Assets/HUD/ArrowDown.png'
     __ARROW_SIZE = (16, 15)
@@ -27,9 +31,11 @@ class HUD:
     __STRENGTH_ARROW_POS = (508, 60)
     __VEL_ARROW_POS = (506, 100)
 
-    def __init__(self, status: Status) -> None:
+    def __init__(self, status: Status, escudo: EscudoMadeira) -> None:
         self.__status_inicial = deepcopy(status)
         self.__status = status
+        self.__escudo = escudo
+
         self.__posicao = Opcoes().POSICAO_HUD
         self.__image = import_single_sprite(HUD.__PATH, HUD.__SIZE)
         self.__arrow_up = import_single_sprite(HUD.__ARROW_UP_PATH, HUD.__ARROW_SIZE)
@@ -44,6 +50,12 @@ class HUD:
         self.__current_health = self.__status.vida
         self.__health_change_speed = 1
         self.__health_ratio = self.__status.vida_maxima / HUD.__LIFE_SIZE[0]
+
+        self.__current_shield_health = self.__escudo.vida
+        self.__last_shield_health = self.__escudo.vida
+        self.__target_shield_health = self.__escudo.vida
+        self.__shield_health_change_speed = 1
+        self.__shield_health_ratio = self.__escudo.vida_maxima / HUD.__SHIELD_BAR_SIZE[0]
 
     def image(self) -> Surface:
         return self.__image
@@ -71,7 +83,26 @@ class HUD:
 
         self.__last_health = self.__status.vida
 
-    def desenhar(self, tela: TelaJogo):
+        shield_damage_taken = False
+        shield_health_received = False
+        shield_health_diff = self.__escudo.vida - self.__last_shield_health
+        if shield_health_diff < 0:
+            shield_damage_taken = True
+        elif shield_health_diff > 0:
+            shield_health_received = True
+
+        if shield_damage_taken:
+            self.__target_shield_health += shield_health_diff
+            if self.__target_shield_health < 0:
+                self.__target_shield_health = 0
+        if shield_health_received:
+            self.__target_shield_health += shield_health_diff
+            if self.__target_shield_health > self.__escudo.vida_maxima:
+                self.__target_shield_health = self.__escudo.vida_maxima
+
+        self.__last_shield_health = self.__escudo.vida
+
+    def desenhar(self, tela: TelaJogo) -> None:
         self.__update()
 
         tela.janela.blit(self.__image, self.__rect)
@@ -107,6 +138,7 @@ class HUD:
         tela.janela.blit(chance_critica_surf, chance_critica_rect)
 
         self.__desenhar_vida(tela)
+        self.__desenhar_vida_escudo(tela)
         self.__desenhar_efeitos(tela)
 
     def __desenhar_vida(self, tela: TelaJogo):
@@ -132,7 +164,31 @@ class HUD:
         draw.rect(tela.janela, (255, 0, 0), health_rect)
         draw.rect(tela.janela, diff_color, diff_rect)
 
-    def __desenhar_efeitos(self, tela: TelaJogo):
+    def __desenhar_vida_escudo(self, tela: TelaJogo) -> None:
+        shield_bar_width = int(self.__current_shield_health / self.__shield_health_ratio)
+        diff_health = self.__target_shield_health - self.__current_shield_health
+        diff_width = int(diff_health / self.__shield_health_ratio)
+
+        # Perdendo vida
+        if self.__current_shield_health > self.__target_shield_health:
+            diff_color = (105, 105, 204)
+            self.__current_shield_health -= self.__shield_health_change_speed
+        # Ganhando Vida
+        elif self.__current_shield_health < self.__target_shield_health:
+            diff_color = (0, 0, 122)
+            self.__current_shield_health += self.__shield_health_change_speed
+        else:
+            diff_color = (0, 0, 0)  # Vermelho
+
+        health_rect = Rect(HUD.__SHIELD_BAR_POS, (shield_bar_width, HUD.__SHIELD_BAR_SIZE[1]))
+        diff_rect = Rect(health_rect.right,
+                         HUD.__SHIELD_BAR_POS[1], diff_width, HUD.__SHIELD_BAR_SIZE[1])
+        diff_rect.normalize()
+
+        draw.rect(tela.janela, (0, 0, 150), health_rect)
+        draw.rect(tela.janela, diff_color, diff_rect)
+
+    def __desenhar_efeitos(self, tela: TelaJogo) -> None:
         if self.__status.defesa > self.__status_inicial.defesa:
             rect = self.__arrow_up.get_rect(center=HUD.__DEFENSE_ARROW_POS)
             tela.janela.blit(self.__arrow_up, rect)

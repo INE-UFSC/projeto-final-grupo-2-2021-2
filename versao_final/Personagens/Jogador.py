@@ -1,5 +1,6 @@
 from typing import List
 import pygame
+from Itens.EscudoMadeira import EscudoMadeira
 from Personagens.AbstractPersonagem import AbstractPersonagem
 from Itens.AbstractItem import AbstractItem
 from Config.Enums import Direction
@@ -22,10 +23,11 @@ class Jogador(AbstractPersonagem):
     }
 
     def __init__(self, posicao: tuple, nome: str, mapa=None) -> None:
+        super().__init__(stats=Jogador.__STATS, posicao=posicao, tamanho=(30, 48), mapa=mapa)
+
         self.__itens: List[AbstractItem] = []
         self.__nome = nome
-
-        super().__init__(stats=Jogador.__STATS, posicao=posicao, tamanho=(30, 48), mapa=mapa)
+        self.__escudo = EscudoMadeira(self.hitbox)
 
         if not Jogador.__ANIMACOES_IMPORTADAS:
             Jogador.__import_character_assets()
@@ -38,12 +40,17 @@ class Jogador(AbstractPersonagem):
         self.__ANIMACAO_RESETADA = False
         self.__FRAME_TO_WAIT = 0
         self.__MORREU = False
-        self.__ACABOU_DE_TOMAR_DANO = False
+        self.__DEFENDENDO = False
 
         self.__str_direction = self.__get_direction_sprites()
         self.__animations = Jogador.__animations[self.__animation][self.__str_direction]
         self.__image = self.image
         self.__rect = self.rect
+        self.__escudo_rect = pygame.Rect(0, 0, 0, 0)
+
+    @property
+    def escudo(self) -> EscudoMadeira:
+        return self.__escudo
 
     def processar_inputs(self) -> None:
         keys = pygame.key.get_pressed()
@@ -60,9 +67,16 @@ class Jogador(AbstractPersonagem):
 
         if keys[pygame.K_e]:
             self.mapa.pegar_item()
-        if keys[pygame.K_j]:
-            if self.__atacar():
-                self.__set_animation('Attacking')
+
+        if keys[pygame.K_k]:
+            if self.__animation != 'Attacking' and not self.__escudo.quebrado:
+                self.__DEFENDENDO = True
+        else:
+            self.__DEFENDENDO = False
+            if keys[pygame.K_j]:
+                if self.__atacar():
+                    self.__set_animation('Attacking')
+
         if keys[pygame.K_a] or keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_d]:
             self.__mover(keys)
             self.__set_animation('Walking')
@@ -89,6 +103,33 @@ class Jogador(AbstractPersonagem):
         else:
             return 0
 
+    def tomar_dano_escudo(self, dano: int) -> int:
+        dano_passado = self.__escudo.tomar_dano(dano)
+        if dano_passado > 0:
+            self.tomar_dano(dano_passado)
+
+    def __atualizar_rect_escudo(self) -> None:
+        if self.__DEFENDENDO:
+            direita = [Direction.DIREITA_BAIXO, Direction.DIREITA_CIMA, Direction.DIREITA_MEIO]
+            esquerda = [Direction.ESQUERDA_BAIXO, Direction.ESQUERDA_MEIO, Direction.ESQUERDA_CIMA]
+            if self.direction in direita:
+                self.__escudo_rect = pygame.Rect(self.hitbox.topright, (4, self.hitbox.altura))
+            elif self.direction in esquerda:
+                self.__escudo_rect = pygame.Rect(self.hitbox.topleft, (4, self.hitbox.altura))
+            elif self.direction == Direction.MEIO_CIMA:
+                self.__escudo_rect = pygame.Rect(self.hitbox.topleft, (self.hitbox.largura, 4))
+            else:
+                self.__escudo_rect = pygame.Rect(self.hitbox.bottomleft, (self.hitbox.largura, 4))
+        else:
+            self.__escudo_rect = pygame.Rect(0, 0, 0, 0)
+        self.__escudo_rect.normalize()
+
+    def get_rect_escudo(self) -> pygame.Rect:
+        return self.__escudo_rect
+
+    def pontos_defendendo(self) -> list:
+        pass
+
     def pontos_para_ataque(self) -> list:
         return super().pontos_para_ataque()
 
@@ -100,6 +141,11 @@ class Jogador(AbstractPersonagem):
         for item in self.__itens:
             if item.check_aplicado():
                 self.__itens.remove(item)
+        self.__escudo.update()
+        if self.__escudo.quebrado:
+            self.__DEFENDENDO = False
+
+        self.__atualizar_rect_escudo()
 
     @classmethod
     def __import_character_assets(cls):
@@ -209,7 +255,7 @@ class Jogador(AbstractPersonagem):
             return 'Cima'
 
     def __mover(self, keys) -> None:
-        if self.__animation == 'Attacking' or self.__animation == 'Dying':
+        if self.__animation == 'Dying' or self.__animation == 'Attacking':
             return None
 
         tentar_esquerda = keys[pygame.K_a]
@@ -250,4 +296,5 @@ class Jogador(AbstractPersonagem):
             if self.mapa.validar_movimento(personagem=self, posicao=nova_posicao_y):
                 self.hitbox.posicao = nova_posicao_y
 
-        self._atualizar_frente(x_movement, y_movement)
+        if not self.__DEFENDENDO:
+            self._atualizar_frente(x_movement, y_movement)

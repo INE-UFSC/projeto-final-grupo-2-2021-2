@@ -43,7 +43,6 @@ class Adapter(Singleton):
         ratio = 10 / (self.__opcoes.MAX_DELAY_ATAQUE - self.__opcoes.MIN_DELAY_ATAQUE)
         velocidade = vel_ataque / ratio
 
-        print(self.__opcoes.MAX_DELAY_ATAQUE - velocidade)
         return self.__opcoes.MAX_DELAY_ATAQUE - velocidade
 
     def __inverter_ponto(self, position: tuple) -> tuple:

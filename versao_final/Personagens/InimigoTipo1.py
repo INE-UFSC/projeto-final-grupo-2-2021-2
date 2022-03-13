@@ -37,7 +37,7 @@ class InimigoTipo1(AbstractInimigo):
         self.__MORREU = False
         self.__LAST_ANIMATION = 'Idle'
         self.__ANIMACAO_RESETADA = False
-        self.__MAX_DELAY_ATAQUE = 60
+        self.__MAX_DELAY_ATAQUE = self.__adapter.vel_ataque_to_delay(self.vel_ataque)
         self.__CURRENT_DELAY_ATAQUE = 0
 
     def __import_character_assets(self) -> List[Dict]:

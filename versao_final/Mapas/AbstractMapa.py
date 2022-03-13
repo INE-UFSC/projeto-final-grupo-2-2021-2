@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from math import ceil
 from typing import List, Type
+
+import pygame
 from Personagens.AbstractInimigo import AbstractInimigo
 from Itens.AbstractItem import AbstractItem
 from Mapas.MapInterpreter import MapInterpreter
@@ -96,6 +98,10 @@ class AbstractMapa(ABC):
 
         self.__desenhar_pontos(tela)
         tela.janela.blit(self.__jogador.image, self.__jogador.rect)
+
+        rect_escudo = self.__jogador.get_rect_escudo()
+        color = (0, 0, 255)
+        pygame.draw.rect(tela.janela, color, rect_escudo)
 
     def pegar_item(self) -> AbstractItem:
         rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
@@ -273,7 +279,7 @@ class AbstractMapa(ABC):
         for ponto2 in pontos_2:
             func = gerar_equação_vetorial_reta(ponto1, ponto2)
 
-            x = 1
+            x = 0.6
             step = 0.2
             alcance = self.__adapter.alcance_to_vector_dist(personagem.alcance)
             while x < alcance:
@@ -301,7 +307,7 @@ class AbstractMapa(ABC):
         for ponto2 in pontos_2:
             func = gerar_equação_vetorial_reta(ponto1, ponto2)
 
-            x = 1
+            x = 0.6
             step = 0.2
             alcance = self.__adapter.alcance_to_vector_dist(personagem.alcance)
             while x < alcance:
@@ -312,12 +318,26 @@ class AbstractMapa(ABC):
                 pontos.append(ponto)
                 x += step
 
+        acertou_jogador = False
         rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
         for ponto in pontos:
             if rect_jogador.collidepoint(ponto):
-                dano = personagem.dano
-                dano_causado = self.__jogador.tomar_dano(dano)
+                acertou_jogador = True
                 break
+
+        acertou_escudo = False
+        for ponto in pontos:
+            rect_escudo = self.__jogador.get_rect_escudo()
+            if rect_escudo.collidepoint(ponto):
+                acertou_escudo = True
+                break
+
+        if acertou_escudo:
+            dano = personagem.dano
+            self.__jogador.tomar_dano_escudo(dano)
+        elif acertou_jogador:
+            dano = personagem.dano
+            dano_causado = self.__jogador.tomar_dano(dano)
 
     def __get_AStar_pathfinder_for_hitbox(self, hitbox: Hitbox) -> AStar:
         proporcao = self._get_proporsion_for_hitbox(hitbox)

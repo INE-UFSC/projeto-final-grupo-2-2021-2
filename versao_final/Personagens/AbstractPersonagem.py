@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from Config.Enums import Direction
 from Utils.Hitbox import Hitbox
-from Personagens.Arma import Arma
+from Itens.Arma import Arma
 from Personagens.Status import Status
 
 
@@ -51,22 +51,22 @@ class AbstractPersonagem(ABC):
     def _atualizar_frente(self, x_movement: int, y_movement: int) -> None:
         if x_movement < 0:
             if y_movement < 0:
-                self.direction = Direction.ESQUERDA_CIMA
+                self.__direction = Direction.ESQUERDA_CIMA
             elif y_movement > 0:
-                self.direction = Direction.ESQUERDA_BAIXO
+                self.__direction = Direction.ESQUERDA_BAIXO
             else:
-                self.direction = Direction.ESQUERDA_MEIO
+                self.__direction = Direction.ESQUERDA_MEIO
         elif x_movement > 0:
             if y_movement < 0:
-                self.direction = Direction.DIREITA_CIMA
+                self.__direction = Direction.DIREITA_CIMA
             elif y_movement > 0:
-                self.direction = Direction.DIREITA_BAIXO
+                self.__direction = Direction.DIREITA_BAIXO
             else:
-                self.direction = Direction.DIREITA_MEIO
+                self.__direction = Direction.DIREITA_MEIO
         elif y_movement > 0:
-            self.direction = Direction.MEIO_BAIXO
+            self.__direction = Direction.MEIO_BAIXO
         elif y_movement < 0:
-            self.direction = Direction.MEIO_CIMA
+            self.__direction = Direction.MEIO_CIMA
 
         self.__LAST_POSITION = self.hitbox.posicao
 
