@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from Config.Enums import Direction
+from Itens.Armas.AbstractArma import AbstractArma
 from Utils.Hitbox import Hitbox
-from Itens.Arma import Arma
+from Itens.Armas.EspadaBasica import EspadaBasica
 from Personagens.Status import Status
 
 
@@ -11,9 +12,7 @@ class AbstractPersonagem(ABC):
         self.__status = Status(stats)
         self.__direction = Direction.MEIO_BAIXO
 
-        dano = stats['arma_dano'] if 'arma_dano' in stats.keys() else 2
-        alcance = stats['arma_alcance'] if 'arma_alcance' in stats.keys() else 10
-        self.__arma = Arma(dano, alcance)
+        self.__arma: AbstractArma = EspadaBasica()
 
         self.__ACABOU_DE_TOMAR_DANO = False
         self.__hitbox = Hitbox(posicao, tamanho)
@@ -162,12 +161,12 @@ class AbstractPersonagem(ABC):
         self.__status.invencibilidade = value
 
     @property
-    def arma(self) -> Arma:
+    def arma(self) -> AbstractArma:
         return self.__arma
 
     @arma.setter
     def arma(self, arma) -> None:
-        if isinstance(arma, Arma):
+        if isinstance(arma, AbstractArma):
             self.__arma = arma
 
     @property

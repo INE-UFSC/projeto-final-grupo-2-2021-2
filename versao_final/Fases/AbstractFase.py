@@ -9,7 +9,7 @@ from Personagens.HUD import HUD
 class AbstractFase(ABC):
     def __init__(self, jogador: Jogador, mapas: List[AbstractMapa]) -> None:
         self.__jogador: Jogador = jogador
-        self.__hud = HUD(self.__jogador.status, self.__jogador.escudo)
+        self.__hud = HUD(self.__jogador.status, self.__jogador.escudo, self.__jogador.arma)
 
         self.__PLAYER_WON = False
         self.__MAX_DELAY_CHANGE_MAP = 100

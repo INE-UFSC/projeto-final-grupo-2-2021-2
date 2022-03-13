@@ -1,4 +1,4 @@
-class Status():
+class Status:
     def __init__(self, status: dict) -> None:
         self.__vida_maxima = status['vida'] if 'vida' in status.keys() else 0
         self.__ataque = status['ataque'] if 'ataque' in status.keys() else 0

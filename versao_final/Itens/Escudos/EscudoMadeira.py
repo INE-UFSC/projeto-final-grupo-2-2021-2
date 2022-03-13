@@ -1,13 +1,15 @@
 from pygame import Rect
 from Config.Enums import Direction
+from Itens.Escudos.AbstractEscudo import AbstractEscudo
 from Utils.Hitbox import Hitbox
 
 
-class EscudoMadeira:
+class EscudoMadeira(AbstractEscudo):
     __DEFESA = 3
     __VIDA = 20
     __REGENERATION_RATE = 1
     __REGENERATION_DELAY = 200
+    __MOVEMENT_SLOW = 1
 
     def __init__(self, player_hitbox: Hitbox) -> None:
         self.__defesa = EscudoMadeira.__DEFESA
@@ -53,6 +55,10 @@ class EscudoMadeira:
             return Rect(self.__hitbox.topleft, (self.__hitbox.largura, 4))
         else:
             return Rect(self.__hitbox.bottomleft, (self.__hitbox.largura, 4))
+
+    @property
+    def movement_slow(self) -> int:
+        return EscudoMadeira.__MOVEMENT_SLOW
 
     @property
     def vida_maxima(self) -> int:

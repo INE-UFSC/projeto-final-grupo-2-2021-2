@@ -1,6 +1,7 @@
 from typing import List
 import pygame
-from Itens.EscudoMadeira import EscudoMadeira
+from Itens.Escudos.AbstractEscudo import AbstractEscudo
+from Itens.Escudos.EscudoMadeira import EscudoMadeira
 from Personagens.AbstractPersonagem import AbstractPersonagem
 from Itens.AbstractItem import AbstractItem
 from Config.Enums import Direction
@@ -17,8 +18,6 @@ class Jogador(AbstractPersonagem):
         'defesa': 5,
         'vel': 3,
         'vel_ataque': 1,
-        'arma_dano': 3,
-        'arma_alcance': 20,
         'transpassavel': False
     }
 
@@ -27,7 +26,7 @@ class Jogador(AbstractPersonagem):
 
         self.__itens: List[AbstractItem] = []
         self.__nome = nome
-        self.__escudo = EscudoMadeira(self.hitbox)
+        self.__escudo: AbstractEscudo = EscudoMadeira(self.hitbox)
 
         if not Jogador.__ANIMACOES_IMPORTADAS:
             Jogador.__import_character_assets()
@@ -272,17 +271,22 @@ class Jogador(AbstractPersonagem):
             tentar_cima = False
             tentar_baixo = False
 
+        if self.__DEFENDENDO:
+            vel = self.vel - self.__escudo.movement_slow
+        else:
+            vel = self.vel
+
         if tentar_esquerda:
-            x_movement = - self.vel
+            x_movement = - vel
         elif tentar_direita:
-            x_movement = self.vel
+            x_movement = vel
         else:
             x_movement = 0
 
         if tentar_cima:
-            y_movement = - self.vel
+            y_movement = - vel
         elif tentar_baixo:
-            y_movement = self.vel
+            y_movement = vel
         else:
             y_movement = 0
 

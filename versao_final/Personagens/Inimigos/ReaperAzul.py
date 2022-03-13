@@ -6,12 +6,12 @@ class ReaperAzul(InimigoTipo1):
     __TAMANHO_IMAGEM = (80, 80)
     __TAMANHO = (35, 45)
     __SPRITE_PATH = 'Assets/Personagens/Reaper/ReaperAzul/'
-    __STATS_FACIL = {'vida': 12, 'ataque': 3, 'defesa': 3, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 3,
-                     'arma_alcance': 16, 'view_distance': 100, 'transpassavel': False}
-    __STATS_MEDIO = {'vida': 18, 'ataque': 4, 'defesa': 4, 'vel': 2, 'vel_ataque': 1, 'arma_dano': 4,
-                     'arma_alcance': 16, 'view_distance': 100, 'transpassavel': False}
-    __STATS_DIFICIL = {'vida': 23, 'ataque': 5, 'defesa': 5, 'vel': 3, 'vel_ataque': 1, 'arma_dano': 5,
-                       'arma_alcance': 16, 'view_distance': 100, 'transpassavel': False}
+    __STATS_FACIL = {'vida': 12, 'ataque': 3, 'defesa': 3, 'vel': 2, 'vel_ataque': 1,
+                     'view_distance': 100, 'transpassavel': False}
+    __STATS_MEDIO = {'vida': 18, 'ataque': 4, 'defesa': 4, 'vel': 2, 'vel_ataque': 1,
+                     'view_distance': 100, 'transpassavel': False}
+    __STATS_DIFICIL = {'vida': 23, 'ataque': 5, 'defesa': 5, 'vel': 3, 'vel_ataque': 1,
+                       'view_distance': 100, 'transpassavel': False}
     __DIST_PARA_ATAQUE = 7
     __CHANCE_DAMAGE_STOP_ATTACK = 0.2
     __FRAME_EXECUTAR_ATAQUE = 17

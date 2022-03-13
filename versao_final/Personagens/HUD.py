@@ -2,7 +2,8 @@ from pygame import Rect, Surface, draw, font
 from copy import deepcopy
 from Config.Opcoes import Opcoes
 from Config.TelaJogo import TelaJogo
-from Itens.EscudoMadeira import EscudoMadeira
+from Itens.Escudos.EscudoMadeira import AbstractEscudo
+from Itens.Armas.AbstractArma import AbstractArma
 from Personagens.Status import Status
 from Utils.Folder import import_single_sprite
 
@@ -31,9 +32,10 @@ class HUD:
     __STRENGTH_ARROW_POS = (508, 60)
     __VEL_ARROW_POS = (506, 100)
 
-    def __init__(self, status: Status, escudo: EscudoMadeira) -> None:
+    def __init__(self, status: Status, escudo: AbstractEscudo, arma: AbstractArma) -> None:
         self.__status_inicial = deepcopy(status)
         self.__status = status
+        self.__arma = arma
         self.__escudo = escudo
 
         self.__posicao = Opcoes().POSICAO_HUD
@@ -109,8 +111,8 @@ class HUD:
         defesa = f'{self.__status.defesa}'
         vel = f'{self.__status.vel}'
         strength = f'{self.__status.ataque}'
-        dano = f'3'
-        defesa_escudo = f'3'
+        dano = f'{self.__arma.dano}'
+        defesa_escudo = f'{self.__escudo.defesa}'
         chance_critica = f'3'
 
         defesa_surf = self.__font.render(defesa, False, self.__text_color)

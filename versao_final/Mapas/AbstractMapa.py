@@ -3,6 +3,7 @@ from math import ceil
 from typing import List, Type
 
 import pygame
+from Itens.Armas.EspadaBasica import EspadaBasica
 from Personagens.AbstractInimigo import AbstractInimigo
 from Itens.AbstractItem import AbstractItem
 from Mapas.MapInterpreter import MapInterpreter
