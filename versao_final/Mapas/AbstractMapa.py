@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from math import ceil
 from typing import List, Type
+from Effects.DamageTaken import DamageTaken
+from Effects.EffectsHandler import EffectsHandler
 from Personagens.AbstractInimigo import AbstractInimigo
 from Itens.AbstractItem import AbstractItem
 from Mapas.MapInterpreter import MapInterpreter
@@ -32,6 +34,7 @@ class AbstractMapa(ABC):
         self.__matrix = []
         self.__pontos = []
         self.__jogador = jogador
+        self.__effect_handler = EffectsHandler()
 
         self.__hitbox = Hitbox(self.__opcoes.POSICAO_MAPAS, self.__opcoes.TAMANHO_MAPAS)
 
@@ -109,6 +112,7 @@ class AbstractMapa(ABC):
         rect_escudo = self.__jogador.get_rect_escudo()
         color = (0, 0, 255)
         draw.rect(tela.janela, color, rect_escudo)
+        self.__effect_handler.desenhar(tela)
 
     def pegar_item(self) -> AbstractItem:
         rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
@@ -248,6 +252,8 @@ class AbstractMapa(ABC):
                 self.__itens_to_duration.pop(item)
                 self.__itens.remove(item)
 
+        self.__effect_handler.update()
+
     def __handle_item_drop(self, position: tuple) -> None:
         item = self._get_item_to_drop()
         if isinstance(item, AbstractItem):
@@ -304,6 +310,9 @@ class AbstractMapa(ABC):
                 if rect_inimigo.collidepoint(ponto):
                     dano = personagem.dano
                     dano_causado = inimigo.tomar_dano(dano)
+                    if dano_causado > 0:
+                        effect = DamageTaken(dano_causado, inimigo.hitbox.midtop)
+                        self.__effect_handler.add_effect(effect)
                     break
 
     def __executar_ataque_inimigo(self, personagem: AbstractPersonagem):
@@ -339,12 +348,17 @@ class AbstractMapa(ABC):
                 acertou_escudo = True
                 break
 
+        dano_causado = 0
         if acertou_escudo:
             dano = personagem.dano
-            self.__jogador.tomar_dano_escudo(dano)
+            dano_causado = self.__jogador.tomar_dano_escudo(dano)
         elif acertou_jogador:
             dano = personagem.dano
             dano_causado = self.__jogador.tomar_dano(dano)
+
+        if dano_causado > 0:
+            effect = DamageTaken(dano_causado, self.__jogador.hitbox.midtop)
+            self.__effect_handler.add_effect(effect)
 
     def __get_AStar_pathfinder_for_hitbox(self, hitbox: Hitbox) -> AStar:
         proporcao = self._get_proporsion_for_hitbox(hitbox)

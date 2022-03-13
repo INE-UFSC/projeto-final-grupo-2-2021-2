@@ -105,7 +105,10 @@ class Jogador(AbstractPersonagem):
     def tomar_dano_escudo(self, dano: int) -> int:
         dano_passado = self.__escudo.tomar_dano(dano)
         if dano_passado > 0:
-            self.tomar_dano(dano_passado)
+            dano_tomado = self.tomar_dano(dano_passado)
+            return dano_tomado
+        else:
+            return 0
 
     def __atualizar_rect_escudo(self) -> None:
         if self.__DEFENDENDO:
