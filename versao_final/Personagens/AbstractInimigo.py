@@ -20,7 +20,11 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__MUITO_PERTO = 4
         self.__MINIMO_PASSOS_NO_CAMINHO = 0
         self.__LAST_STATE = self.__state.state
+        self.__TOMOU_DANO = False
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 150
+
+    def _tomou_dano(self) -> bool:
+        return self.__TOMOU_DANO
 
     @property
     def _state(self) -> EnemyState:
@@ -47,6 +51,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
                 self.__send_signal()
             self.__LAST_STATE = self.__state.state
 
+        self.__TOMOU_DANO = False
         super().update()
 
     @abstractmethod
@@ -56,6 +61,9 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def receber_ataque(self, ataque: Ataque) -> int:
         if ataque.acertou_hitbox(self.hitbox):
             dano_tomado = self.tomar_dano(ataque.dano)
+            if dano_tomado > 0:
+                self.__TOMOU_DANO = True
+
             return dano_tomado
         else:
             return 0

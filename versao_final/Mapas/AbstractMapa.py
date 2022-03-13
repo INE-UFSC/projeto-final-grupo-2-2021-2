@@ -35,7 +35,6 @@ class AbstractMapa(ABC):
         self.__itens: List[AbstractItem] = []
         self.__itens_to_duration = {}
         self.__matrix = []
-        self.__pontos = []
         self.__jogador = jogador
         self.__effect_handler = EffectsHandler()
 
@@ -109,7 +108,6 @@ class AbstractMapa(ABC):
         for inimigo in self.__inimigos:
             tela.janela.blit(inimigo.image, inimigo.rect)
 
-        self.__desenhar_pontos(tela)
         tela.janela.blit(self.__jogador.image, self.__jogador.rect)
 
         rect_escudo = self.__jogador.get_rect_escudo()
@@ -181,9 +179,6 @@ class AbstractMapa(ABC):
         x = 0
         while x < 1:
             ponto = equação_vetorial(x)
-            # Código exclusivo para testes
-            # self.__pontos.append(ponto)
-
             ponto = self.__adapter.pygame_pos_to_matrix_index(ponto)
 
             if ponto in self.__map.positions_blocking_vision:
@@ -202,8 +197,6 @@ class AbstractMapa(ABC):
         x = 0
         while x < 1:
             ponto = equação_vetorial(x)
-            # Código exclusivo para testes
-            # self.__pontos.append(ponto)
 
             ponto = self.__adapter.pygame_pos_to_matrix_index(ponto)
             if ponto in self.__map.positions_blocking_movement:
@@ -403,14 +396,6 @@ class AbstractMapa(ABC):
             enemies_list.append(enemy)
 
         return enemies_list
-
-    # Código exclusivo para testes
-    def __desenhar_pontos(self, tela: TelaJogo):
-        for ponto in self.__pontos:
-            rect = Rect(ponto, (2, 2))
-            color = (0, 255, 255)
-            draw.rect(tela.janela, color, rect)
-        self.__pontos = []
 
     def __remover_inimigo(self, inimigo):
         self.__inimigos.remove(inimigo)

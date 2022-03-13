@@ -14,8 +14,6 @@ class AbstractPersonagem(ABC):
         self.__direction = Direction.MEIO_BAIXO
 
         self.__arma: AbstractArma = EspadaBasica()
-
-        self.__ACABOU_DE_TOMAR_DANO = False
         self.__hitbox = Hitbox(posicao, tamanho)
         self.__mapa = mapa
 
@@ -27,18 +25,6 @@ class AbstractPersonagem(ABC):
     def direction(self, value) -> Direction:
         if type(value) == Direction:
             self.__direction = value
-
-    @property
-    def _tomou_dano(self) -> bool:
-        if self.__ACABOU_DE_TOMAR_DANO:
-            self.__ACABOU_DE_TOMAR_DANO = False
-            return True
-        else:
-            return False
-
-    @abstractmethod
-    def receber_ataque(self, ataque: Ataque) -> int:
-        pass
 
     def _atualizar_frente(self, x_movement: int, y_movement: int) -> None:
         if x_movement < 0:
@@ -59,8 +45,6 @@ class AbstractPersonagem(ABC):
             self.__direction = Direction.MEIO_BAIXO
         elif y_movement < 0:
             self.__direction = Direction.MEIO_CIMA
-
-        self.__LAST_POSITION = self.hitbox.posicao
 
     @abstractmethod
     def pontos_para_ataque(self) -> list:
@@ -100,6 +84,10 @@ class AbstractPersonagem(ABC):
             return self.hitbox.midtop
         else:
             return self.hitbox.midtop
+
+    @abstractmethod
+    def receber_ataque(self, ataque: Ataque) -> int:
+        pass
 
     @abstractmethod
     def update(self):

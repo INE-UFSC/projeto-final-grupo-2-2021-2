@@ -17,7 +17,6 @@ class InimigoTipo1(AbstractInimigo):
 
     def __init__(self, mapa: AbstractMapa, path: str, posicao=(0, 0)) -> None:
         stats = self.__calibrar_dificuldade()
-        self.__adapter = Adapter()
         super().__init__(stats=stats, posicao=posicao, tamanho=self._TAMANHO, mapa=mapa)
 
         if path not in self.__PATH_TO_SPRITES:
@@ -150,7 +149,7 @@ class InimigoTipo1(AbstractInimigo):
 
         # Update para cancelar ataque caso jogador saia do range ou caso tome hit
         if self.__animation == 'Attacking':
-            if self._tomou_dano:
+            if self._tomou_dano():
                 if self.__will_damage_stop_attack():
                     self.__set_animation('Hurt')
             elif distancia > self.alcance + 10:
@@ -182,7 +181,7 @@ class InimigoTipo1(AbstractInimigo):
             self.__set_animation('Dying')
         elif self._state.ALERTA:
             self.__set_animation('Procurando')
-        elif self._tomou_dano:
+        elif self._tomou_dano():
             self.__set_animation('Hurt')
         elif self._state.ATACANDO:
             self.__set_animation('Walking')
