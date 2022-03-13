@@ -2,17 +2,19 @@ from typing import List
 from math import sqrt
 
 
-def gerar_equação_vetorial_reta(p1, p2):
-    def funcao(x):
-        sub = ((p2[0] - p1[0]) * x, (p2[1] - p1[1]) * x)
-        ponto = (p1[0] + sub[0], p1[1] + sub[1])
-        return ponto
+class GAHandler:
+    @classmethod
+    def gerar_equação_vetorial_reta(cls, p1, p2):
+        def funcao(x):
+            sub = ((p2[0] - p1[0]) * x, (p2[1] - p1[1]) * x)
+            ponto = (p1[0] + sub[0], p1[1] + sub[1])
+            return ponto
 
-    return funcao
+        return funcao
 
-
-def distancia_dois_pontos(p1: tuple, p2: tuple) -> float:
-    return ((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2) ** (1/2)
+    @classmethod
+    def distancia_dois_pontos(cls, p1: tuple, p2: tuple) -> float:
+        return ((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2) ** (1/2)
 
 
 class NodeHeap:

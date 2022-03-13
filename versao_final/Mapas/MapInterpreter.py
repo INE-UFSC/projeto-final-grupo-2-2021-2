@@ -1,4 +1,4 @@
-from random import choice
+from random import choice, shuffle
 
 
 class MapInterpreter:
@@ -18,6 +18,7 @@ class MapInterpreter:
         self.__start_player_position = self.__get_start_player_position()
         self.__return_player_position = self.__get_return_player_position()
         self.__enemies_start_position = self.__get_all_enemies_position()
+        shuffle(self.__enemies_start_position)
 
         self.__set_init_and_end_map_positions()
         self.__set_all_positions_blocking()

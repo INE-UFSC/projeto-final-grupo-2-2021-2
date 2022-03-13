@@ -1,14 +1,12 @@
 from abc import ABC, abstractmethod
 from math import ceil
 from typing import List, Type
-
-import pygame
-from Itens.Armas.EspadaBasica import EspadaBasica
 from Personagens.AbstractInimigo import AbstractInimigo
 from Itens.AbstractItem import AbstractItem
 from Mapas.MapInterpreter import MapInterpreter
 from Objetos.AbstractObjeto import AbstractObjeto
 from Objetos.ObstaculoInvisivel import ObjetoInvisivel
+from Personagens.AbstractSignal import AbstractSignal
 from Utils.Adapter import Adapter
 from Utils.Hitbox import Hitbox
 from Personagens.Jogador import Jogador
@@ -16,8 +14,7 @@ from Config.Opcoes import Opcoes
 from Config.TelaJogo import TelaJogo
 from Personagens.AbstractPersonagem import AbstractPersonagem
 from Utils.Maps import MapUpdater
-from Utils.Movement import AStar, distancia_dois_pontos, gerar_equação_vetorial_reta
-from Utils.Movement import gerar_equação_vetorial_reta
+from Utils.Movement import AStar, GAHandler
 from pygame import Surface, Rect, draw
 from random import randint
 
@@ -75,6 +72,15 @@ class AbstractMapa(ABC):
     def iniciar_rodada(self, tela: TelaJogo) -> None:
         self.desenhar(tela)
 
+    def send_enemies_signal(self, signal: AbstractSignal) -> None:
+        for enemy in self.__inimigos:
+            if enemy == signal.sender:
+                continue
+
+            dist = GAHandler.distancia_dois_pontos(signal.source_position, enemy.hitbox.center)
+            if dist < signal.signal_range:
+                enemy.receive_signal(signal)
+
     def animate(self) -> None:
         for inimigo in self.__inimigos:
             inimigo.animate()
@@ -102,7 +108,7 @@ class AbstractMapa(ABC):
 
         rect_escudo = self.__jogador.get_rect_escudo()
         color = (0, 0, 255)
-        pygame.draw.rect(tela.janela, color, rect_escudo)
+        draw.rect(tela.janela, color, rect_escudo)
 
     def pegar_item(self) -> AbstractItem:
         rect_jogador = Rect(self.__jogador.hitbox.posicao, self.__jogador.hitbox.tamanho)
@@ -158,8 +164,8 @@ class AbstractMapa(ABC):
         return True
 
     def is_line_of_sight_clear(self, p1, p2) -> bool:
-        equação_vetorial = gerar_equação_vetorial_reta(p1, p2)
-        distancia = distancia_dois_pontos(p1, p2)
+        equação_vetorial = GAHandler.gerar_equação_vetorial_reta(p1, p2)
+        distancia = GAHandler.distancia_dois_pontos(p1, p2)
 
         distancia_entre_pixels_checados = 4
         step = 1 / (distancia // distancia_entre_pixels_checados)
@@ -179,8 +185,8 @@ class AbstractMapa(ABC):
         return True
 
     def is_line_of_sight_clear_to_walk(self, p1, p2) -> bool:
-        equação_vetorial = gerar_equação_vetorial_reta(p1, p2)
-        distancia = distancia_dois_pontos(p1, p2)
+        equação_vetorial = GAHandler.gerar_equação_vetorial_reta(p1, p2)
+        distancia = GAHandler.distancia_dois_pontos(p1, p2)
 
         distancia_entre_pixels_checados = 4
         step = 1 / (distancia // distancia_entre_pixels_checados)
@@ -278,7 +284,7 @@ class AbstractMapa(ABC):
 
         pontos = []
         for ponto2 in pontos_2:
-            func = gerar_equação_vetorial_reta(ponto1, ponto2)
+            func = GAHandler.gerar_equação_vetorial_reta(ponto1, ponto2)
 
             x = 0.6
             step = 0.2
@@ -306,7 +312,7 @@ class AbstractMapa(ABC):
 
         pontos = []
         for ponto2 in pontos_2:
-            func = gerar_equação_vetorial_reta(ponto1, ponto2)
+            func = GAHandler.gerar_equação_vetorial_reta(ponto1, ponto2)
 
             x = 0.6
             step = 0.2

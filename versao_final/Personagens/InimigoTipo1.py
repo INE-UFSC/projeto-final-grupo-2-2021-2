@@ -175,15 +175,15 @@ class InimigoTipo1(AbstractInimigo):
             self.__FRAME_TO_WAIT -= 1
             return self.__animation
 
-        if self._estado == Estado.REPOUSO:
+        if self._state.REPOUSO:
             self.__set_animation('Repouso')
-        elif self._estado == Estado.MORRENDO:
+        elif self._state.MORRENDO:
             self.__set_animation('Dying')
-        elif self._estado == Estado.ALERTA:
+        elif self._state.ALERTA:
             self.__set_animation('Procurando')
         elif self._tomou_dano:
             self.__set_animation('Hurt')
-        elif self._estado == Estado.ATACANDO:
+        elif self._state.ATACANDO:
             self.__set_animation('Walking')
 
         return self.__animation

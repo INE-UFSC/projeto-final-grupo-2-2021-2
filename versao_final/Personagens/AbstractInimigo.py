@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
+from Config.Enums import Estado
 from Utils.Hitbox import Hitbox
 from Personagens.AbstractPersonagem import AbstractPersonagem
-from Config.Enums import Estado
+from Personagens.EnemyState import EnemyState
 from pygame import Rect, Surface
 
 
 class AbstractInimigo(AbstractPersonagem, ABC):
     def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, mapa) -> None:
         super().__init__(stats, posicao, tamanho, mapa)
-        self.__estado = Estado.REPOUSO
+        self.__state = EnemyState(Estado.REPOUSO, self.hitbox, sender=self)
 
         self.__caminho = []
         self.__len_caminho = 0
@@ -17,27 +18,33 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__PERTO = 18
         self.__MUITO_PERTO = 4
         self.__MINIMO_PASSOS_NO_CAMINHO = 0
+        self.__LAST_STATE = self.__state.state
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 150
 
     @property
-    def _estado(self) -> Estado:
-        return self.__estado
+    def _state(self) -> EnemyState:
+        return self.__state
 
     @abstractmethod
     def update(self, hit_jogador: Hitbox) -> None:
         if self.vida <= 0:
-            self.__estado = Estado.MORRENDO
+            self.__state.state = Estado.MORRENDO
 
-        distancia = self._calcular_distancia(hit_jogador)
-        if distancia > self.__PERTO:
-            x_movement = self.hitbox.posicao[0] - self.__LAST_POSITION[0]
-            y_movement = self.hitbox.posicao[1] - self.__LAST_POSITION[1]
-        else:
-            x_movement = hit_jogador.posicao[0] - self.hitbox.posicao[0]
-            y_movement = hit_jogador.posicao[1] - self.hitbox.posicao[1]
+        if not self.__state.MORRENDO:
+            distancia = self._calcular_distancia(hit_jogador)
+            if distancia > self.__PERTO:
+                x_movement = self.hitbox.posicao[0] - self.__LAST_POSITION[0]
+                y_movement = self.hitbox.posicao[1] - self.__LAST_POSITION[1]
+            else:
+                x_movement = hit_jogador.posicao[0] - self.hitbox.posicao[0]
+                y_movement = hit_jogador.posicao[1] - self.hitbox.posicao[1]
 
-        self._atualizar_frente(x_movement, y_movement)
-        self.__LAST_POSITION = self.hitbox.posicao
+            self._atualizar_frente(x_movement, y_movement)
+            self.__LAST_POSITION = self.hitbox.posicao
+
+            if self.__LAST_STATE != self.__state.state:
+                self.__send_signal()
+            self.__LAST_STATE = self.__state.state
 
         super().update()
 
@@ -46,18 +53,24 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         pass
 
     def mover(self, hit_jogador: Hitbox) -> None:
-        if self.__estado == Estado.MORRENDO:
+        if self.__state.MORRENDO:
             return None
 
-        if self.__estado == Estado.REPOUSO:
+        if self.__state.REPOUSO:
             self.__update_visao(hit_jogador)
-        elif self.__estado == Estado.ALERTA:
+        elif self.__state.ALERTA:
             self.__procurar_jogador(hit_jogador)
-        elif self.__estado == Estado.ATACANDO:
+        elif self.__state.ATACANDO:
             self.__seguir_jogador(hit_jogador)
 
     def pontos_para_ataque(self) -> list:
         return super().pontos_para_ataque()
+
+    def __send_signal(self) -> None:
+        self.mapa.send_enemies_signal(self.__state)
+
+    def receive_signal(self, signal: EnemyState) -> None:
+        self.__state = signal.update_state(self.__state)
 
     @abstractmethod
     def atacar(self):
@@ -147,7 +160,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
 
         # Procura o jogador
         if self.__encontrou_jogador_novamente(hit_jogador):
-            self.__estado = Estado.ATACANDO
+            self.__state.state = Estado.ATACANDO
             self.__caminho = []
         else:
             # Se não, continua no caminho aleatório
@@ -163,7 +176,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         else:
             # Perdeu totalmente a visão do jogador e foi para o ultimo caminho
             # passa para estado de alerta, vai ficar procurando o jogador
-            self.__estado = Estado.ALERTA
+            self.__state.state = Estado.ALERTA
 
     def __chegou_no_ponto(self, ponto: tuple) -> bool:
         rect = Rect(self.hitbox.posicao, self.hitbox.tamanho)
@@ -243,10 +256,10 @@ class AbstractInimigo(AbstractPersonagem, ABC):
                 self.hitbox.posicao = nova_posicao_y
 
     def __update_visao(self, hit_jogador: Hitbox) -> None:
-        if self.__estado == Estado.REPOUSO or self.__estado == Estado.ALERTA:
+        if self.__state.REPOUSO or self.__state.ALERTA:
             if self.__jogador_dentro_da_visao(hit_jogador):
                 if self.__esta_vendo_jogador_mediamente(hit_jogador):
-                    self.__estado = Estado.ATACANDO
+                    self.__state.state = Estado.ATACANDO
 
     def __encontrou_jogador_novamente(self, hit_jogador) -> bool:
         if self.__jogador_dentro_da_visao(hit_jogador):
