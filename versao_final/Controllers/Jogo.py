@@ -4,6 +4,7 @@ from Personagens.Jogador import Jogador
 from Config.Opcoes import Opcoes
 from Controllers.ControladorFases import ControladorFases
 from Fases.AbstractFase import AbstractFase
+from Sounds.MusicHandler import MusicHandler
 from Views.Telas.TelaPause import TelaPause
 from Config.Enums import ComandosEnum
 
@@ -11,6 +12,7 @@ from Config.Enums import ComandosEnum
 class Jogo:
     def __init__(self):
         pygame.init()  # Temporariamente enquanto não mexo nas telas
+        self.__music = MusicHandler()
         self.__tela = TelaJogo()
         self.__opcoes = Opcoes()
         self.__jogador = None
@@ -46,6 +48,7 @@ class Jogo:
                         self.__paused = not self.__paused
 
             self.__fase_atual.desenhar(self.__tela)
+            self.__music.update()
             if self.__paused:
                 self.__tela_pause.desenhar()
                 self.__tela_pause.run(eventos)
