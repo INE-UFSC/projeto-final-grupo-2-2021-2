@@ -4,7 +4,6 @@ from Config.Opcoes import Opcoes
 from Config.Enums import Direction
 from Personagens.AbstractInimigo import AbstractInimigo
 from Mapas.AbstractMapa import AbstractMapa
-from Utils.Adapter import Adapter
 from Utils.Converter import Converter
 from Utils.Folder import import_fliped_folder, import_folder
 from Utils.Hitbox import Hitbox
@@ -287,3 +286,10 @@ class InimigoTipo1(AbstractInimigo):
     @abstractmethod
     def _FRAME_EXECUTAR_ATAQUE(self) -> int:
         pass
+
+    @property
+    def morrendo(self) -> bool:
+        if self.__animation == 'Dying':
+            return True
+        else:
+            return False

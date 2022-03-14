@@ -1,11 +1,15 @@
 from Personagens.InimigoTipo1 import InimigoTipo1
 from Mapas.AbstractMapa import AbstractMapa
+from random import choice
 
 
 class MinotauroAzul(InimigoTipo1):
     __TAMANHO_IMAGEM = (80, 65)
     __TAMANHO = (30, 42)
     __SPRITE_PATH = 'Assets/Personagens/Minotauro/MinotauroAzul/'
+    __HURT_SOUND_END_PATHS = ['ogre1.wav', 'ogre2.wav', 'ogre3.wav', 'ogre4.wav', 'ogre5.wav']
+    __DYING_SOUND_PATH = 'Sounds/sounds/Monsters/Die/ogre2.wav'
+    __HURT_SOUNDS_PATH_BASE = 'Sounds/sounds/Monsters/Hurt/'
     __STATS_FACIL = {'vida': 15, 'ataque': 4, 'defesa': 3, 'vel': 2, 'vel_ataque': 1,
                      'view_distance': 150, 'transpassavel': False}
     __STATS_MEDIO = {'vida': 20, 'ataque': 5, 'defesa': 4, 'vel': 2, 'vel_ataque': 1,
@@ -18,6 +22,7 @@ class MinotauroAzul(InimigoTipo1):
 
     def __init__(self, mapa: AbstractMapa, posicao=(0, 0)) -> None:
         super().__init__(mapa, MinotauroAzul.__SPRITE_PATH, posicao)
+        self.__DYING_SOUND_PLAYED = False
 
     @property
     def _SPRITE_PATH(self) -> str:
@@ -54,3 +59,13 @@ class MinotauroAzul(InimigoTipo1):
     @property
     def _FRAME_EXECUTAR_ATAQUE(self) -> int:
         return MinotauroAzul.__FRAME_EXECUTAR_ATAQUE
+
+    @property
+    def hurt_sound_path(self) -> str:
+        end = choice(MinotauroAzul.__HURT_SOUND_END_PATHS)
+        path = MinotauroAzul.__HURT_SOUNDS_PATH_BASE + end
+        return path
+
+    @property
+    def dying_sound_path(self) -> str:
+        return MinotauroAzul.__DYING_SOUND_PATH

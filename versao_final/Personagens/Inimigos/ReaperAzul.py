@@ -1,11 +1,15 @@
 from Personagens.InimigoTipo1 import InimigoTipo1
 from Mapas.AbstractMapa import AbstractMapa
+from random import choice
 
 
 class ReaperAzul(InimigoTipo1):
     __TAMANHO_IMAGEM = (80, 80)
     __TAMANHO = (35, 45)
     __SPRITE_PATH = 'Assets/Personagens/Reaper/ReaperAzul/'
+    __HURT_SOUND_END_PATHS = ['ogre1.wav', 'ogre2.wav', 'ogre3.wav', 'ogre4.wav', 'ogre5.wav']
+    __DYING_SOUND_PATH = 'Sounds/sounds/Monsters/Die/ogre2.wav'
+    __HURT_SOUNDS_PATH_BASE = 'Sounds/sounds/Monsters/Hurt/'
     __STATS_FACIL = {'vida': 12, 'ataque': 3, 'defesa': 3, 'vel': 2, 'vel_ataque': 1,
                      'view_distance': 100, 'transpassavel': False}
     __STATS_MEDIO = {'vida': 18, 'ataque': 4, 'defesa': 4, 'vel': 2, 'vel_ataque': 1,
@@ -54,3 +58,13 @@ class ReaperAzul(InimigoTipo1):
     @property
     def _FRAME_EXECUTAR_ATAQUE(self) -> int:
         return ReaperAzul.__FRAME_EXECUTAR_ATAQUE
+
+    @property
+    def hurt_sound_path(self) -> str:
+        end = choice(ReaperAzul.__HURT_SOUND_END_PATHS)
+        path = ReaperAzul.__HURT_SOUNDS_PATH_BASE + end
+        return path
+
+    @property
+    def dying_sound_path(self) -> str:
+        return ReaperAzul.__DYING_SOUND_PATH

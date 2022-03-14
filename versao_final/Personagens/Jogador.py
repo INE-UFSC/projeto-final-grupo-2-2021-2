@@ -1,3 +1,4 @@
+from random import choice
 from typing import List
 import pygame
 from Itens.Escudos.AbstractEscudo import AbstractEscudo
@@ -13,6 +14,9 @@ class Jogador(AbstractPersonagem):
     __BASE_PATH = 'Assets/Player/{}/{}'
     __ANIMACOES_IMPORTADAS = False
     __IMAGE_SIZE = (60, 65)
+    __HURT_SOUND_END_PATHS = ['hit1', 'hit2', 'hit3', 'hit4', 'hit5']
+    __DYING_SOUND_PATH = 'Sounds/sounds/Player/die1.mp3'
+    __SOUND_PATH_BASE = 'Sounds/sounds/Player/{}.mp3'
     __STATS = {
         'vida': 50,
         'ataque': 5,
@@ -104,19 +108,26 @@ class Jogador(AbstractPersonagem):
             return 0
 
     def receber_ataque(self, ataque: Ataque) -> int:
-        if ataque.acertou_hitbox(self.escudo.hitbox(self.direction)):
-            dano_passado = self.__escudo.tomar_dano(ataque.dano)
+        if self.__DEFENDENDO:
+            if ataque.acertou_hitbox(self.escudo.hitbox(self.direction)):
+                dano_passado = self.__escudo.tomar_dano(ataque.dano)
 
-            if dano_passado > 0:
-                dano_tomado = self.tomar_dano(dano_passado)
+                if dano_passado > 0:
+                    dano_tomado = self.tomar_dano(dano_passado)
+                    return dano_tomado
+                else:
+                    return 0
+            elif ataque.acertou_hitbox(self.hitbox):
+                dano_tomado = self.tomar_dano(ataque.dano)
                 return dano_tomado
             else:
                 return 0
-        elif ataque.acertou_hitbox(self.hitbox):
-            dano_tomado = self.tomar_dano(ataque.dano)
-            return dano_tomado
         else:
-            return 0
+            if ataque.acertou_hitbox(self.hitbox):
+                dano_tomado = self.tomar_dano(ataque.dano)
+                return dano_tomado
+            else:
+                return 0
 
     def tomar_dano_escudo(self, dano: int) -> int:
         dano_passado = self.__escudo.tomar_dano(dano)
@@ -219,6 +230,23 @@ class Jogador(AbstractPersonagem):
     @property
     def morreu(self) -> bool:
         return self.__MORREU
+
+    @property
+    def morrendo(self) -> bool:
+        if self.__animation == 'Dying':
+            return True
+        else:
+            return False
+
+    @property
+    def hurt_sound_path(self) -> str:
+        end = choice(Jogador.__HURT_SOUND_END_PATHS)
+        path = Jogador.__SOUND_PATH_BASE.format(end)
+        return path
+
+    @property
+    def dying_sound_path(self) -> str:
+        return Jogador.__DYING_SOUND_PATH
 
     def __atacar(self) -> bool:
         if self.__animation == 'Attacking' or self.__animation == 'Dying':

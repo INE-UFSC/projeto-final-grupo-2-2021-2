@@ -110,6 +110,10 @@ class AbstractInimigo(AbstractPersonagem, ABC):
     def morreu(self) -> bool:
         pass
 
+    @abstractmethod
+    def morrendo(self) -> bool:
+        pass
+
     @property
     @abstractmethod
     def image(self) -> Surface:

@@ -31,6 +31,7 @@ class AbstractMapa(ABC):
         self.__music = MusicHandler()
 
         self.__inimigos: List[AbstractInimigo] = []
+        self.__personagens_morrendo: List[AbstractInimigo] = []
         self.__objetos: List[AbstractObjeto] = []
         self.__itens: List[AbstractItem] = []
         self.__itens_to_duration = {}
@@ -235,6 +236,15 @@ class AbstractMapa(ABC):
 
     def update(self):
         self.__jogador.update()
+        if self.__jogador.morrendo and self.__jogador not in self.__personagens_morrendo:
+            self.__music.play_sound(self.__jogador.dying_sound_path)
+            self.__personagens_morrendo.append(self.__jogador)
+
+        for inimigo in self.__inimigos:
+            if inimigo.morrendo and inimigo not in self.__personagens_morrendo:
+                self.__music.play_sound(inimigo.dying_sound_path)
+                self.__personagens_morrendo.append(inimigo)
+
         for inimigo in self.__inimigos:
             inimigo.update(self.__jogador.hitbox)
 
@@ -291,6 +301,7 @@ class AbstractMapa(ABC):
             if dano_tomado > 0:
                 effect = DamageTaken(dano_tomado, inimigo.hitbox.midtop)
                 self.__effect_handler.add_effect(effect)
+                self.__music.play_sound(inimigo.hurt_sound_path)
 
     def __executar_ataque_inimigo(self, personagem: AbstractPersonagem):
         p1 = personagem.hitbox.center
@@ -301,6 +312,7 @@ class AbstractMapa(ABC):
         if dano_tomado > 0:
             effect = DamageTaken(dano_tomado, self.__jogador.hitbox.midtop)
             self.__effect_handler.add_effect(effect)
+            self.__music.play_sound(self.__jogador.hurt_sound_path)
 
     def __get_AStar_pathfinder_for_hitbox(self, hitbox: Hitbox) -> AStar:
         proporcao = self._get_proporsion_for_hitbox(hitbox)
@@ -399,6 +411,7 @@ class AbstractMapa(ABC):
 
     def __remover_inimigo(self, inimigo):
         self.__inimigos.remove(inimigo)
+        self.__personagens_morrendo.remove(inimigo)
 
     @property
     def jogador(self) -> Jogador:

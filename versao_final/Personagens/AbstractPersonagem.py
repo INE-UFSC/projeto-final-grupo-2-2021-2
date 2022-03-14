@@ -173,3 +173,23 @@ class AbstractPersonagem(ABC):
     @abstractmethod
     def animate(self) -> None:
         pass
+
+    @property
+    @abstractmethod
+    def hurt_sound_path(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def dying_sound_path(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def morreu(self) -> bool:
+        pass
+
+    @property
+    @abstractmethod
+    def morrendo(self) -> bool:
+        pass

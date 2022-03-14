@@ -9,6 +9,8 @@ class MusicHandler(Singleton):
             self.__PLAYING_MUSIC = False
 
     def play_music(self, music_path: str) -> None:
+        if music_path == '':
+            return
         try:
             if self.__PLAYING_MUSIC:
                 mixer.music.stop()
@@ -20,6 +22,8 @@ class MusicHandler(Singleton):
             print(f'Error Playing Music: {e}')
 
     def play_sound(self, sound_path: str) -> None:
+        if sound_path == '':
+            return
         try:
             sound = mixer.Sound(sound_path)
             sound.play()
