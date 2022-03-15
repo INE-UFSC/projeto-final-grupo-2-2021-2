@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+
+from pygame import Rect, Surface
 from Config.Enums import Direction
 from Itens.Armas.AbstractArma import AbstractArma
 from Utils.Ataque import Ataque
@@ -65,7 +67,7 @@ class AbstractPersonagem(ABC):
         elif self.__direction == Direction.MEIO_CIMA:
             return [self.hitbox.midtop, self.hitbox.midlefttop, self.hitbox.midrighttop]
 
-    def _determinar_posicao_frente(self) -> Direction:
+    def _determinar_posicao_frente(self) -> tuple:
         if self.__direction == Direction.DIREITA_BAIXO:
             return self.hitbox.bottomright
         elif self.__direction == Direction.DIREITA_MEIO:
@@ -192,4 +194,14 @@ class AbstractPersonagem(ABC):
     @property
     @abstractmethod
     def morrendo(self) -> bool:
+        pass
+
+    @property
+    @abstractmethod
+    def image(self) -> Surface:
+        pass
+
+    @property
+    @abstractmethod
+    def rect(self) -> Rect:
         pass

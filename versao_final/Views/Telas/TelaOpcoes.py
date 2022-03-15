@@ -4,7 +4,7 @@ from Views.Components.Botao import Botao
 from Config.Enums import ComandosEnum, Dificuldade
 from Views.Components.Imagem import Imagem
 from Views.Telas.AbstractTela import AbstractTela
-from Views.Components.Texto import Texto
+from Views.Components.Text import Text
 from Config.TelaJogo import TelaJogo
 import pygame
 
@@ -27,7 +27,7 @@ class TelaOpcoes(AbstractTela):
         self.__opcoes = Opcoes()
 
         self.__botoes: List[Botao] = []
-        self.__textos: List[Texto] = []
+        self.__textos: List[Text] = []
         self.__cursor: Imagem = None
         self.__criar_botoes()
         self.__criar_cursor()
@@ -109,8 +109,8 @@ class TelaOpcoes(AbstractTela):
     def __criar_textos(self):
         branco = (255, 255, 255)
         preto = (0, 0, 0)
-        self.__textos.append(Texto(POS_TITULO, TAM_TITULO, 'The Binding of Isaac', 60, branco))
-        self.__textos.append(Texto(POS_DIFICULDADE, TAM_DIFICULDADE, 'Dificuldade: ', 30, preto))
+        self.__textos.append(Text(POS_TITULO, TAM_TITULO, 'The Binding of Isaac', 60, branco))
+        self.__textos.append(Text(POS_DIFICULDADE, TAM_DIFICULDADE, 'Dificuldade: ', 30, preto))
 
     def __criar_cursor(self):
         self.__cursor = Imagem(POS_BOTOES[0], (50, 40), 'Assets/Telas/seta.png')

@@ -54,13 +54,9 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__TOMOU_DANO = False
         super().update()
 
-    @abstractmethod
-    def animate(self) -> None:
-        pass
-
     def receber_ataque(self, ataque: Ataque) -> int:
         if ataque.acertou_hitbox(self.hitbox):
-            dano_tomado = self.tomar_dano(ataque.dano)
+            dano_tomado = self.__tomar_dano(ataque.dano)
             if dano_tomado > 0:
                 self.__TOMOU_DANO = True
 
@@ -68,7 +64,7 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         else:
             return 0
 
-    def tomar_dano(self, dano: int) -> int:
+    def __tomar_dano(self, dano: int) -> int:
         if self.__state.MORRENDO:
             return 0
 
@@ -101,28 +97,6 @@ class AbstractInimigo(AbstractPersonagem, ABC):
 
     def receive_signal(self, signal: EnemyState) -> None:
         self.__state = signal.update_state(self.__state)
-
-    @abstractmethod
-    def atacar(self):
-        pass
-
-    @abstractmethod
-    def morreu(self) -> bool:
-        pass
-
-    @abstractmethod
-    def morrendo(self) -> bool:
-        pass
-
-    @property
-    @abstractmethod
-    def image(self) -> Surface:
-        pass
-
-    @property
-    @abstractmethod
-    def rect(self) -> Rect:
-        pass
 
     def __seguir_jogador(self, hit_jogador: Hitbox) -> None:
         distancia = self._calcular_distancia(hit_jogador)

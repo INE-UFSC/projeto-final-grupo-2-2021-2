@@ -37,3 +37,13 @@ class Estado(Enum):
     REPOUSO = 2
     ATACANDO = 3
     MORRENDO = 4
+
+
+class States(Enum):
+    MENU = 1
+    OPTIONS = 2
+    PLAY = 3
+    NEW = 4
+    LOAD = 5
+    SAME = 6
+    QUIT = 7

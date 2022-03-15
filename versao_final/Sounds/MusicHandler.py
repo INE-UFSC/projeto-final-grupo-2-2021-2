@@ -41,5 +41,17 @@ class MusicHandler(Singleton):
                 self.__PLAYING_MUSIC = False
         else:
             if not self.__PLAYING_MUSIC:
-                mixer.music.set_volume(60)
+                mixer.music.set_volume(0.6)
                 self.__PLAYING_MUSIC = True
+
+    @property
+    def playing(self) -> bool:
+        return self.__PLAYING_MUSIC
+
+    def toggle_pause(self) -> None:
+        if self.__PLAYING_MUSIC:
+            mixer.music.set_volume(0)
+            self.__PLAYING_MUSIC = False
+        else:
+            mixer.music.set_volume(0.6)
+            self.__PLAYING_MUSIC = True

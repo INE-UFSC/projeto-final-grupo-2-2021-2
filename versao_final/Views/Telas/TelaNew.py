@@ -1,7 +1,7 @@
 from typing import List
 from Views.Components.Botao import Botao
 from Views.Components.Imagem import Imagem
-from Views.Components.Texto import Texto
+from Views.Components.Text import Text
 from Config.Enums import ComandosEnum
 from Views.Telas.AbstractTela import AbstractTela
 from Config.TelaJogo import TelaJogo
@@ -24,7 +24,7 @@ class TelaNewGame(AbstractTela):
         self.__save_name = 'Save1'
 
         self.__botoes: List[Botao] = []
-        self.__textos: List[Texto] = []
+        self.__textos: List[Text] = []
         self.__cursor: Imagem = None
         self.__criar_botoes()
         self.__criar_textos()
@@ -94,7 +94,7 @@ class TelaNewGame(AbstractTela):
 
     def __criar_textos(self):
         branco = (255, 255, 255)
-        self.__textos.append(Texto(POS_TEXTO[0], TAM_TEXTO, 'The Binding of Isaac', 60, branco))
+        self.__textos.append(Text(POS_TEXTO[0], TAM_TEXTO, 'The Binding of Isaac', 60, branco))
 
     def __criar_botoes(self):
         funcJogar = self.__comandos[ComandosEnum.NEW_GAME]

@@ -59,12 +59,6 @@ class HUD:
         self.__shield_health_change_speed = 1
         self.__shield_health_ratio = self.__escudo.vida_maxima / HUD.__SHIELD_BAR_SIZE[0]
 
-    def image(self) -> Surface:
-        return self.__image
-
-    def rect(self) -> Rect:
-        return self.__rect
-
     def __update(self) -> None:
         damage_taken = False
         health_received = False

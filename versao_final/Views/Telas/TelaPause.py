@@ -3,7 +3,7 @@ from Utils.Folder import import_single_sprite
 from Utils.Hitbox import Hitbox
 from Views.Components.Botao import Botao
 from Views.Components.Imagem import Imagem
-from Views.Components.Texto import Texto
+from Views.Components.Text import Text
 from Config.Enums import ComandosEnum
 from Views.Telas.AbstractTela import AbstractTela
 from Config.TelaJogo import TelaJogo
@@ -37,7 +37,7 @@ class TelaPause(AbstractTela):
         self.__comandos = comandos
         self.__tela = TelaJogo()
         self.__botoes: List[Botao] = []
-        self.__textos: List[Texto] = []
+        self.__textos: List[Text] = []
         self.__cursor: Imagem = None
         self.__criar_botoes()
         self.__criar_cursor()

@@ -3,6 +3,7 @@ import sys
 from Config.Opcoes import Opcoes
 from Config.Enums import ComandosEnum
 from Config.TelaJogo import TelaJogo
+from Sounds.MusicHandler import MusicHandler
 from Views.Telas.TelaJogar import TelaJogar
 from Views.Telas.TelaMenu import TelaMenuPrincipal
 from Views.Telas.TelaNew import TelaNewGame
@@ -13,6 +14,7 @@ from Controllers.Jogo import Jogo
 class ControladorJogo():
     def __init__(self):
         pygame.init()
+        self.__music = MusicHandler()
         self.__tela = TelaJogo()
         self.__MENU_FPS = 40
 
