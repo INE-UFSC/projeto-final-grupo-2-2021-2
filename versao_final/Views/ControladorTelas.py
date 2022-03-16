@@ -26,13 +26,19 @@ class ControladorTelas:
         MAIN_LOOP = True
         while MAIN_LOOP:
             clock.tick(self.__FPS)
-            self.__machine.desenhar(self.__tela)
-            self.__machine.run()
 
-            for event in pygame.event.get():
+            events = pygame.event.get()
+            for event in events:
                 if event.type == pygame.QUIT:
                     MAIN_LOOP = False
                     pygame.quit()
                     exit()
+
+            self.__machine.desenhar(self.__tela)
+            self.__machine.run(events)
+            if self.__machine.stop():
+                MAIN_LOOP = False
+                pygame.quit()
+                exit()
 
             pygame.display.update()

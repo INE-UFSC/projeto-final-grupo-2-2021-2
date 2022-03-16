@@ -47,3 +47,4 @@ class States(Enum):
     LOAD = 5
     SAME = 6
     QUIT = 7
+    PLAYING = 8

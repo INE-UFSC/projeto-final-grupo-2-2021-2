@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, List
 from Config.Opcoes import Opcoes
 from Config.Enums import Dificuldade, States
 from Sounds.MusicHandler import MusicHandler
 from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
-from pygame import Rect, draw, font, MOUSEBUTTONUP
+from pygame import K_BACKSPACE, KEYDOWN, MOUSEBUTTONDOWN, Rect, draw, font, MOUSEBUTTONUP
+from pygame.event import Event
 import pygame
 
 
@@ -20,14 +21,20 @@ class Button(ABC):
 
         self.__rect = Rect(self.__position, self.__size)
         self.__color = self.__normal_color
+        self.__clicked = False
 
-    def _button_clicked(self) -> bool:
+    def run(self, events: List[Event]) -> None:
+        self.__clicked = False
+
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
-            for event in pygame.event.get():
+            for event in events:
                 if event.type == MOUSEBUTTONUP and event.button == 1:
-                    return True
-        return False
+                    self.__clicked = True
+
+    @property
+    def clicked(self) -> bool:
+        return self.__clicked
 
     def hover(self) -> None:
         if self.__rect.collidepoint(pygame.mouse.get_pos()):
@@ -38,6 +45,14 @@ class Button(ABC):
     @property
     def rect(self) -> Rect:
         return self.__rect
+
+    @property
+    def color(self) -> tuple:
+        return self.__color
+
+    @color.setter
+    def color(self, value: tuple) -> None:
+        self.__color = value
 
     @property
     def next_state(self) -> Any:
@@ -60,10 +75,10 @@ class TextButton(Button):
 
         super().__init__(position, size, next_state)
         self.__color = (255, 255, 255)
-        self.__text = text
         self.__font = font.SysFont('Agency FB', 25)
-        self.__text = self.__font.render(text, True, self.__color)
-        self.__text_rect = self.__text.get_rect(center=rect.center)
+        self.__text = text
+        self.__text_surf = self.__font.render(text, True, self.__color)
+        self.__text_rect = self.__text_surf.get_rect(center=self.rect.center)
 
     @property
     def text(self) -> str:
@@ -72,14 +87,16 @@ class TextButton(Button):
     @text.setter
     def text(self, value) -> None:
         if type(value) == str:
-            self.__text = self.__font.render(value, True, self.__color)
+            self.__text = value
+            self.__text_surf = self.__font.render(self.__text, True, self.__color)
+            self.__text_rect = self.__text_surf.get_rect(center=self.rect.center)
 
     def desenhar(self, tela: TelaJogo) -> None:
         super().desenhar(tela)
-        tela.janela.blit(self.__text, self.__text_rect)
+        tela.janela.blit(self.__text_surf, self.__text_rect)
 
     def get_state(self) -> States:
-        if super()._button_clicked():
+        if self.clicked:
             return self.next_state
         else:
             return States.SAME
@@ -96,7 +113,7 @@ class ImageButton(Button):
         tela.janela.blit(self.__image, self.__rect)
 
     def get_state(self) -> States:
-        if super()._button_clicked():
+        if self.clicked:
             return self.next_state
         else:
             return States.SAME
@@ -130,7 +147,7 @@ class MusicButton(TextButton):
         super().__init__(text, position, MusicButton.__SIZE, next_state)
 
     def get_state(self) -> States:
-        if super()._button_clicked():
+        if self.clicked:
             self.__executar()
             return self.next_state
         else:
@@ -158,7 +175,7 @@ class ButtonDificil(MenuButton):
         super().__init__(text, position, next_state)
 
     def get_state(self) -> States:
-        if super()._button_clicked():
+        if self.clicked:
             self.__executar()
             return self.next_state
         else:
@@ -174,7 +191,7 @@ class ButtonMedio(MenuButton):
         super().__init__(text, position, next_state)
 
     def get_state(self) -> States:
-        if super()._button_clicked():
+        if self.clicked:
             self.__executar()
             return self.next_state
         else:
@@ -190,7 +207,7 @@ class ButtonFacil(MenuButton):
         super().__init__(text, position, next_state)
 
     def get_state(self) -> States:
-        if super()._button_clicked():
+        if self.clicked:
             self.__executar()
             return self.next_state
         else:
@@ -199,3 +216,42 @@ class ButtonFacil(MenuButton):
     def __executar(self) -> None:
         self.__opcoes = Opcoes()
         self.__opcoes.dificuldade = Dificuldade.facil
+
+
+class InputText(TextButton):
+    __SIZE = (105, 35)
+    __MAX_SIZE = 10
+
+    def __init__(self, position: tuple, default_text: str) -> None:
+        super().__init__(default_text, position, InputText.__SIZE, States.SAME)
+
+        self.__rect_active_color = (255, 50, 50)
+        self.__active = False
+
+    def desenhar(self, tela: TelaJogo) -> None:
+        if self.__active:
+            self.color = self.__rect_active_color
+        else:
+            self.hover()
+
+        super().desenhar(tela)
+
+    def run(self, events: List[Event]) -> None:
+        for event in events:
+            if event.type == MOUSEBUTTONDOWN:
+                if self.rect.collidepoint(event.pos):
+                    self.__active = True
+                else:
+                    self.__active = False
+            if event.type == KEYDOWN:
+                if self.__active:
+                    if event.key == K_BACKSPACE:
+                        self.__change_text(f'{self.text[:-1]}')
+                    else:
+                        self.__change_text(f'{self.text}{event.unicode}')
+
+    def __change_text(self, value) -> None:
+        if len(value) > InputText.__MAX_SIZE:
+            return
+        elif type(value) == str:
+            self.text = value

@@ -1,5 +1,5 @@
-from abc import abstractmethod
-from typing_extensions import Self
+from typing import List
+from pygame.event import Event
 from Config.TelaJogo import TelaJogo
 from Views.Views.AbstractView import AbstractView
 from Config.Enums import States
@@ -18,8 +18,8 @@ class AbstractState:
     def state(self) -> States:
         return self.__state
 
-    def run(self) -> States:
-        next_state = self.__view.run()
+    def run(self, events: List[Event]) -> States:
+        next_state = self.__view.run(events)
         return next_state
 
     def desenhar(self, tela: TelaJogo) -> None:

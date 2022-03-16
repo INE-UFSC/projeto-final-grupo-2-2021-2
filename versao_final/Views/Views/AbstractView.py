@@ -1,7 +1,9 @@
 from abc import abstractmethod
+from multiprocessing import Event
+from typing import List
 from Config.Opcoes import Opcoes
 from Config.Enums import States
-from pygame import Rect, Surface
+from pygame import Rect, Surface, event
 from Config.TelaJogo import TelaJogo
 
 
@@ -17,7 +19,7 @@ class AbstractView:
         tela.janela.blit(self.image, self.rect)
 
     @abstractmethod
-    def run(self) -> States:
+    def run(self, events: List[event.Event]) -> States:
         pass
 
     @property
