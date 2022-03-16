@@ -16,111 +16,117 @@ from Sounds.MusicHandler import MusicHandler
 
 class DungeonFase(AbstractFase):
     def __init__(self, jogador: Jogador) -> None:
+        super().__init__(jogador)
         self.__opcoes = Opcoes()
         self.__dificuldade = self.__opcoes.dificuldade
         self.__music = MusicHandler()
 
-        first_enemies = self.__get_enemies_first_map()
-        map1 = DungeonMap1(jogador, first_enemies)
-        second_enemies = self.__get_enemies_second_map()
-        map2 = DungeonMap2(jogador, second_enemies)
-        third_enemies = self.__get_enemies_third_map()
-        map3 = DungeonMap3(jogador, third_enemies)
+        map1 = DungeonMap1(jogador)
+        first_enemies = self.__get_enemies_first_map(map1)
+        map1.add_inimigos(first_enemies)
+
+        map2 = DungeonMap2(jogador)
+        second_enemies = self.__get_enemies_second_map(map2)
+        map2.add_inimigos(second_enemies)
+
+        map3 = DungeonMap3(jogador)
+        third_enemies = self.__get_enemies_third_map(map3)
+        map3.add_inimigos(third_enemies)
 
         maps: List[AbstractMapa] = [map1, map2, map3]
-        super().__init__(jogador, maps)
+        super()._set_maps_lists(maps)
 
-    def __get_enemies_first_map(self) -> list:
+    def __get_enemies_first_map(self, mapa: AbstractMapa) -> list:
         enemies = []
 
         if self.__dificuldade == Dificuldade.facil:
             for _ in range(4):
-                enemies.append(MinotauroAzul)
+                enemies.append(MinotauroAzul(mapa=mapa))
             for _ in range(2):
-                enemies.append(MinotauroMarrom)
+                enemies.append(MinotauroMarrom(mapa=mapa))
 
         if self.__dificuldade == Dificuldade.medio:
             for _ in range(4):
-                enemies.append(MinotauroAzul)
+                enemies.append(MinotauroAzul(mapa=mapa))
             for _ in range(3):
-                enemies.append(MinotauroMarrom)
+                enemies.append(MinotauroMarrom(mapa=mapa))
             for _ in range(2):
-                enemies.append(MinotauroCinza)
+                enemies.append(MinotauroCinza(mapa=mapa))
 
         elif self.__dificuldade == Dificuldade.dificil:
             for _ in range(4):
-                enemies.append(MinotauroAzul)
+                enemies.append(MinotauroAzul(mapa=mapa))
             for _ in range(2):
-                enemies.append(MinotauroMarrom)
+                enemies.append(MinotauroMarrom(mapa=mapa))
             for _ in range(2):
-                enemies.append(MinotauroCinza)
+                enemies.append(MinotauroCinza(mapa=mapa))
             for _ in range(1):
-                enemies.append(ReaperAzul)
+                enemies.append(ReaperAzul(mapa=mapa))
 
         return enemies
 
-    def __get_enemies_second_map(self) -> list:
+    def __get_enemies_second_map(self, mapa) -> list:
         enemies = []
 
         if self.__dificuldade == Dificuldade.facil:
             for _ in range(2):
-                enemies.append(MinotauroAzul)
+                enemies.append(MinotauroAzul(mapa=mapa))
             for _ in range(1):
-                enemies.append(MinotauroMarrom)
+                enemies.append(MinotauroMarrom(mapa=mapa))
             for _ in range(2):
-                enemies.append(ReaperAzul)
+                enemies.append(ReaperAzul(mapa=mapa))
 
         if self.__dificuldade == Dificuldade.medio:
             for _ in range(3):
-                enemies.append(MinotauroAzul)
+                enemies.append(MinotauroAzul(mapa=mapa))
             for _ in range(2):
-                enemies.append(MinotauroMarrom)
+                enemies.append(MinotauroMarrom(mapa=mapa))
             for _ in range(3):
-                enemies.append(ReaperAzul)
+                enemies.append(ReaperAzul(mapa=mapa))
             for _ in range(2):
-                enemies.append(ReaperVerde)
+                enemies.append(ReaperVerde(mapa=mapa))
 
         elif self.__dificuldade == Dificuldade.dificil:
             for _ in range(2):
-                enemies.append(MinotauroAzul)
+                enemies.append(MinotauroAzul(mapa=mapa))
             for _ in range(2):
-                enemies.append(MinotauroMarrom)
+                enemies.append(MinotauroMarrom(mapa=mapa))
             for _ in range(2):
-                enemies.append(ReaperAzul)
+                enemies.append(ReaperAzul(mapa=mapa))
             for _ in range(3):
-                enemies.append(ReaperVerde)
+                enemies.append(ReaperVerde(mapa=mapa))
 
         return enemies
 
-    def __get_enemies_third_map(self) -> list:
+    def __get_enemies_third_map(self, mapa) -> list:
         enemies = []
 
         if self.__dificuldade == Dificuldade.facil:
             for _ in range(2):
-                enemies.append(MinotauroAzul)
+                enemies.append(MinotauroAzul(mapa=mapa))
             for _ in range(1):
-                enemies.append(MinotauroMarrom)
+                enemies.append(MinotauroMarrom(mapa=mapa))
             for _ in range(2):
-                enemies.append(ReaperAzul)
+                enemies.append(ReaperAzul(mapa=mapa))
 
         if self.__dificuldade == Dificuldade.medio:
             for _ in range(2):
-                enemies.append(MinotauroAzul)
+                enemies.append(MinotauroAzul(mapa=mapa))
             for _ in range(1):
-                enemies.append(MinotauroMarrom)
+                enemies.append(MinotauroMarrom(mapa=mapa))
             for _ in range(4):
-                enemies.append(ReaperAzul)
+                enemies.append(ReaperAzul(mapa=mapa))
             for _ in range(3):
-                enemies.append(ReaperVerde)
+                enemies.append(ReaperVerde(mapa=mapa))
 
         elif self.__dificuldade == Dificuldade.dificil:
             for _ in range(2):
-                enemies.append(MinotauroAzul)
+                enemies.append(MinotauroAzul(mapa=mapa))
             for _ in range(2):
-                enemies.append(MinotauroMarrom)
+                enemies.append(MinotauroMarrom(mapa=mapa))
             for _ in range(2):
-                enemies.append(ReaperAzul)
+                enemies.append(ReaperAzul(mapa=mapa))
             for _ in range(3):
-                enemies.append(ReaperVerde)
+                enemies.append(ReaperVerde(mapa=mapa))
 
         return enemies

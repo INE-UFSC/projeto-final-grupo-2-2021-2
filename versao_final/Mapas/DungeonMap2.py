@@ -46,7 +46,7 @@ class DungeonMap2(AbstractMapa):
     __SPRITE_PATH = 'Assets/Mapas/Dungeon/sala2.png'
     __MUSIC_PATH = 'Sounds/musics/som_ambiente2.ogg'
 
-    def __init__(self, jogador: Jogador, enemies: List[Type[AbstractInimigo]]):
+    def __init__(self, jogador: Jogador, enemies: List[AbstractInimigo] = None):
         super().__init__(jogador, enemies)
 
         self.__adapter = Adapter()

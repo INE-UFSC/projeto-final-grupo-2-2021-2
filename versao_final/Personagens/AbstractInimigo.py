@@ -8,8 +8,8 @@ from pygame import Rect
 
 
 class AbstractInimigo(AbstractPersonagem, ABC):
-    def __init__(self, stats: dict, posicao: tuple, tamanho: tuple, mapa) -> None:
-        super().__init__(stats, posicao, tamanho, mapa)
+    def __init__(self, posicao: tuple, mapa) -> None:
+        super().__init__(posicao, self._TAMANHO, mapa)
         self.__state = EnemyState(Estado.REPOUSO, self.hitbox, sender=self)
 
         self.__caminho = []
@@ -21,7 +21,10 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__MINIMO_PASSOS_NO_CAMINHO = 0
         self.__LAST_STATE = self.__state.state
         self.__TOMOU_DANO = False
+
+    def _set_status(self, stats: dict) -> None:
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 150
+        return super()._set_status(stats)
 
     def _tomou_dano(self) -> bool:
         return self.__TOMOU_DANO
@@ -372,3 +375,8 @@ class AbstractInimigo(AbstractPersonagem, ABC):
             return self.hitbox.midtop, hit_jogador.midbottom
         else:  # Abaixo
             return self.hitbox.midbottom, hit_jogador.midtop
+
+    @property
+    @abstractmethod
+    def _TAMANHO(self) -> tuple:
+        pass

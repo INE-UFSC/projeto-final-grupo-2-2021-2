@@ -16,12 +16,10 @@ class JogoOptions(Singleton):
 
     def create_new_game(self) -> None:
         self.__current_game = Jogo(self.__new_game_name)
-        self.__dao.add(self.__current_game)
-        saves = self.__dao.get_all()
-        print(saves)
 
     def load_game(self) -> None:
-        self.__current_game = Jogo(self.__load_game_name)
+        self.__current_game = self.__dao.get(self.__load_game_name)
+        print(self.__current_game.controlador.current_fase.current_map.inimigos)
 
     def current_game(self) -> Jogo:
         return self.__current_game
@@ -55,7 +53,6 @@ class JogoOptions(Singleton):
 
     def get_all_names(self) -> List[str]:
         saves = self.__dao.get_all()
-        print(saves)
         names = list(saves.keys())
 
         if len(names) < 5:

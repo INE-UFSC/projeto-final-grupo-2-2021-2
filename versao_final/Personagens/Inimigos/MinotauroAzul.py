@@ -22,7 +22,6 @@ class MinotauroAzul(InimigoTipo1):
 
     def __init__(self, mapa: AbstractMapa, posicao=(0, 0)) -> None:
         super().__init__(mapa, MinotauroAzul.__SPRITE_PATH, posicao)
-        self.__DYING_SOUND_PLAYED = False
 
     @property
     def _SPRITE_PATH(self) -> str:

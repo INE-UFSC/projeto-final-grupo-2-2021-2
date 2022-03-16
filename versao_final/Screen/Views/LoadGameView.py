@@ -95,7 +95,6 @@ class LoadGameView(AbstractView):
 
         start_button = self.__buttons[0]
         if start_button.clicked:
-            print('Clicado')
             if self.__active_save_button is None or self.__active_save_button.text == 'Empty':
                 return States.SAME
             else:

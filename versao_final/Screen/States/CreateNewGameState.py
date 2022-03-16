@@ -16,5 +16,4 @@ class CreateNewGameState(AbstractState):
 
     def run(self, events: List[Event]) -> States:
         self.__jogoOptions.create_new_game()
-        print(self.__jogoOptions.current_game)
         return States.PLAYING

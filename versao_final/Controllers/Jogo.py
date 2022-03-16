@@ -20,6 +20,10 @@ class Jogo:
     def save_name(self) -> str:
         return self.__save_name
 
+    @save_name.setter
+    def save_name(self, value: str) -> None:
+        self.__save_name = value
+
     def player_has_lost(self) -> bool:
         return self.__fase_atual.player_has_lost()
 
@@ -27,6 +31,7 @@ class Jogo:
         return self.__PLAYER_WON
 
     def run(self, events: List[event.Event]) -> None:
+        print(f'Run Jogo: {len(self.__fase_atual.current_map.inimigos)}')
         self.__music.update()
         self.__fase_atual.run()
 
@@ -46,3 +51,12 @@ class Jogo:
         self.__controlador = ControladorFases(self.__jogador)
         self.__fase_atual: AbstractFase = self.__controlador.proxima_fase()
         self.__fase_atual.start()
+
+    @property
+    def controlador(self) -> ControladorFases:
+        return self.__controlador
+
+    @controlador.setter
+    def controlador(self, controlador: ControladorFases) -> None:
+        self.__controlador = controlador
+        self.__fase_atual = controlador.current_fase

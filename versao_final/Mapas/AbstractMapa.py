@@ -24,13 +24,12 @@ from random import randint
 
 
 class AbstractMapa(ABC):
-    def __init__(self, jogador: Jogador, enemies: List[Type[AbstractInimigo]]):
+    def __init__(self, jogador: Jogador, enemies: List[AbstractInimigo] = None):
         self.__adapter = Adapter()
         self.__opcoes = Opcoes()
-        self.__enemies_types: List[Type[AbstractInimigo]] = enemies
         self.__music = MusicHandler()
 
-        self.__inimigos: List[AbstractInimigo] = []
+        self.__inimigos: List[AbstractInimigo] = [] if enemies is None else enemies
         self.__personagens_morrendo: List[AbstractInimigo] = []
         self.__objetos: List[AbstractObjeto] = []
         self.__itens: List[AbstractItem] = []
@@ -41,9 +40,12 @@ class AbstractMapa(ABC):
 
         self.__hitbox = Hitbox(self.__opcoes.POSICAO_MAPAS, self.__opcoes.TAMANHO_MAPAS)
 
+    def add_inimigos(self, inimigos: List[AbstractInimigo]) -> None:
+        self.__inimigos.extend(inimigos)
+
     @abstractmethod
     def load(self):
-        self.__inimigos.extend(self.__create_enemies(self.__enemies_types))
+        self.__update_enemies_position()
 
     def _setup_mapa(self, mapa_matrix: list) -> None:
         self.__proporcao_to_matrix = {}
@@ -388,23 +390,16 @@ class AbstractMapa(ABC):
 
         return self.__MapUpdater.validate_ponto_in_matrix(ponto, matrix)
 
-    def __create_enemies(self, enemies_types: List[Type[AbstractInimigo]]) -> List[AbstractInimigo]:
-        enemies_list: List[AbstractInimigo] = []
+    def __update_enemies_position(self) -> None:
         posicoes = self.__map.get_enemies_positions()
+        posicoes = self.__adapter.matrix_index_list_to_pygame_pos_list(posicoes)
         index = 0
 
-        for Enemy_Type in enemies_types:
-            position = posicoes[index]
+        for inimigo in self.__inimigos:
+            inimigo.hitbox.posicao = posicoes[index]
             index += 1
             if index >= len(posicoes):
                 index = 0
-
-            position = self.__adapter.matrix_index_to_pygame_pos(position)
-
-            enemy = Enemy_Type(mapa=self, posicao=position)
-            enemies_list.append(enemy)
-
-        return enemies_list
 
     def __remover_inimigo(self, inimigo):
         self.__inimigos.remove(inimigo)

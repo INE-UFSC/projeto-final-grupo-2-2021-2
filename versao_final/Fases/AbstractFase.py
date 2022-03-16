@@ -8,7 +8,7 @@ from Sounds.MusicHandler import MusicHandler
 
 
 class AbstractFase(ABC):
-    def __init__(self, jogador: Jogador, mapas: List[AbstractMapa]) -> None:
+    def __init__(self, jogador: Jogador) -> None:
         self.__jogador: Jogador = jogador
         self.__hud = HUD(self.__jogador.status, self.__jogador.escudo, self.__jogador.arma)
         self.__music = MusicHandler()
@@ -17,13 +17,38 @@ class AbstractFase(ABC):
         self.__MAX_DELAY_CHANGE_MAP = 100
         self.__CURRENT_DELAY_CHANGE_MAP = 0
 
+    def _set_maps_lists(self, mapas: List[AbstractMapa]) -> None:
         self.__maps_list: List[AbstractMapa] = mapas
         self.__current_map: AbstractMapa = self.__maps_list[0]
         self.__current_map_index = 0
         if not self.__current_map.loaded:
             self.__current_map.load()
 
+    @property
+    def mapas(self) -> List[AbstractMapa]:
+        return self.__maps_list
+
+    @mapas.setter
+    def mapas(self, mapas: List[AbstractMapa]) -> None:
+        self.__maps_list = mapas
+        self.__current_map = self.__maps_list[self.__current_map_index]
+        if not self.__current_map.loaded:
+            self.__current_map.load()
+
+    @property
+    def current_map_index(self) -> int:
+        return self.__current_map_index
+
+    @current_map_index.setter
+    def current_map_index(self, map_index) -> None:
+        self.__current_map_index = map_index
+        self.__current_map = self.__maps_list[self.__current_map_index]
+        if not self.__current_map.loaded:
+            self.__current_map.load()
+
     def run(self) -> None:
+        print('Running')
+        print(len(self.__current_map.inimigos))
         self.__update()
         self.__current_map.animate()
         self.__jogador.processar_inputs()
@@ -83,11 +108,11 @@ class AbstractFase(ABC):
         self.__music.play_music(self.__current_map.background_music_path)
 
     @property
-    def _jogador(self) -> Jogador:
+    def jogador(self) -> Jogador:
         return self.__jogador
 
     @property
-    def _mapa(self) -> AbstractMapa:
+    def current_map(self) -> AbstractMapa:
         return self.__current_map
 
     @property

@@ -16,5 +16,4 @@ class LoadingGameState(AbstractState):
 
     def run(self, events: List[Event]) -> States:
         self.__jogoOptions.load_game()
-        print('Retornando Playing')
         return States.PLAYING

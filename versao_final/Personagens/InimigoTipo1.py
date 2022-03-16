@@ -15,8 +15,9 @@ class InimigoTipo1(AbstractInimigo):
     __PATH_TO_SPRITES = {}
 
     def __init__(self, mapa: AbstractMapa, path: str, posicao=(0, 0)) -> None:
+        super().__init__(posicao=posicao, mapa=mapa)
         stats = self.__calibrar_dificuldade()
-        super().__init__(stats=stats, posicao=posicao, tamanho=self._TAMANHO, mapa=mapa)
+        super()._set_status(stats)
 
         if path not in self.__PATH_TO_SPRITES:
             sprites = self.__import_character_assets()

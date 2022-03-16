@@ -26,11 +26,11 @@ class Jogador(AbstractPersonagem):
         'transpassavel': False
     }
 
-    def __init__(self, posicao: tuple, nome: str, mapa=None) -> None:
-        super().__init__(stats=Jogador.__STATS, posicao=posicao, tamanho=(30, 48), mapa=mapa)
+    def __init__(self, posicao: tuple, mapa=None) -> None:
+        super().__init__(posicao=posicao, tamanho=(30, 48), mapa=mapa)
+        super()._set_status(Jogador.__STATS)
 
         self.__itens: List[AbstractItem] = []
-        self.__nome = nome
         self.__escudo: AbstractEscudo = EscudoMadeira(self.hitbox)
 
         if not Jogador.__ANIMACOES_IMPORTADAS:
