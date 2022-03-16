@@ -62,6 +62,10 @@ class Button(ABC):
     def desenhar(self, tela: TelaJogo) -> None:
         draw.rect(tela.janela, self.__color, self.__rect, 3, 8)
 
+    @property
+    def position(self) -> tuple:
+        return self.__position
+
     @abstractmethod
     def get_state(self) -> States:
         pass
@@ -105,12 +109,22 @@ class TextButton(Button):
 class ImageButton(Button):
     def __init__(self, position, size, path, scale, next_state: States) -> None:
         super().__init__(position, size, next_state)
-        self.__image = import_single_sprite(path, scale)
-        self.__rect = self.__image.get_rect(center=position)
+        self.__scale = scale
+        self.__image = import_single_sprite(path, (60, 60))
+        self.__rect = self.__image.get_rect(topleft=position)
+        self.__path_to_sprite = {path: self.__image}
 
     def desenhar(self, tela: TelaJogo) -> None:
-        super().desenhar(tela)
         tela.janela.blit(self.__image, self.__rect)
+
+    def _change_path(self, path: str) -> None:
+        if path in self.__path_to_sprite.keys():
+            self.__image = self.__path_to_sprite[path]
+            self.__rect = self.__image.get_rect(topleft=self.position)
+        else:
+            self.__image = import_single_sprite(path, self.__scale)
+            self.__rect = self.__image.get_rect(topleft=self.position)
+            self.__path_to_sprite[path] = self.__image
 
     def get_state(self) -> States:
         if self.clicked:
@@ -135,7 +149,6 @@ class ImageTextButton(ImageButton):
 
     def desenhar(self, tela: TelaJogo) -> None:
         ImageButton.desenhar(tela)
-        TextButton()
 
 
 class MusicButton(TextButton):
@@ -143,6 +156,7 @@ class MusicButton(TextButton):
 
     def __init__(self, position, next_state: States) -> None:
         self.__music = MusicHandler()
+        self.__opcoes = Opcoes()
         text = self.__get_current_music_status_text()
         super().__init__(text, position, MusicButton.__SIZE, next_state)
 
@@ -161,12 +175,52 @@ class MusicButton(TextButton):
 
     def __executar(self) -> None:
         self.__music.toggle_pause()
+        self.__opcoes.tocar_musica = not self.__opcoes.tocar_musica
 
     def __update(self) -> None:
         self.text = self.__get_current_music_status_text()
 
     def desenhar(self, tela: TelaJogo) -> None:
         self.__update()
+        super().desenhar(tela)
+
+
+class MusicImageButton(ImageButton):
+    __MUTED_PATH = 'Assets/Telas/mutado.png'
+    __NOT_MUTED_PATH = 'Assets/Telas/som.png'
+
+    def __init__(self, position, size, scale, next_state: States) -> None:
+        self.__music = MusicHandler()
+        self.__opcoes = Opcoes()
+
+        path = self.__get_current_path()
+        super().__init__(position, size, path, scale, next_state)
+
+    def __get_current_path(self) -> str:
+        if self.__opcoes.tocar_musica:
+            return MusicImageButton.__NOT_MUTED_PATH
+        else:
+            return MusicImageButton.__MUTED_PATH
+
+    def get_state(self) -> States:
+        if self.clicked:
+            self.__executar()
+            return self.next_state
+        else:
+            return States.SAME
+
+    def run(self, events: List[Event]) -> None:
+        return super().run(events)
+
+    def __executar(self) -> None:
+        self.__opcoes.tocar_musica = not self.__opcoes.tocar_musica
+        self.__music.toggle_pause()
+        path = self.__get_current_path()
+        super()._change_path(path)
+
+    def desenhar(self, tela: TelaJogo) -> None:
+        path = self.__get_current_path()
+        super()._change_path(path)
         super().desenhar(tela)
 
 

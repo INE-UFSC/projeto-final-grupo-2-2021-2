@@ -8,11 +8,18 @@ from Config.TelaJogo import TelaJogo
 
 
 class AbstractView:
-    def __init__(self, state: States) -> None:
+    def __init__(self, state: States, position=None, size=None) -> None:
         self.__state: States = state
         self.__opcoes = Opcoes()
-        self.__views_size = self.__opcoes.TAMANHO_TELA
-        self.__position = self.__opcoes.POSICAO_TELAS
+        if size is None:
+            self.__views_size = self.__opcoes.TAMANHO_TELA
+        else:
+            self.__views_size = size
+
+        if position is None:
+            self.__position = self.__opcoes.POSICAO_TELAS
+        else:
+            self.__position = position
 
     @abstractmethod
     def desenhar(self, tela: TelaJogo) -> None:
