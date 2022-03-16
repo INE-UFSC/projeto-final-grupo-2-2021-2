@@ -1,3 +1,5 @@
+from DAO.JogoDAO import JogoDAO
+from DAO.JogoOptions import JogoOptions
 from Screen.Components.Text import Text
 from typing import List
 from pygame import Rect, Surface, event
@@ -5,7 +7,7 @@ from pygame import Rect, Surface
 from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
 from Config.Enums import States
-from Screen.Components.Buttons import Button, MenuButton
+from Screen.Components.Buttons import Button, MenuButton, SaveButton
 from Screen.Views.AbstractView import AbstractView
 
 
@@ -24,6 +26,9 @@ class LoadGameView(AbstractView):
 
         self.__image = LoadGameView.__IMAGE
         self.__rect = self.__image.get_rect(topleft=self._position)
+        self.__active_save_button: SaveButton = None
+        self.__jogoOptions = JogoOptions()
+        self.__dao = JogoDAO()
 
         self.__BTN_POS = [
             (self._views_size[0]*2/10, self._views_size[1]/2 - 100),
@@ -37,14 +42,10 @@ class LoadGameView(AbstractView):
         ]
 
         self.__buttons: List[Button] = [
-            MenuButton('Save1', self.__BTN_POS[0], States.SAME),
-            MenuButton('Save2', self.__BTN_POS[1], States.SAME),
-            MenuButton('Save3', self.__BTN_POS[2], States.SAME),
-            MenuButton('Save4', self.__BTN_POS[3], States.SAME),
-            MenuButton('Save5', self.__BTN_POS[4], States.SAME),
-            MenuButton('Start', self.__BTN_POS[5], States.PLAYING),
+            MenuButton('Start', self.__BTN_POS[5], States.LOAD_GAME),
             MenuButton('Delete', self.__BTN_POS[6], States.SAME),
             MenuButton('Return', self.__BTN_POS[7], States.PLAY)]
+        self.__load_save_buttons()
         self.__TEXT_POS = [
             (self._views_size[0]/2, 100),
             (self._views_size[0]*2/10, self._views_size[1]/2 - 150)
@@ -69,12 +70,44 @@ class LoadGameView(AbstractView):
         for text in self.__texts:
             text.desenhar(tela)
 
+    def __load_save_buttons(self) -> None:
+        saves_names = self.__jogoOptions.get_all_names()
+        if len(self.__buttons) > 3:
+            self.__buttons = self.__buttons[:3]
+
+        self.__buttons.extend([
+            SaveButton(saves_names[0], self.__BTN_POS[0], States.SAME),
+            SaveButton(saves_names[1], self.__BTN_POS[1], States.SAME),
+            SaveButton(saves_names[2], self.__BTN_POS[2], States.SAME),
+            SaveButton(saves_names[3], self.__BTN_POS[3], States.SAME),
+            SaveButton(saves_names[4], self.__BTN_POS[4], States.SAME)])
+
     def run(self, events: List[event.Event]) -> States:
         for button in self.__buttons:
             button.hover()
             button.run(events)
-            state = button.get_state()
 
-            if state != States.SAME:
-                return state
+        saves_buttons = self.__buttons[3:]
+        for button in saves_buttons:
+            if button.active:
+                self.__active_save_button = button
+                self.__jogoOptions.load_game_name = button.text
+
+        start_button = self.__buttons[0]
+        if start_button.clicked:
+            print('Clicado')
+            if self.__active_save_button is None or self.__active_save_button.text == 'Empty':
+                return States.SAME
+            else:
+                return start_button.next_state
+
+        delete_button = self.__buttons[1]
+        if delete_button.clicked:
+            if self.__active_save_button is not None or self.__active_save_button.text == 'Empty':
+                self.__dao.remove(self.__active_save_button.text)
+                self.__load_save_buttons()
+
+        return_button = self.__buttons[2]
+        if return_button.clicked:
+            return return_button.next_state
         return States.SAME

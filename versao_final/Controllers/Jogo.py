@@ -1,5 +1,4 @@
 from typing import List
-import pygame
 from pygame import event
 from Config.TelaJogo import TelaJogo
 from Personagens.Jogador import Jogador
@@ -10,12 +9,16 @@ from Sounds.MusicHandler import MusicHandler
 
 
 class Jogo:
-    def __init__(self):
-        pygame.init()  # Temporariamente enquanto não mexo nas telas
+    def __init__(self, save_name: str):
+        self.__save_name = save_name
         self.__music = MusicHandler()
         self.__opcoes = Opcoes()
         self.__carregar_dados()
         self.__PLAYER_WON = False
+
+    @property
+    def save_name(self) -> str:
+        return self.__save_name
 
     def player_has_lost(self) -> bool:
         return self.__fase_atual.player_has_lost()

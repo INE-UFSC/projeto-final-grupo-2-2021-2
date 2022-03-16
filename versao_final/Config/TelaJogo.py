@@ -1,7 +1,7 @@
 import pygame
 from Config.Opcoes import Opcoes
 
-BACKGROUND_PATH = 'Assets/Telas/FundoFloresta.png'
+BACKGROUND_PATH = 'Assets/Telas/3.jpg'
 
 
 class TelaJogo():

@@ -6,20 +6,20 @@ from Config.Enums import States
 from Screen.Views.AbstractView import AbstractView
 
 
-class PlayingView(AbstractView):
-    __STATE = States.PLAYING
+class StaticView(AbstractView):
+    __STATE = States.STATIC
     __IMAGE_PATH = 'Assets/Telas/3.1.jpg'
     __IMAGE_LOADED = False
     __IMAGE: Surface = None
 
     def __init__(self) -> None:
-        super().__init__(PlayingView.__STATE)
+        super().__init__(StaticView.__STATE)
 
-        if not PlayingView.__IMAGE_LOADED:
-            PlayingView.__IMAGE = import_single_sprite(PlayingView.__IMAGE_PATH, self._views_size)
-            PlayingView.__IMAGE_LOADED = True
+        if not StaticView.__IMAGE_LOADED:
+            StaticView.__IMAGE = import_single_sprite(StaticView.__IMAGE_PATH, self._views_size)
+            StaticView.__IMAGE_LOADED = True
 
-        self.__image = PlayingView.__IMAGE
+        self.__image = StaticView.__IMAGE
         self.__rect = self.__image.get_rect(topleft=self._position)
 
     @property

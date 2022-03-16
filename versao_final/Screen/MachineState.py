@@ -1,7 +1,9 @@
 from Config.Enums import States
 from Config.TelaJogo import TelaJogo
 from Screen.States.AbstractState import AbstractState
+from Screen.States.CreateNewGameState import CreateNewGameState
 from Screen.States.LoadGameState import LoadGameState
+from Screen.States.LoadingGameState import LoadingGameState
 from Screen.States.MenuState import MenuState
 from Screen.States.OptionsState import OptionsState
 from typing import Dict, List
@@ -21,7 +23,9 @@ class StateMachine:
             States.PLAY: PlayGameState(),
             States.NEW: NewGameState(),
             States.LOAD: LoadGameState(),
-            States.PLAYING: PlayingState()}
+            States.PLAYING: PlayingState(),
+            States.CREATE_NEW: CreateNewGameState(),
+            States.LOAD_GAME: LoadingGameState()}
         self.__current: AbstractState = self.__states[States.MENU]
 
     @property
@@ -44,6 +48,6 @@ class StateMachine:
     def __set_next_state(self, state: States) -> None:
         if state == States.SAME:
             return None
-
+        print(state)
         next_state = self.__states[state]
         self.__current = next_state

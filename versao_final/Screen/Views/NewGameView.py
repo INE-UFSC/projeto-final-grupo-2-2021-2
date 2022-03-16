@@ -6,6 +6,7 @@ from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
 from Config.Enums import States
 from Screen.Components.Buttons import Button, MenuButton, InputText
+from DAO.JogoOptions import JogoOptions
 from Screen.Views.AbstractView import AbstractView
 
 
@@ -17,6 +18,7 @@ class NewGameView(AbstractView):
 
     def __init__(self) -> None:
         super().__init__(NewGameView.__STATE)
+        self.__jogoOptions = JogoOptions()
 
         if not NewGameView.__IMAGE_LOADED:
             NewGameView.__IMAGE = import_single_sprite(NewGameView.__IMAGE_PATH, self._views_size)
@@ -30,7 +32,7 @@ class NewGameView(AbstractView):
             (self._views_size[0]/2, self._views_size[1]/2 + 50),
             (self._views_size[0]*55/100, self._views_size[1]/2 - 100)]
         self.__buttons: List[Button] = [
-            MenuButton('START', self.__BTN_POS[0], States.PLAYING),
+            MenuButton('START', self.__BTN_POS[0], States.CREATE_NEW),
             MenuButton('RETURN', self.__BTN_POS[1], States.PLAY),
             InputText(self.__BTN_POS[2], 'Save1')
         ]
@@ -63,6 +65,10 @@ class NewGameView(AbstractView):
             button.hover()
             button.run(events)
             state = button.get_state()
+
+            if state == States.CREATE_NEW:
+                input_text = self.__buttons[2].text
+                self.__jogoOptions.new_game_name = input_text
 
             if state != States.SAME:
                 return state

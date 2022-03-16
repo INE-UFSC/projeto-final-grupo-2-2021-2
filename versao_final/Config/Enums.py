@@ -48,3 +48,6 @@ class States(Enum):
     SAME = 6
     QUIT = 7
     PLAYING = 8
+    LOAD_GAME = 9
+    CREATE_NEW = 10
+    STATIC = 11

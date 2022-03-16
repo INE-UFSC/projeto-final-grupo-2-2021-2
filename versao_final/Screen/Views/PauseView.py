@@ -1,6 +1,5 @@
 from typing import List
 from pygame import Rect, Surface, event
-from Config.Opcoes import Opcoes
 from Config.TelaJogo import TelaJogo
 from Screen.Components.Buttons import Button, MenuButton, MusicImageButton
 from Utils.Folder import import_single_sprite
