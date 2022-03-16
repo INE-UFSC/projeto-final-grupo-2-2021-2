@@ -1,12 +1,14 @@
 from Config.Enums import States
 from Config.TelaJogo import TelaJogo
-from Views.States.AbstractState import AbstractState
-from Views.States.MenuState import MenuState
-from Views.States.OptionsState import OptionsState
+from Screen.States.AbstractState import AbstractState
+from Screen.States.LoadGameState import LoadGameState
+from Screen.States.MenuState import MenuState
+from Screen.States.OptionsState import OptionsState
 from typing import Dict, List
-from Views.States.PlayGameState import PlayGameState
-from Views.States.NewGameState import NewGameState
-from Views.States.QuitState import QuitState
+from Screen.States.PlayGameState import PlayGameState
+from Screen.States.NewGameState import NewGameState
+from Screen.States.PlayingState import PlayingState
+from Screen.States.QuitState import QuitState
 from pygame.event import Event
 
 
@@ -17,7 +19,9 @@ class StateMachine:
             States.OPTIONS: OptionsState(),
             States.QUIT: QuitState(),
             States.PLAY: PlayGameState(),
-            States.NEW: NewGameState()}
+            States.NEW: NewGameState(),
+            States.LOAD: LoadGameState(),
+            States.PLAYING: PlayingState()}
         self.__current: AbstractState = self.__states[States.MENU]
 
     @property

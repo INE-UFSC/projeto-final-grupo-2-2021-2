@@ -4,7 +4,7 @@ from Utils.Ataque import Ataque
 from Utils.Hitbox import Hitbox
 from Personagens.AbstractPersonagem import AbstractPersonagem
 from Personagens.EnemyState import EnemyState
-from pygame import Rect, Surface
+from pygame import Rect
 
 
 class AbstractInimigo(AbstractPersonagem, ABC):

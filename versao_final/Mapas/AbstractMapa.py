@@ -75,9 +75,6 @@ class AbstractMapa(ABC):
             position = self.__adapter.matrix_index_to_pygame_pos(position_map)
             self.__objetos.append(ObjetoInvisivel(position, (menor, menor), True, False))
 
-    def iniciar_rodada(self, tela: TelaJogo) -> None:
-        self.desenhar(tela)
-
     def send_enemies_signal(self, signal: AbstractSignal) -> None:
         for enemy in self.__inimigos:
             if enemy == signal.sender:

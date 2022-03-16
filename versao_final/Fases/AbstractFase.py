@@ -40,9 +40,8 @@ class AbstractFase(ABC):
         else:
             return False
 
-    def start(self, tela: TelaJogo):
+    def start(self):
         self.__jogador.mapa = self.__current_map
-        self.__current_map.iniciar_rodada(tela)
         self.__music.play_music(self.__current_map.background_music_path)
 
     def desenhar(self, tela: TelaJogo) -> None:

@@ -1,12 +1,12 @@
-from Views.Components.Text import DifficultyText, Text
+from Screen.Components.Text import DifficultyText, Text
 from typing import List
 from pygame import Rect, Surface, event
 from pygame import Rect, Surface
 from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
 from Config.Enums import States
-from Views.Components.Buttons import Button, ButtonDificil, ButtonFacil, ButtonMedio, MenuButton, MusicButton
-from Views.Views.AbstractView import AbstractView
+from Screen.Components.Buttons import Button, ButtonDificil, ButtonFacil, ButtonMedio, MenuButton, MusicButton
+from Screen.Views.AbstractView import AbstractView
 
 
 class OptionsView(AbstractView):

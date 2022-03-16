@@ -1,7 +1,6 @@
-from pickle import FALSE
 from Config.TelaJogo import TelaJogo
 from Sounds.MusicHandler import MusicHandler
-from Views.MachineState import StateMachine
+from Screen.MachineState import StateMachine
 import pygame
 
 

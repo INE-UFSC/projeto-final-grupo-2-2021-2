@@ -1,5 +1,5 @@
-from Views.States.AbstractState import AbstractState
-from Views.Views.PlayGameView import PlayGameView
+from Screen.States.AbstractState import AbstractState
+from Screen.Views.PlayGameView import PlayGameView
 from Config.Enums import States
 
 

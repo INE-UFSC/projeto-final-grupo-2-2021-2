@@ -1,5 +1,5 @@
-from Views.States.AbstractState import AbstractState
-from Views.Views.MenuView import MenuView
+from Screen.States.AbstractState import AbstractState
+from Screen.Views.MenuView import MenuView
 from Config.Enums import States
 
 

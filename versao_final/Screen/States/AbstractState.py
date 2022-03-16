@@ -1,7 +1,7 @@
 from typing import List
 from pygame.event import Event
 from Config.TelaJogo import TelaJogo
-from Views.Views.AbstractView import AbstractView
+from Screen.Views.AbstractView import AbstractView
 from Config.Enums import States
 
 

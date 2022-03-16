@@ -1,5 +1,5 @@
-from Views.States.AbstractState import AbstractState
-from Views.Views.OptionsView import OptionsView
+from Screen.States.AbstractState import AbstractState
+from Screen.Views.OptionsView import OptionsView
 from Config.Enums import States
 
 

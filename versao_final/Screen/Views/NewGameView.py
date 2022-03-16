@@ -1,43 +1,47 @@
-from Views.Components.Text import Text
+from Screen.Components.Text import Text
 from typing import List
+from pygame import Rect, Surface, event
 from pygame import Rect, Surface
 from Config.TelaJogo import TelaJogo
-from pygame import Rect, Surface, event
 from Utils.Folder import import_single_sprite
 from Config.Enums import States
-from Views.Components.Buttons import Button, MenuButton
-from Views.Views.AbstractView import AbstractView
+from Screen.Components.Buttons import Button, MenuButton, InputText
+from Screen.Views.AbstractView import AbstractView
 
 
-class PlayGameView(AbstractView):
-    __STATE = States.PLAY
+class NewGameView(AbstractView):
+    __STATE = States.NEW
     __IMAGE_PATH = 'Assets/Telas/3.1.jpg'
     __IMAGE_LOADED = False
     __IMAGE: Surface = None
 
     def __init__(self) -> None:
-        super().__init__(PlayGameView.__STATE)
+        super().__init__(NewGameView.__STATE)
 
-        if not PlayGameView.__IMAGE_LOADED:
-            PlayGameView.__IMAGE = import_single_sprite(PlayGameView.__IMAGE_PATH, self._views_size)
-            PlayGameView.__IMAGE_LOADED = True
+        if not NewGameView.__IMAGE_LOADED:
+            NewGameView.__IMAGE = import_single_sprite(NewGameView.__IMAGE_PATH, self._views_size)
+            NewGameView.__IMAGE_LOADED = True
 
-        self.__image = PlayGameView.__IMAGE
+        self.__image = NewGameView.__IMAGE
         self.__rect = self.__image.get_rect(topleft=self._position)
 
         self.__BTN_POS = [
-            (self._views_size[0]/2, self._views_size[1]/2 - 100),
             (self._views_size[0]/2, self._views_size[1]/2 - 25),
-            (self._views_size[0]/2, self._views_size[1]/2 + 50)]
+            (self._views_size[0]/2, self._views_size[1]/2 + 50),
+            (self._views_size[0]*55/100, self._views_size[1]/2 - 100)]
         self.__buttons: List[Button] = [
-            MenuButton('NEW', self.__BTN_POS[0], States.NEW),
-            MenuButton('LOAD', self.__BTN_POS[1], States.LOAD),
-            MenuButton('RETURN', self.__BTN_POS[2], States.MENU)]
+            MenuButton('START', self.__BTN_POS[0], States.PLAYING),
+            MenuButton('RETURN', self.__BTN_POS[1], States.PLAY),
+            InputText(self.__BTN_POS[2], 'Save1')
+        ]
 
         self.__TEXT_POS = [
-            (self._views_size[0]/2, 100)]
+            (self._views_size[0]/2, 100),
+            (self._views_size[0]*45/100, self._views_size[1]/2 - 100),
+        ]
         self.__texts: List[Text] = [
-            Text(self.__TEXT_POS[0], 60, 'The Binding Of Isaac')]
+            Text(self.__TEXT_POS[0], 60, 'New Game'),
+            Text(self.__TEXT_POS[1], 25, 'Save Name:')]
 
     @property
     def image(self) -> Surface:
