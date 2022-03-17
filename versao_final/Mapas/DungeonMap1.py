@@ -48,7 +48,6 @@ class DungeonMap1(AbstractMapa):
 
     def __init__(self, jogador: Jogador, enemies: List[AbstractInimigo] = None):
         super().__init__(jogador, enemies)
-        print('Criando Mapa 1')
 
         self.__adapter = Adapter()
 
@@ -68,13 +67,11 @@ class DungeonMap1(AbstractMapa):
 
     def load(self) -> None:
         if not self.__LOADED:
-            print('Setup do Dungeon1')
             super()._setup_mapa(DungeonMap1.__MATRIX)
             super().load()
             self.__LOADED = True
 
         for inimigo in self.inimigos:
-            print(inimigo.hitbox.posicao)
             if inimigo.hitbox.posicao == (0, 0):
                 super().load()
                 break

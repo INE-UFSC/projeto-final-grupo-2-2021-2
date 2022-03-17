@@ -9,7 +9,6 @@ class EnemyState(AbstractSignal):
     __RANGE = 145
 
     def __init__(self, state: Estado, hitbox: Hitbox, sender: AbstractPersonagem) -> None:
-        print('Criando EnemyState')
         self.__state = state
         self.__hitbox = hitbox
         self.__sender = sender

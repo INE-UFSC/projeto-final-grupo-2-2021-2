@@ -1,4 +1,6 @@
+from copy import copy, deepcopy
 from typing import List, Type
+from zlib import decompressobj
 from Controllers.ControladorFases import ControladorFases
 from Controllers.Jogo import Jogo
 from Fases.AbstractFase import AbstractFase
@@ -75,18 +77,27 @@ class MapDaoAdapter:
         enemies_dao = mapa_dao['enemies']
         MapTipo: Type[AbstractMapa] = mapa_dao['type']
 
+        # Create the player and take his hitbox
         jogador = JogadorDaoAdapter.create(jogador_dao)
+        hitbox_jogador = copy(jogador.hitbox)
+
+        # Create the map and then change the player hitbox
         mapa = MapTipo(jogador)
         mapa.load()
+        jogador.set_hitbox(hitbox_jogador)
+
+        # Create the enemies
         enemies = []
         for enemy_dao in enemies_dao:
             enemy = InimigosDaoAdapter.create(enemy_dao, mapa)
             enemies.append(enemy)
 
+        # Keep their hitbox
         list_hitbox = []
         for enemy in enemies:
             list_hitbox.append(enemy.hitbox)
 
+        # Add the enemies to map and return their hitbox
         mapa.add_inimigos(enemies)
         for inimigo in mapa.inimigos:
             hitbox = list_hitbox.pop(0)
@@ -120,27 +131,32 @@ class FaseDaoAdapter:
         mapa_index: int = fase_dao['map_index']
         mapas_dao = dict = fase_dao['mapas']
 
+        # Create the player and keep his hitbox
         jogador = JogadorDaoAdapter.create(jogador_dao)
-        mapas: List[AbstractMapa] = []
+        true_hitbox = deepcopy(jogador.hitbox)
 
+        # Create each map
+        mapas: List[AbstractMapa] = []
         for mapa_dao in mapas_dao:
-            # print('Criando um mapa')
             mapa = MapDaoAdapter.create(mapa_dao)
             mapas.append(mapa)
 
-        # print('Criando Fase')
+        # Create the phase, load each map and update the player hitbox
         fase = FaseType(jogador)
-        # print('Pronto')
         for mapa in mapas:
-            mapa.jogador = jogador
             mapa.load()
+            mapa.jogador.set_hitbox(true_hitbox)
+        fase.jogador.set_hitbox(true_hitbox)
+        # Update player in phase, now with another hitbox, another shield, and another HUD
+        fase.jogador = fase.jogador
 
+        # Configure the current map in player instance
         current_map = mapas[mapa_index]
         jogador.mapa = current_map
 
+        # Update maps in phase instance
         fase.mapas = mapas
         fase.current_map_index = mapa_index
-
         return fase
 
 
@@ -165,22 +181,36 @@ class ControladorFasesDaoAdapter:
     @classmethod
     def create(cls, controlador_dao: dict) -> ControladorFases:
         fases_dao = controlador_dao['fases']
+        current_fase_dao = controlador_dao['current']
+
+        # Create each phase in the phases list
         fases = []
         for fase_dao in fases_dao:
-            # print('Criando aqui')
             fase = FaseDaoAdapter.create(fase_dao)
-            jogador = fase.jogador
             fases.append(fase)
 
-        current_fase_dao = controlador_dao['current']
+        # Create the current fase and get the player instance
         current_fase = FaseDaoAdapter.create(current_fase_dao)
         jogador = current_fase.jogador
 
-        # print('Criando Controlador')
+        # Keep the player hitbox and create the controller
+        true_hitbox = deepcopy(jogador.hitbox)
         controlador = ControladorFases(jogador)
+
+        # Return the player hitbox to him
+        jogador.set_hitbox(true_hitbox)
+
+        # Update the player instances in all objects
+        for mapa in current_fase.mapas:
+            mapa.jogador = jogador
+        # Update the current map in player
+        jogador.mapa = current_fase.current_map
+        # Update the player in phase, now with another shield and HUD
+        current_fase.jogador = current_fase.jogador
+
+        # Update the current phases and phases list in controller
         controlador.current_fase = current_fase
         controlador.set_fases(fases)
-
         return controlador
 
 
@@ -203,7 +233,6 @@ class JogoDaoAdapter:
         controlador = ControladorFasesDaoAdapter.create(controlador_dao)
 
         jogo = Jogo(save_name)
-        jogo.controlador = controlador
 
-        # print('Retornando Jogo')
+        jogo.controlador = controlador
         return jogo

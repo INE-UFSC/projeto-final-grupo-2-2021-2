@@ -67,13 +67,11 @@ class DungeonMap2(AbstractMapa):
 
     def load(self) -> None:
         if not self.__LOADED:
-            print('Setup do Dungeon2')
             super()._setup_mapa(DungeonMap2.__MATRIX)
             self.__LOADED = True
             super().load()
 
         for inimigo in self.inimigos:
-            print(inimigo.hitbox.posicao)
             if inimigo.hitbox.posicao == (0, 0):
                 super().load()
                 break

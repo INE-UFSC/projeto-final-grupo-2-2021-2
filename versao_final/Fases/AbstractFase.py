@@ -107,6 +107,13 @@ class AbstractFase(ABC):
     def jogador(self) -> Jogador:
         return self.__jogador
 
+    @jogador.setter
+    def jogador(self, jogador: Jogador) -> None:
+        if isinstance(jogador, Jogador):
+            self.__jogador = jogador
+            print('Atualizando HUD')
+            self.__hud = HUD(self.__jogador.status, self.__jogador.escudo, self.__jogador.arma)
+
     @property
     def current_map(self) -> AbstractMapa:
         return self.__current_map

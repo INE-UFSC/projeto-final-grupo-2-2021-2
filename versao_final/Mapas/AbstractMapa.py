@@ -78,16 +78,11 @@ class AbstractMapa(ABC):
             self.__objetos.append(ObjetoInvisivel(position, (menor, menor), True, False))
 
     def send_enemies_signal(self, signal: AbstractSignal) -> None:
-        print('Send Signal')
         for enemy in self.__inimigos:
             if enemy == signal.sender:
                 continue
-            print(f'Pos Inimigo: {enemy.hitbox.posicao}')
-            print(signal.source_position)
-            print(signal.sender.hitbox.posicao)
             dist = GAHandler.distancia_dois_pontos(signal.source_position, enemy.hitbox.center)
             if dist < signal.signal_range:
-                print(dist)
                 enemy.receive_signal(signal)
 
     def animate(self) -> None:
