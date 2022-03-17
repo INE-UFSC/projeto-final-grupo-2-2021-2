@@ -6,7 +6,7 @@ from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
 from Config.Enums import States
 from Screen.Components.Buttons import Button, MenuButton, InputText
-from DAO.JogoOptions import JogoOptions
+from Jogo.ControllerJogo import ControllerJogo
 from Screen.Views.AbstractView import AbstractView
 
 
@@ -18,7 +18,9 @@ class NewGameView(AbstractView):
 
     def __init__(self) -> None:
         super().__init__(NewGameView.__STATE)
-        self.__jogoOptions = JogoOptions()
+        self.__FORCE_RUN = False
+        self.__NEXT_STATE = None
+        self.__jogoOptions = ControllerJogo()
 
         if not NewGameView.__IMAGE_LOADED:
             NewGameView.__IMAGE = import_single_sprite(NewGameView.__IMAGE_PATH, self._views_size)
@@ -44,6 +46,7 @@ class NewGameView(AbstractView):
         self.__texts: List[Text] = [
             Text(self.__TEXT_POS[0], 60, 'New Game'),
             Text(self.__TEXT_POS[1], 25, 'Save Name:')]
+        self.__temp_text: List[List[Text, int]] = []
 
     @property
     def image(self) -> Surface:
@@ -60,15 +63,34 @@ class NewGameView(AbstractView):
         for text in self.__texts:
             text.desenhar(tela)
 
+        for index, [text, duration] in enumerate(self.__temp_text):
+            if duration > 0:
+                self.__temp_text[index][1] -= 1
+                duration -= 1
+                text.desenhar(tela)
+            else:
+                self.__temp_text.remove([text, duration])
+
     def run(self, events: List[event.Event]) -> States:
         for button in self.__buttons:
-            button.hover()
             button.run(events)
+
+        start_button = self.__buttons[0]
+        if start_button.clicked and not self.__FORCE_RUN:
+            text = Text((575, 530), 35, 'Loading New Game...')
+            self.__temp_text.append([text, 40])
+            input_text = self.__buttons[2].text
+            self.__jogoOptions.new_game_name = input_text
+            self.__FORCE_RUN = True
+            self.__NEXT_STATE = start_button.next_state
+            return States.SAME
+
+        for button in self.__buttons:
+            button.hover()
             state = button.get_state()
 
-            if state == States.CREATE_NEW:
-                input_text = self.__buttons[2].text
-                self.__jogoOptions.new_game_name = input_text
+            if self.__FORCE_RUN:
+                return self.__NEXT_STATE
 
             if state != States.SAME:
                 return state

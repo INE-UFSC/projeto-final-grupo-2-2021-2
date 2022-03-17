@@ -21,8 +21,7 @@ class AbstractFase(ABC):
         self.__maps_list: List[AbstractMapa] = mapas
         self.__current_map: AbstractMapa = self.__maps_list[0]
         self.__current_map_index = 0
-        if not self.__current_map.loaded:
-            self.__current_map.load()
+        self.__current_map.load()
 
     @property
     def mapas(self) -> List[AbstractMapa]:
@@ -32,8 +31,7 @@ class AbstractFase(ABC):
     def mapas(self, mapas: List[AbstractMapa]) -> None:
         self.__maps_list = mapas
         self.__current_map = self.__maps_list[self.__current_map_index]
-        if not self.__current_map.loaded:
-            self.__current_map.load()
+        self.__current_map.load()
 
     @property
     def current_map_index(self) -> int:
@@ -43,12 +41,9 @@ class AbstractFase(ABC):
     def current_map_index(self, map_index) -> None:
         self.__current_map_index = map_index
         self.__current_map = self.__maps_list[self.__current_map_index]
-        if not self.__current_map.loaded:
-            self.__current_map.load()
+        self.__current_map.load()
 
     def run(self) -> None:
-        print('Running')
-        print(len(self.__current_map.inimigos))
         self.__update()
         self.__current_map.animate()
         self.__jogador.processar_inputs()
@@ -100,8 +95,7 @@ class AbstractFase(ABC):
         next_map = self.__maps_list[self.__current_map_index + 1]
         self.__current_map = next_map
         self.__current_map_index += 1
-        if not self.__current_map.loaded:
-            self.__current_map.load()
+        self.__current_map.load()
         self.__current_map.change_player_position_entering_map()
         self.__jogador.mapa = self.__current_map
         self.__CURRENT_DELAY_CHANGE_MAP = self.__MAX_DELAY_CHANGE_MAP
@@ -110,6 +104,12 @@ class AbstractFase(ABC):
     @property
     def jogador(self) -> Jogador:
         return self.__jogador
+
+    @jogador.setter
+    def jogador(self, jogador: Jogador) -> None:
+        if isinstance(jogador, Jogador):
+            self.__jogador = jogador
+            self.__hud = HUD(self.__jogador.status, self.__jogador.escudo, self.__jogador.arma)
 
     @property
     def current_map(self) -> AbstractMapa:

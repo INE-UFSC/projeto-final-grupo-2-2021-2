@@ -1,22 +1,11 @@
 import pygame
-from Utils.Folder import import_folder, import_single_sprite
-from pygame.sprite import Sprite
-from DAO.DAO import DAO
+from Sounds.MusicHandler import MusicHandler
+from Config.TelaJogo import TelaJogo
+pygame.init()
+tela = TelaJogo()
+tela.mostrar_fundo()
 
+music = MusicHandler()
 
-class Teste(Sprite):
-
-    def __init__(self) -> None:
-        pygame.init()
-        super().__init__()
-        self.image = pygame.image.load('Assets/Telas/1.jpg')
-
-
-janela = pygame.display.set_mode((500, 500))
-imagem_fundo = pygame.image.load('Assets/Telas/1.jpg')
-
-
-teste1 = Teste()
-
-dao = DAO()
-dao.add('Key', teste1)
+path = 'Sounds/musics/lose/lose_music_10.mp3'
+music.play_music_once(path)

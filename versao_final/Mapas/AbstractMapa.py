@@ -81,7 +81,6 @@ class AbstractMapa(ABC):
         for enemy in self.__inimigos:
             if enemy == signal.sender:
                 continue
-
             dist = GAHandler.distancia_dois_pontos(signal.source_position, enemy.hitbox.center)
             if dist < signal.signal_range:
                 enemy.receive_signal(signal)
@@ -396,7 +395,8 @@ class AbstractMapa(ABC):
         index = 0
 
         for inimigo in self.__inimigos:
-            inimigo.hitbox.posicao = posicoes[index]
+            hitbox = Hitbox(posicoes[index], inimigo.hitbox.tamanho)
+            inimigo.set_hitbox(hitbox)
             index += 1
             if index >= len(posicoes):
                 index = 0
@@ -408,6 +408,11 @@ class AbstractMapa(ABC):
     @property
     def jogador(self) -> Jogador:
         return self.__jogador
+
+    @jogador.setter
+    def jogador(self, jogador: Jogador) -> None:
+        if isinstance(jogador, Jogador):
+            self.__jogador = jogador
 
     @property
     def inimigos(self) -> List[AbstractInimigo]:

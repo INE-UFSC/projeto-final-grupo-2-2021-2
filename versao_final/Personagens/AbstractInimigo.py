@@ -26,6 +26,10 @@ class AbstractInimigo(AbstractPersonagem, ABC):
         self.__view_distance = stats['view_distance'] if 'view_distance' in stats.keys() else 150
         return super()._set_status(stats)
 
+    def set_hitbox(self, hitbox: Hitbox) -> None:
+        super().set_hitbox(hitbox)
+        self.__state = EnemyState(Estado.REPOUSO, self.hitbox, self)
+
     def _tomou_dano(self) -> bool:
         return self.__TOMOU_DANO
 

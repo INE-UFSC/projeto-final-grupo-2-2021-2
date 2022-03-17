@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 from typing import Any, List
 from Config.Opcoes import Opcoes
 from Config.Enums import Dificuldade, States
-from DAO.JogoOptions import JogoOptions
+from Jogo.ControllerJogo import ControllerJogo
 from Sounds.MusicHandler import MusicHandler
 from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
-from pygame import K_BACKSPACE, KEYDOWN, MOUSEBUTTONDOWN, Rect, draw, font, MOUSEBUTTONUP, K_DELETE
+from pygame import K_BACKSPACE, KEYDOWN, MOUSEBUTTONDOWN, Rect, draw, font, MOUSEBUTTONUP
 from pygame.event import Event
 import pygame
 
@@ -141,7 +141,7 @@ class MenuButton(TextButton):
         super().__init__(text, position, MenuButton.__SIZE, next_state)
 
 
-class SaveButton(MenuButton):
+class SaveNameButton(MenuButton):
     def __init__(self, text, position, next_state: States) -> None:
         super().__init__(text, position, next_state)
         self.__active = False
@@ -162,6 +162,26 @@ class SaveButton(MenuButton):
             self.hover()
 
         super().desenhar(tela)
+
+    @property
+    def active(self) -> bool:
+        return self.__active
+
+
+class SaveButton(MenuButton):
+    def __init__(self, text, position, next_state: States) -> None:
+        super().__init__(text, position, next_state)
+        self.__dao = ControllerJogo()
+
+    def run(self, events: List[Event]) -> None:
+        for event in events:
+            if event.type == MOUSEBUTTONDOWN:
+                if self.rect.collidepoint(event.pos):
+                    self.__executar()
+        super().run(events)
+
+    def __executar(self) -> None:
+        self.__dao.save()
 
     @property
     def active(self) -> bool:
@@ -307,7 +327,7 @@ class InputText(TextButton):
     def __init__(self, position: tuple, default_text: str) -> None:
         super().__init__(default_text, position, InputText.__SIZE, States.SAME)
 
-        self.__jogoOptions = JogoOptions()
+        self.__jogoOptions = ControllerJogo()
         self.__rect_active_color = (255, 50, 50)
         self.__active = False
 

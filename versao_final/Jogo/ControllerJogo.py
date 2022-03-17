@@ -1,25 +1,28 @@
 from typing import List
 from Config.Singleton import Singleton
 from DAO.JogoDAO import JogoDAO
-from Controllers.Jogo import Jogo
+from Jogo.Jogo import Jogo
 
 
-class JogoOptions(Singleton):
+class ControllerJogo(Singleton):
     def __init__(self) -> None:
         if not super().created:
             self.__new_game_name = 'Save1'
             self.__load_game_name = ''
-            self.__current_game_save = 'Empty'
+            self.__current_game_save = ''
             self.__dao = JogoDAO()
             self.__current_game = None
-            self.__available_saves = self.__dao.get_all()
+
+    def save(self) -> None:
+        self.__dao.add(self.__current_game)
 
     def create_new_game(self) -> None:
         self.__current_game = Jogo(self.__new_game_name)
+        self.__current_game_save = self.__new_game_name
 
     def load_game(self) -> None:
         self.__current_game = self.__dao.get(self.__load_game_name)
-        print(self.__current_game.controlador.current_fase.current_map.inimigos)
+        self.__current_game_save = self.__load_game_name
 
     def current_game(self) -> Jogo:
         return self.__current_game

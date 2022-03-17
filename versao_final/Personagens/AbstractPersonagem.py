@@ -166,8 +166,7 @@ class AbstractPersonagem(ABC):
     def hitbox(self) -> Hitbox:
         return self.__hitbox
 
-    @hitbox.setter
-    def hitbox(self, hitbox: Hitbox) -> None:
+    def set_hitbox(self, hitbox: Hitbox) -> None:
         if isinstance(hitbox, Hitbox):
             self.__hitbox = hitbox
 

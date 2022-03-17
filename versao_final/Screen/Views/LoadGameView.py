@@ -1,5 +1,5 @@
 from DAO.JogoDAO import JogoDAO
-from DAO.JogoOptions import JogoOptions
+from Jogo.ControllerJogo import ControllerJogo
 from Screen.Components.Text import Text
 from typing import List
 from pygame import Rect, Surface, event
@@ -7,7 +7,7 @@ from pygame import Rect, Surface
 from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
 from Config.Enums import States
-from Screen.Components.Buttons import Button, MenuButton, SaveButton
+from Screen.Components.Buttons import Button, MenuButton, SaveNameButton
 from Screen.Views.AbstractView import AbstractView
 
 
@@ -19,6 +19,8 @@ class LoadGameView(AbstractView):
 
     def __init__(self) -> None:
         super().__init__(LoadGameView.__STATE)
+        self.__FORCE_RUN = False
+        self.__NEXT_STATE = None
 
         if not LoadGameView.__IMAGE_LOADED:
             LoadGameView.__IMAGE = import_single_sprite(LoadGameView.__IMAGE_PATH, self._views_size)
@@ -26,8 +28,8 @@ class LoadGameView(AbstractView):
 
         self.__image = LoadGameView.__IMAGE
         self.__rect = self.__image.get_rect(topleft=self._position)
-        self.__active_save_button: SaveButton = None
-        self.__jogoOptions = JogoOptions()
+        self.__active_save_button: SaveNameButton = None
+        self.__controllerJogo = ControllerJogo()
         self.__dao = JogoDAO()
 
         self.__BTN_POS = [
@@ -55,6 +57,8 @@ class LoadGameView(AbstractView):
             Text(self.__TEXT_POS[1], 25, 'Available Saves:')
         ]
 
+        self.__temp_text: List[List[Text, int]] = []
+
     @ property
     def image(self) -> Surface:
         return self.__image
@@ -70,17 +74,25 @@ class LoadGameView(AbstractView):
         for text in self.__texts:
             text.desenhar(tela)
 
+        for index, [text, duration] in enumerate(self.__temp_text):
+            if duration > 0:
+                self.__temp_text[index][1] -= 1
+                duration -= 1
+                text.desenhar(tela)
+            else:
+                self.__temp_text.remove([text, duration])
+
     def __load_save_buttons(self) -> None:
-        saves_names = self.__jogoOptions.get_all_names()
+        saves_names = self.__controllerJogo.get_all_names()
         if len(self.__buttons) > 3:
             self.__buttons = self.__buttons[:3]
 
         self.__buttons.extend([
-            SaveButton(saves_names[0], self.__BTN_POS[0], States.SAME),
-            SaveButton(saves_names[1], self.__BTN_POS[1], States.SAME),
-            SaveButton(saves_names[2], self.__BTN_POS[2], States.SAME),
-            SaveButton(saves_names[3], self.__BTN_POS[3], States.SAME),
-            SaveButton(saves_names[4], self.__BTN_POS[4], States.SAME)])
+            SaveNameButton(saves_names[0], self.__BTN_POS[0], States.SAME),
+            SaveNameButton(saves_names[1], self.__BTN_POS[1], States.SAME),
+            SaveNameButton(saves_names[2], self.__BTN_POS[2], States.SAME),
+            SaveNameButton(saves_names[3], self.__BTN_POS[3], States.SAME),
+            SaveNameButton(saves_names[4], self.__BTN_POS[4], States.SAME)])
 
     def run(self, events: List[event.Event]) -> States:
         for button in self.__buttons:
@@ -91,22 +103,34 @@ class LoadGameView(AbstractView):
         for button in saves_buttons:
             if button.active:
                 self.__active_save_button = button
-                self.__jogoOptions.load_game_name = button.text
+                self.__controllerJogo.load_game_name = button.text
 
         start_button = self.__buttons[0]
         if start_button.clicked:
-            if self.__active_save_button is None or self.__active_save_button.text == 'Empty':
+            if self.__active_save_button is not None and self.__active_save_button.text != 'Empty':
+                save_name = self.__controllerJogo.load_game_name
+                text = Text((575, 600), 35, f'Loading Save {save_name}...')
+                self.__temp_text.append([text, 40])
+                self.__FORCE_RUN = True
+                self.__NEXT_STATE = start_button.next_state
                 return States.SAME
             else:
-                return start_button.next_state
+                return States.SAME
 
         delete_button = self.__buttons[1]
         if delete_button.clicked:
-            if self.__active_save_button is not None or self.__active_save_button.text == 'Empty':
-                self.__dao.remove(self.__active_save_button.text)
+            if self.__active_save_button is not None and self.__active_save_button.text != 'Empty':
+                save_name = self.__active_save_button.text
+                self.__active_save_button = None
+                text = Text((575, 600), 35, f'Deleting Save {save_name}...')
+                self.__temp_text.append([text, 20])
+                self.__dao.remove(save_name)
                 self.__load_save_buttons()
 
         return_button = self.__buttons[2]
         if return_button.clicked:
             return return_button.next_state
+
+        if self.__FORCE_RUN:
+            return self.__NEXT_STATE
         return States.SAME

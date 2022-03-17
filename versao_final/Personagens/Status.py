@@ -1,15 +1,33 @@
 class Status:
     def __init__(self, status: dict) -> None:
-        self.__vida_maxima = status['vida'] if 'vida' in status.keys() else 0
+        if 'vida_maxima' in status.keys():
+            self.__vida_maxima = status['vida_maxima']
+        elif 'vida' in status.keys():
+            self.__vida_maxima = status['vida']
+        else:
+            self.__vida_maxima = 0
+        
+        self.__vida = status['vida'] if 'vida' in status.keys() else 0
         self.__ataque = status['ataque'] if 'ataque' in status.keys() else 0
         self.__defesa = status['defesa'] if 'defesa' in status.keys() else 0
         self.__alcance = status['alcance'] if 'alcance' in status.keys() else 0
         self.__vel = status['vel'] if 'vel' in status.keys() else 0
         self.__vel_ataque = status['vel_ataque'] if 'vel_ataque' in status.keys() else 0
-        self.__vida = self.__vida_maxima
         self.__invencibilidade = False
         self.__transpassavel = status['transpassavel'] if 'transpassavel' in status.keys(
         ) else False
+
+    def get_status_dict(self) -> dict:
+        return {
+            'vida': self.__vida,
+            'vida_maxima': self.__vida_maxima,
+            'ataque': 5,
+            'defesa': 5,
+            'vel': 3,
+            'vel_ataque': 1,
+            'transpassavel': False
+        }
+        
 
     @property
     def ataque(self) -> int:

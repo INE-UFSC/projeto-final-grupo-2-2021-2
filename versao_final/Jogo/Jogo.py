@@ -3,7 +3,7 @@ from pygame import event
 from Config.TelaJogo import TelaJogo
 from Personagens.Jogador import Jogador
 from Config.Opcoes import Opcoes
-from Controllers.ControladorFases import ControladorFases
+from Fases.ControladorFases import ControladorFases
 from Fases.AbstractFase import AbstractFase
 from Sounds.MusicHandler import MusicHandler
 
@@ -31,7 +31,6 @@ class Jogo:
         return self.__PLAYER_WON
 
     def run(self, events: List[event.Event]) -> None:
-        print(f'Run Jogo: {len(self.__fase_atual.current_map.inimigos)}')
         self.__music.update()
         self.__fase_atual.run()
 
