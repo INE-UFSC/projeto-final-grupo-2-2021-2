@@ -21,7 +21,6 @@ class PlayingState(AbstractState):
         self.__jogoOptions = JogoOptions()
         self.__pause_screen = PauseView()
         self.__paused = False
-        self.__timer = 2000
         super().__init__(view, PlayingState.__STATE)
 
     def run(self, events: List[Event]) -> States:
@@ -35,6 +34,9 @@ class PlayingState(AbstractState):
                     self.__paused = not self.__paused
 
         if self.__paused:
+            if self.__pause_screen.unpause():
+                self.__paused = False
+
             next_state = self.__pause_screen.run(events)
             return next_state
         else:

@@ -21,9 +21,7 @@ class AbstractFase(ABC):
         self.__maps_list: List[AbstractMapa] = mapas
         self.__current_map: AbstractMapa = self.__maps_list[0]
         self.__current_map_index = 0
-        if not self.__current_map.loaded:
-            print('Aoba')
-            self.__current_map.load()
+        self.__current_map.load()
 
     @property
     def mapas(self) -> List[AbstractMapa]:
@@ -33,9 +31,7 @@ class AbstractFase(ABC):
     def mapas(self, mapas: List[AbstractMapa]) -> None:
         self.__maps_list = mapas
         self.__current_map = self.__maps_list[self.__current_map_index]
-        if not self.__current_map.loaded:
-            print('Aoba2')
-            self.__current_map.load()
+        self.__current_map.load()
 
     @property
     def current_map_index(self) -> int:
@@ -45,9 +41,7 @@ class AbstractFase(ABC):
     def current_map_index(self, map_index) -> None:
         self.__current_map_index = map_index
         self.__current_map = self.__maps_list[self.__current_map_index]
-        if not self.__current_map.loaded:
-            print('Aoba3')
-            self.__current_map.load()
+        self.__current_map.load()
 
     def run(self) -> None:
         self.__update()
@@ -98,12 +92,12 @@ class AbstractFase(ABC):
         self.__music.play_music(self.__current_map.background_music_path)
 
     def __set_next_map(self):
+        print('Set next mapa')
         next_map = self.__maps_list[self.__current_map_index + 1]
         self.__current_map = next_map
         self.__current_map_index += 1
-        if not self.__current_map.loaded:
-            print('Aoba4')
-            self.__current_map.load()
+        print(type(self.__current_map))
+        self.__current_map.load()
         self.__current_map.change_player_position_entering_map()
         self.__jogador.mapa = self.__current_map
         self.__CURRENT_DELAY_CHANGE_MAP = self.__MAX_DELAY_CHANGE_MAP

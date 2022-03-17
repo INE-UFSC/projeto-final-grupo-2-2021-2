@@ -21,7 +21,6 @@ class DungeonFase(AbstractFase):
         self.__dificuldade = self.__opcoes.dificuldade
         self.__music = MusicHandler()
 
-        print('Dungeon Fase, criando mapas')
         map1 = DungeonMap1(jogador)
         first_enemies = self.__get_enemies_first_map(map1)
         map1.add_inimigos(first_enemies)
@@ -35,7 +34,6 @@ class DungeonFase(AbstractFase):
         map3.add_inimigos(third_enemies)
 
         maps: List[AbstractMapa] = [map1, map2, map3]
-        print('Mapas criados')
         super()._set_maps_lists(maps)
 
     def __get_enemies_first_map(self, mapa: AbstractMapa) -> list:

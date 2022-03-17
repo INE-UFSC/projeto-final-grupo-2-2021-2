@@ -7,7 +7,7 @@ from pygame import Rect, Surface
 from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
 from Config.Enums import States
-from Screen.Components.Buttons import Button, MenuButton, SaveButton
+from Screen.Components.Buttons import Button, MenuButton, SaveNameButton
 from Screen.Views.AbstractView import AbstractView
 
 
@@ -26,7 +26,7 @@ class LoadGameView(AbstractView):
 
         self.__image = LoadGameView.__IMAGE
         self.__rect = self.__image.get_rect(topleft=self._position)
-        self.__active_save_button: SaveButton = None
+        self.__active_save_button: SaveNameButton = None
         self.__jogoOptions = JogoOptions()
         self.__dao = JogoDAO()
 
@@ -76,11 +76,11 @@ class LoadGameView(AbstractView):
             self.__buttons = self.__buttons[:3]
 
         self.__buttons.extend([
-            SaveButton(saves_names[0], self.__BTN_POS[0], States.SAME),
-            SaveButton(saves_names[1], self.__BTN_POS[1], States.SAME),
-            SaveButton(saves_names[2], self.__BTN_POS[2], States.SAME),
-            SaveButton(saves_names[3], self.__BTN_POS[3], States.SAME),
-            SaveButton(saves_names[4], self.__BTN_POS[4], States.SAME)])
+            SaveNameButton(saves_names[0], self.__BTN_POS[0], States.SAME),
+            SaveNameButton(saves_names[1], self.__BTN_POS[1], States.SAME),
+            SaveNameButton(saves_names[2], self.__BTN_POS[2], States.SAME),
+            SaveNameButton(saves_names[3], self.__BTN_POS[3], States.SAME),
+            SaveNameButton(saves_names[4], self.__BTN_POS[4], States.SAME)])
 
     def run(self, events: List[event.Event]) -> States:
         for button in self.__buttons:

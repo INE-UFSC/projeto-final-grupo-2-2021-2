@@ -12,7 +12,9 @@ class JogoOptions(Singleton):
             self.__current_game_save = 'Empty'
             self.__dao = JogoDAO()
             self.__current_game = None
-            self.__available_saves = self.__dao.get_all()
+
+    def save(self) -> None:
+        self.__dao.add(self.__current_game)
 
     def create_new_game(self) -> None:
         self.__current_game = Jogo(self.__new_game_name)

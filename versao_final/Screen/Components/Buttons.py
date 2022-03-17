@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, List
 from Config.Opcoes import Opcoes
 from Config.Enums import Dificuldade, States
+from DAO.JogoDAO import JogoDAO
 from DAO.JogoOptions import JogoOptions
 from Sounds.MusicHandler import MusicHandler
 from Config.TelaJogo import TelaJogo
@@ -141,7 +142,7 @@ class MenuButton(TextButton):
         super().__init__(text, position, MenuButton.__SIZE, next_state)
 
 
-class SaveButton(MenuButton):
+class SaveNameButton(MenuButton):
     def __init__(self, text, position, next_state: States) -> None:
         super().__init__(text, position, next_state)
         self.__active = False
@@ -162,6 +163,25 @@ class SaveButton(MenuButton):
             self.hover()
 
         super().desenhar(tela)
+
+    @property
+    def active(self) -> bool:
+        return self.__active
+
+
+class SaveButton(MenuButton):
+    def __init__(self, text, position, next_state: States) -> None:
+        super().__init__(text, position, next_state)
+        self.__dao = JogoOptions()
+
+    def run(self, events: List[Event]) -> None:
+        for event in events:
+            if event.type == MOUSEBUTTONDOWN:
+                if self.rect.collidepoint(event.pos):
+                    self.__executar()
+
+    def __executar(self) -> None:
+        self.__dao.save()
 
     @property
     def active(self) -> bool:

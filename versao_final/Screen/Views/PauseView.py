@@ -1,7 +1,7 @@
 from typing import List
 from pygame import Rect, Surface, event
 from Config.TelaJogo import TelaJogo
-from Screen.Components.Buttons import Button, MenuButton, MusicImageButton
+from Screen.Components.Buttons import Button, MenuButton, MusicImageButton, SaveButton
 from Utils.Folder import import_single_sprite
 from Config.Enums import States
 from Screen.Views.AbstractView import AbstractView
@@ -31,8 +31,9 @@ class PauseView(AbstractView):
         self.__rect = self.__image.get_rect(topleft=self._position)
 
         self.__buttons: List[Button] = [
-            MenuButton('CONTINUAR', (575, 350), States.SAME),
-            MenuButton('SAIR', (575, 420), States.MENU),
+            MenuButton('CONTINUAR', (575, 320), States.SAME),
+            SaveButton('SAVE', (575, 390), States.SAME),
+            MenuButton('SAIR', (575, 460), States.MENU),
             MusicImageButton((760, 185), PauseView.__SIZE_SOM, (60, 60), States.SAME)
         ]
 
@@ -48,6 +49,13 @@ class PauseView(AbstractView):
         super().desenhar(tela)
         for button in self.__buttons:
             button.desenhar(tela)
+
+    def unpause(self) -> bool:
+        continue_button = self.__buttons[0]
+        if continue_button.clicked:
+            return True
+        else:
+            return False
 
     def run(self, events: List[event.Event]) -> States:
         for button in self.__buttons:

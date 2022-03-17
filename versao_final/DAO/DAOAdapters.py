@@ -77,12 +77,21 @@ class MapDaoAdapter:
 
         jogador = JogadorDaoAdapter.create(jogador_dao)
         mapa = MapTipo(jogador)
+        mapa.load()
         enemies = []
         for enemy_dao in enemies_dao:
             enemy = InimigosDaoAdapter.create(enemy_dao, mapa)
             enemies.append(enemy)
 
+        list_hitbox = []
+        for enemy in enemies:
+            list_hitbox.append(enemy.hitbox)
+
         mapa.add_inimigos(enemies)
+        for inimigo in mapa.inimigos:
+            hitbox = list_hitbox.pop(0)
+            inimigo.set_hitbox(hitbox)
+
         return mapa
 
 
@@ -115,13 +124,13 @@ class FaseDaoAdapter:
         mapas: List[AbstractMapa] = []
 
         for mapa_dao in mapas_dao:
-            print('Criando um mapa')
+            # print('Criando um mapa')
             mapa = MapDaoAdapter.create(mapa_dao)
             mapas.append(mapa)
 
-        print('Criando Fase')
+        # print('Criando Fase')
         fase = FaseType(jogador)
-        print('Pronto')
+        # print('Pronto')
         for mapa in mapas:
             mapa.jogador = jogador
             mapa.load()
@@ -158,7 +167,7 @@ class ControladorFasesDaoAdapter:
         fases_dao = controlador_dao['fases']
         fases = []
         for fase_dao in fases_dao:
-            print('Criando aqui')
+            # print('Criando aqui')
             fase = FaseDaoAdapter.create(fase_dao)
             jogador = fase.jogador
             fases.append(fase)
@@ -167,18 +176,11 @@ class ControladorFasesDaoAdapter:
         current_fase = FaseDaoAdapter.create(current_fase_dao)
         jogador = current_fase.jogador
 
-        print('Criando Controlador')
+        # print('Criando Controlador')
         controlador = ControladorFases(jogador)
         controlador.current_fase = current_fase
         controlador.set_fases(fases)
-        for mapa in controlador.current_fase.mapas:
-            print(type(mapa))
-            print(mapa.inimigos)
-            for inimigo in mapa.inimigos:
-                if inimigo.mapa != mapa:
-                    print('Diferente')
-                    print(inimigo.mapa, mapa)
-        print('Controlador Retornado')
+
         return controlador
 
 
@@ -203,5 +205,5 @@ class JogoDaoAdapter:
         jogo = Jogo(save_name)
         jogo.controlador = controlador
 
-        print('Retornando Jogo')
+        # print('Retornando Jogo')
         return jogo

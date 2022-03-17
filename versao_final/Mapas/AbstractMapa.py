@@ -57,7 +57,6 @@ class AbstractMapa(ABC):
 
         player_pos = self.__map.player_start_position
         player_pos = self.__adapter.matrix_index_to_pygame_pos(player_pos)
-        print('Atualizando')
         self.__jogador.hitbox.posicao = player_pos
 
         menor = self._opcoes.MENOR_UNIDADE
@@ -79,12 +78,16 @@ class AbstractMapa(ABC):
             self.__objetos.append(ObjetoInvisivel(position, (menor, menor), True, False))
 
     def send_enemies_signal(self, signal: AbstractSignal) -> None:
+        print('Send Signal')
         for enemy in self.__inimigos:
             if enemy == signal.sender:
                 continue
-
+            print(f'Pos Inimigo: {enemy.hitbox.posicao}')
+            print(signal.source_position)
+            print(signal.sender.hitbox.posicao)
             dist = GAHandler.distancia_dois_pontos(signal.source_position, enemy.hitbox.center)
             if dist < signal.signal_range:
+                print(dist)
                 enemy.receive_signal(signal)
 
     def animate(self) -> None:
@@ -397,7 +400,8 @@ class AbstractMapa(ABC):
         index = 0
 
         for inimigo in self.__inimigos:
-            inimigo.hitbox.posicao = posicoes[index]
+            hitbox = Hitbox(posicoes[index], inimigo.hitbox.tamanho)
+            inimigo.set_hitbox(hitbox)
             index += 1
             if index >= len(posicoes):
                 index = 0

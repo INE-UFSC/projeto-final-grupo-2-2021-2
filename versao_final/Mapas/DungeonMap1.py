@@ -73,6 +73,12 @@ class DungeonMap1(AbstractMapa):
             super().load()
             self.__LOADED = True
 
+        for inimigo in self.inimigos:
+            print(inimigo.hitbox.posicao)
+            if inimigo.hitbox.posicao == (0, 0):
+                super().load()
+                break
+
     def update(self) -> None:
         keys = key.get_pressed()
 
