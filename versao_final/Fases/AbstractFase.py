@@ -22,6 +22,7 @@ class AbstractFase(ABC):
         self.__current_map: AbstractMapa = self.__maps_list[0]
         self.__current_map_index = 0
         if not self.__current_map.loaded:
+            print('Aoba')
             self.__current_map.load()
 
     @property
@@ -33,6 +34,7 @@ class AbstractFase(ABC):
         self.__maps_list = mapas
         self.__current_map = self.__maps_list[self.__current_map_index]
         if not self.__current_map.loaded:
+            print('Aoba2')
             self.__current_map.load()
 
     @property
@@ -44,11 +46,10 @@ class AbstractFase(ABC):
         self.__current_map_index = map_index
         self.__current_map = self.__maps_list[self.__current_map_index]
         if not self.__current_map.loaded:
+            print('Aoba3')
             self.__current_map.load()
 
     def run(self) -> None:
-        print('Running')
-        print(len(self.__current_map.inimigos))
         self.__update()
         self.__current_map.animate()
         self.__jogador.processar_inputs()
@@ -101,6 +102,7 @@ class AbstractFase(ABC):
         self.__current_map = next_map
         self.__current_map_index += 1
         if not self.__current_map.loaded:
+            print('Aoba4')
             self.__current_map.load()
         self.__current_map.change_player_position_entering_map()
         self.__jogador.mapa = self.__current_map

@@ -17,7 +17,6 @@ class JogoDAO(DAO):
         if isinstance(key, str):
             jogo_dao = super().get(key)
             jogo = JogoDaoAdapter.create(jogo_dao)
-            print(jogo.controlador.current_fase.current_map.inimigos)
             return jogo
 
     def remove(self, key: str) -> None:

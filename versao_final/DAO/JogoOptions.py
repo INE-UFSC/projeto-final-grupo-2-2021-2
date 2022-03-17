@@ -19,7 +19,6 @@ class JogoOptions(Singleton):
 
     def load_game(self) -> None:
         self.__current_game = self.__dao.get(self.__load_game_name)
-        print(self.__current_game.controlador.current_fase.current_map.inimigos)
 
     def current_game(self) -> Jogo:
         return self.__current_game

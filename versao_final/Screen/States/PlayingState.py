@@ -29,14 +29,6 @@ class PlayingState(AbstractState):
             PlayingState.__RUNNING = True
             self.__jogo: Jogo = self.__jogoOptions.current_game()
 
-        if self.__timer > 0:
-            self.__timer -= 1
-        if self.__timer == 5:
-            print('Iniciando')
-            for inimigo in self.__jogo.controlador.current_fase.current_map.inimigos:
-                print(inimigo.hitbox.posicao)
-            self.__dao.add(self.__jogo)
-
         for event in events:
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
@@ -55,8 +47,6 @@ class PlayingState(AbstractState):
     def desenhar(self, tela: TelaJogo) -> None:
         if not PlayingState.__RUNNING:
             self.__jogo: Jogo = self.__jogoOptions.current_game()
-            print('Desenhar')
-            print(self.__jogo.controlador.current_fase.current_map.inimigos)
             PlayingState.__RUNNING = True
 
         self.view.desenhar(tela)

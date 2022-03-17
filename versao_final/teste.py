@@ -1,22 +1,20 @@
-import pygame
-from Utils.Folder import import_folder, import_single_sprite
-from pygame.sprite import Sprite
-from DAO.DAO import DAO
+def singleton(class_):
+    instances = {}
+
+    def getinstance(*args, **kwargs):
+        if class_ not in instances:
+            instances[class_] = class_(*args, **kwargs)
+        return instances[class_]
+    return getinstance
 
 
-class Teste(Sprite):
+@singleton
+class Teste:
+    __X = 5
 
     def __init__(self) -> None:
-        pygame.init()
-        super().__init__()
-        self.image = pygame.image.load('Assets/Telas/1.jpg')
+        print(Teste.__X)
 
 
-janela = pygame.display.set_mode((500, 500))
-imagem_fundo = pygame.image.load('Assets/Telas/1.jpg')
-
-
-teste1 = Teste()
-
-dao = DAO()
-dao.add('Key', teste1)
+teste = Teste()
+teste = Teste()

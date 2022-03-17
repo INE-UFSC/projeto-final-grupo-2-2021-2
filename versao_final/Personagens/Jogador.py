@@ -8,6 +8,7 @@ from Itens.AbstractItem import AbstractItem
 from Config.Enums import Direction
 from Utils.Ataque import Ataque
 from Utils.Folder import import_folder
+from Utils.Hitbox import Hitbox
 
 
 class Jogador(AbstractPersonagem):
@@ -243,6 +244,15 @@ class Jogador(AbstractPersonagem):
         end = choice(Jogador.__HURT_SOUND_END_PATHS)
         path = Jogador.__SOUND_PATH_BASE.format(end)
         return path
+
+    @property
+    def hitbox(self) -> Hitbox:
+        return super().hitbox
+
+    def set_hitbox(self, value: Hitbox) -> None:
+        if isinstance(value, Hitbox):
+            self.__escudo: AbstractEscudo = EscudoMadeira(value)
+            super().set_hitbox(value)
 
     @property
     def dying_sound_path(self) -> str:

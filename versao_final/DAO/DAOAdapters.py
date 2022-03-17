@@ -26,9 +26,8 @@ class InimigosDaoAdapter:
         hitbox: Hitbox = enemy_dao['hitbox']
 
         enemy: AbstractInimigo = Tipo(posicao=hitbox.posicao, mapa=mapa)
-        enemy.hitbox = hitbox
+        enemy.set_hitbox(hitbox)
         enemy.status = status
-        print(f'Criando {Tipo} em {hitbox.posicao}')
         return enemy
 
 
@@ -47,7 +46,7 @@ class JogadorDaoAdapter:
         hitbox: Hitbox = jogador_dao['hitbox']
 
         jogador = Jogador((0, 0))
-        jogador.hitbox = hitbox
+        jogador.set_hitbox(hitbox)
         jogador.status = status
 
         return jogador
@@ -78,15 +77,12 @@ class MapDaoAdapter:
 
         jogador = JogadorDaoAdapter.create(jogador_dao)
         mapa = MapTipo(jogador)
-        print(f'Criando mapa {MapTipo}')
         enemies = []
         for enemy_dao in enemies_dao:
             enemy = InimigosDaoAdapter.create(enemy_dao, mapa)
             enemies.append(enemy)
 
         mapa.add_inimigos(enemies)
-        for inimigo in mapa.inimigos:
-            print(inimigo.hitbox.posicao)
         return mapa
 
 
@@ -100,20 +96,12 @@ class FaseDaoAdapter:
             for mapa in mapas:
                 mapa_dao = MapDaoAdapter.add(mapa)
                 mapas_dao.append(mapa_dao)
-                # print('Mapa:')
-                # for key in mapa_dao.keys():
-                #    print(f'Key: {key}')
-                #    print(mapa_dao[key])
 
             jogador_dao = JogadorDaoAdapter.add(fase.jogador)
             fase_dao['mapas'] = mapas_dao
             fase_dao['type'] = type(fase)
             fase_dao['jogador'] = jogador_dao
             fase_dao['map_index'] = fase.current_map_index
-            # print(f'Fase:')
-            # for key in fase_dao.keys():
-            #    print(key)
-            #    print(fase_dao[key])
             return fase_dao
 
     @classmethod
@@ -123,13 +111,24 @@ class FaseDaoAdapter:
         mapa_index: int = fase_dao['map_index']
         mapas_dao = dict = fase_dao['mapas']
 
+        jogador = JogadorDaoAdapter.create(jogador_dao)
         mapas: List[AbstractMapa] = []
+
         for mapa_dao in mapas_dao:
+            print('Criando um mapa')
             mapa = MapDaoAdapter.create(mapa_dao)
             mapas.append(mapa)
 
-        jogador = JogadorDaoAdapter.create(jogador_dao)
+        print('Criando Fase')
         fase = FaseType(jogador)
+        print('Pronto')
+        for mapa in mapas:
+            mapa.jogador = jogador
+            mapa.load()
+
+        current_map = mapas[mapa_index]
+        jogador.mapa = current_map
+
         fase.mapas = mapas
         fase.current_map_index = mapa_index
 
@@ -159,6 +158,7 @@ class ControladorFasesDaoAdapter:
         fases_dao = controlador_dao['fases']
         fases = []
         for fase_dao in fases_dao:
+            print('Criando aqui')
             fase = FaseDaoAdapter.create(fase_dao)
             jogador = fase.jogador
             fases.append(fase)
@@ -167,9 +167,18 @@ class ControladorFasesDaoAdapter:
         current_fase = FaseDaoAdapter.create(current_fase_dao)
         jogador = current_fase.jogador
 
+        print('Criando Controlador')
         controlador = ControladorFases(jogador)
         controlador.current_fase = current_fase
         controlador.set_fases(fases)
+        for mapa in controlador.current_fase.mapas:
+            print(type(mapa))
+            print(mapa.inimigos)
+            for inimigo in mapa.inimigos:
+                if inimigo.mapa != mapa:
+                    print('Diferente')
+                    print(inimigo.mapa, mapa)
+        print('Controlador Retornado')
         return controlador
 
 
@@ -194,6 +203,5 @@ class JogoDaoAdapter:
         jogo = Jogo(save_name)
         jogo.controlador = controlador
 
-        print(jogo.controlador.current_fase.current_map)
-        print(jogo.controlador.current_fase.current_map.inimigos)
+        print('Retornando Jogo')
         return jogo

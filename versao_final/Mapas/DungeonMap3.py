@@ -67,6 +67,7 @@ class DungeonMap3(AbstractMapa):
 
     def load(self) -> None:
         if not self.__LOADED:
+            print('Setup do Dungeon3')
             super()._setup_mapa(DungeonMap3.__MATRIX)
             self.__LOADED = True
             super().load()

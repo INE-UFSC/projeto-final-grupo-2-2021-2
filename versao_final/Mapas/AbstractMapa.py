@@ -57,6 +57,7 @@ class AbstractMapa(ABC):
 
         player_pos = self.__map.player_start_position
         player_pos = self.__adapter.matrix_index_to_pygame_pos(player_pos)
+        print('Atualizando')
         self.__jogador.hitbox.posicao = player_pos
 
         menor = self._opcoes.MENOR_UNIDADE
@@ -408,6 +409,11 @@ class AbstractMapa(ABC):
     @property
     def jogador(self) -> Jogador:
         return self.__jogador
+
+    @jogador.setter
+    def jogador(self, jogador: Jogador) -> None:
+        if isinstance(jogador, Jogador):
+            self.__jogador = jogador
 
     @property
     def inimigos(self) -> List[AbstractInimigo]:
