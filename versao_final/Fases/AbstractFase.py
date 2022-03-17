@@ -92,11 +92,9 @@ class AbstractFase(ABC):
         self.__music.play_music(self.__current_map.background_music_path)
 
     def __set_next_map(self):
-        print('Set next mapa')
         next_map = self.__maps_list[self.__current_map_index + 1]
         self.__current_map = next_map
         self.__current_map_index += 1
-        print(type(self.__current_map))
         self.__current_map.load()
         self.__current_map.change_player_position_entering_map()
         self.__jogador.mapa = self.__current_map
@@ -111,7 +109,6 @@ class AbstractFase(ABC):
     def jogador(self, jogador: Jogador) -> None:
         if isinstance(jogador, Jogador):
             self.__jogador = jogador
-            print('Atualizando HUD')
             self.__hud = HUD(self.__jogador.status, self.__jogador.escudo, self.__jogador.arma)
 
     @property

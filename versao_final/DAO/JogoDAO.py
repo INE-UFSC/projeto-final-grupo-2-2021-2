@@ -1,5 +1,5 @@
 from DAO.DAO import DAO
-from Controllers.Jogo import Jogo
+from Jogo.Jogo import Jogo
 from DAO.DAOAdapters import JogoDaoAdapter
 
 
@@ -17,7 +17,6 @@ class JogoDAO(DAO):
         if isinstance(key, str):
             jogo_dao = super().get(key)
             jogo = JogoDaoAdapter.create(jogo_dao)
-            print(jogo.controlador.current_fase.current_map.jogador.hitbox.posicao)
             return jogo
 
     def remove(self, key: str) -> None:

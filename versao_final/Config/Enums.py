@@ -51,3 +51,6 @@ class States(Enum):
     LOAD_GAME = 9
     CREATE_NEW = 10
     STATIC = 11
+    WINNER = 12
+    LOSER = 13
+    RESET = 14

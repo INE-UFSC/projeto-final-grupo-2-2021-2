@@ -31,9 +31,9 @@ class PauseView(AbstractView):
         self.__rect = self.__image.get_rect(topleft=self._position)
 
         self.__buttons: List[Button] = [
-            MenuButton('CONTINUAR', (575, 320), States.SAME),
+            MenuButton('CONTINUE', (575, 320), States.SAME),
             SaveButton('SAVE', (575, 390), States.SAME),
-            MenuButton('SAIR', (575, 460), States.MENU),
+            MenuButton('LEAVE', (575, 460), States.RESET),
             MusicImageButton((760, 185), PauseView.__SIZE_SOM, (60, 60), States.SAME)
         ]
 

@@ -1,5 +1,5 @@
 from DAO.JogoDAO import JogoDAO
-from DAO.JogoOptions import JogoOptions
+from Jogo.ControllerJogo import ControllerJogo
 from Screen.Components.Text import Text
 from typing import List
 from pygame import Rect, Surface, event
@@ -27,7 +27,7 @@ class LoadGameView(AbstractView):
         self.__image = LoadGameView.__IMAGE
         self.__rect = self.__image.get_rect(topleft=self._position)
         self.__active_save_button: SaveNameButton = None
-        self.__jogoOptions = JogoOptions()
+        self.__jogoOptions = ControllerJogo()
         self.__dao = JogoDAO()
 
         self.__BTN_POS = [

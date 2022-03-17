@@ -3,13 +3,14 @@ from pygame import event
 from Config.TelaJogo import TelaJogo
 from Personagens.Jogador import Jogador
 from Config.Opcoes import Opcoes
-from Controllers.ControladorFases import ControladorFases
+from Fases.ControladorFases import ControladorFases
 from Fases.AbstractFase import AbstractFase
 from Sounds.MusicHandler import MusicHandler
 
 
 class Jogo:
     def __init__(self, save_name: str):
+        print('Jogo sendo criado')
         self.__save_name = save_name
         self.__music = MusicHandler()
         self.__opcoes = Opcoes()

@@ -1,5 +1,5 @@
 from typing import List
-from DAO.JogoOptions import JogoOptions
+from Jogo.ControllerJogo import ControllerJogo
 from Screen.States.AbstractState import AbstractState
 from Screen.Views.StaticView import StaticView
 from pygame.event import Event
@@ -11,7 +11,7 @@ class LoadingGameState(AbstractState):
 
     def __init__(self) -> None:
         view = StaticView()
-        self.__jogoOptions = JogoOptions()
+        self.__jogoOptions = ControllerJogo()
         super().__init__(view, LoadingGameState.__STATE)
 
     def run(self, events: List[Event]) -> States:

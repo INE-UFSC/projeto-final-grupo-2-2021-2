@@ -1,10 +1,10 @@
 from Config.TelaJogo import TelaJogo
 from Sounds.MusicHandler import MusicHandler
-from Screen.MachineState import StateMachine
+from Screen.States.MachineState import StateMachine
 import pygame
 
 
-class ControladorTelas:
+class TheBindingOfIsaac:
     __TELAS_MUSIC_PATH = 'Sounds/musics/som_menu.mp3'
 
     def __init__(self) -> None:
@@ -16,7 +16,7 @@ class ControladorTelas:
 
     def start(self) -> None:
         self.__tela.mostrar_fundo()
-        self.__music.play_music(ControladorTelas.__TELAS_MUSIC_PATH)
+        self.__music.play_music(TheBindingOfIsaac.__TELAS_MUSIC_PATH)
         self._run()
 
     def _run(self) -> None:

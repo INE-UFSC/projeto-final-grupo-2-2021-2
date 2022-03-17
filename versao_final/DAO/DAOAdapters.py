@@ -1,8 +1,7 @@
 from copy import copy, deepcopy
 from typing import List, Type
-from zlib import decompressobj
-from Controllers.ControladorFases import ControladorFases
-from Controllers.Jogo import Jogo
+from Fases.ControladorFases import ControladorFases
+from Jogo.Jogo import Jogo
 from Fases.AbstractFase import AbstractFase
 from Personagens.AbstractInimigo import AbstractInimigo
 from Mapas.AbstractMapa import AbstractMapa

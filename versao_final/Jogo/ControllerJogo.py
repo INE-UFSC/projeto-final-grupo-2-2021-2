@@ -1,10 +1,10 @@
 from typing import List
 from Config.Singleton import Singleton
 from DAO.JogoDAO import JogoDAO
-from Controllers.Jogo import Jogo
+from Jogo.Jogo import Jogo
 
 
-class JogoOptions(Singleton):
+class ControllerJogo(Singleton):
     def __init__(self) -> None:
         if not super().created:
             self.__new_game_name = 'Save1'
@@ -17,9 +17,11 @@ class JogoOptions(Singleton):
         self.__dao.add(self.__current_game)
 
     def create_new_game(self) -> None:
+        print('Criando novo')
         self.__current_game = Jogo(self.__new_game_name)
 
     def load_game(self) -> None:
+        print('Carregando')
         self.__current_game = self.__dao.get(self.__load_game_name)
 
     def current_game(self) -> Jogo:

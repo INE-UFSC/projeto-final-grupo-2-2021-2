@@ -6,7 +6,7 @@ from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
 from Config.Enums import States
 from Screen.Components.Buttons import Button, MenuButton, InputText
-from DAO.JogoOptions import JogoOptions
+from Jogo.ControllerJogo import ControllerJogo
 from Screen.Views.AbstractView import AbstractView
 
 
@@ -18,7 +18,7 @@ class NewGameView(AbstractView):
 
     def __init__(self) -> None:
         super().__init__(NewGameView.__STATE)
-        self.__jogoOptions = JogoOptions()
+        self.__jogoOptions = ControllerJogo()
 
         if not NewGameView.__IMAGE_LOADED:
             NewGameView.__IMAGE = import_single_sprite(NewGameView.__IMAGE_PATH, self._views_size)
