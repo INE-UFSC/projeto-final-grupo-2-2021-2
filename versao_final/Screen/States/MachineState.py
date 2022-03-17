@@ -2,6 +2,7 @@ from Config.Enums import States
 from Config.TelaJogo import TelaJogo
 from Screen.States.AbstractState import AbstractState
 from Screen.States.CreateNewGameState import CreateNewGameState
+from Screen.States.GuideState import GuideState
 from Screen.States.LoadGameState import LoadGameState
 from Screen.States.LoadingGameState import LoadingGameState
 from Screen.States.MenuState import MenuState
@@ -61,5 +62,6 @@ class StateMachine:
             States.LOAD_GAME: LoadingGameState(),
             States.WINNER: WinnerState(),
             States.LOSER: LoserState(),
-            States.RESET: ResetState()
+            States.RESET: ResetState(),
+            States.GUIDE: GuideState()
         }

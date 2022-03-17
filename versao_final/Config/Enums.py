@@ -54,3 +54,4 @@ class States(Enum):
     WINNER = 12
     LOSER = 13
     RESET = 14
+    GUIDE = 15
