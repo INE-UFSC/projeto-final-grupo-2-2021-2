@@ -27,11 +27,13 @@ class MenuView(AbstractView):
         self.__BTN_POS = [
             (self._views_size[0]/2, self._views_size[1]/2 - 100),
             (self._views_size[0]/2, self._views_size[1]/2 - 25),
-            (self._views_size[0]/2, self._views_size[1]/2 + 50)]
+            (self._views_size[0]/2, self._views_size[1]/2 + 50),
+            (self._views_size[0]/2, self._views_size[1]/2 + 125)]
         self.__buttons: List[Button] = [
             MenuButton('PLAY', self.__BTN_POS[0], States.PLAY),
             MenuButton('OPTIONS', self.__BTN_POS[1], States.OPTIONS),
-            MenuButton('QUIT', self.__BTN_POS[2], States.QUIT)]
+            MenuButton('GUIDE', self.__BTN_POS[2], States.GUIDE),
+            MenuButton('QUIT', self.__BTN_POS[3], States.QUIT)]
 
         self.__TEXT_POS = [
             (self._views_size[0]/2, 100)]
