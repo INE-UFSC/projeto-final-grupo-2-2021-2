@@ -10,7 +10,7 @@ from Screen.Components.Text import Text
 
 class LoserView(AbstractView):
     __STATE = States.LOSER
-    __IMAGE_PATH = 'Assets/Telas/3.1.jpg'
+    __IMAGE_PATH = 'Assets/Telas/FundoPause.jfif'
     __IMAGE_LOADED = False
     __IMAGE: Surface = None
 
@@ -25,10 +25,10 @@ class LoserView(AbstractView):
         self.__rect = self.__image.get_rect(topleft=self._position)
 
         self.__texts: List[Text] = [
-            Text((575, 240), 25, 'Loser ;-;')
+            Text((575, 270), 45, 'You Lost ;-;'),
         ]
         self.__buttons: List[Button] = [
-            MenuButton('LEAVE', (575, 320), States.RESET),
+            MenuButton('LEAVE', (575, 400), States.RESET),
         ]
 
     @property

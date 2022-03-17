@@ -10,7 +10,7 @@ from Screen.Views.AbstractView import AbstractView
 
 class WinnerView(AbstractView):
     __STATE = States.WINNER
-    __IMAGE_PATH = 'Assets/Telas/3.1.jpg'
+    __IMAGE_PATH = 'Assets/Telas/FundoPause.jfif'
     __IMAGE_LOADED = False
     __IMAGE: Surface = None
     __POS = (575, 375)
@@ -31,10 +31,10 @@ class WinnerView(AbstractView):
         self.__rect = self.__image.get_rect(topleft=self._position)
 
         self.__texts: List[Text] = [
-            Text((575, 240), 25, 'Winner :3')
+            Text((575, 270), 45, 'You Win :3')
         ]
         self.__buttons: List[Button] = [
-            MenuButton('LEAVE', (575, 320), States.RESET),
+            MenuButton('LEAVE', (575, 400), States.RESET),
         ]
 
     @property

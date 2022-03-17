@@ -178,6 +178,7 @@ class SaveButton(MenuButton):
             if event.type == MOUSEBUTTONDOWN:
                 if self.rect.collidepoint(event.pos):
                     self.__executar()
+        super().run(events)
 
     def __executar(self) -> None:
         self.__dao.save()

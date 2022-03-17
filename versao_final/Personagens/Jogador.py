@@ -233,6 +233,14 @@ class Jogador(AbstractPersonagem):
         return self.__MORREU
 
     @property
+    def itens(self) -> List[AbstractItem]:
+        return self.__itens
+
+    @itens.setter
+    def itens(self, itens: List[AbstractItem]) -> None:
+        self.__itens = itens
+
+    @property
     def morrendo(self) -> bool:
         if self.__animation == 'Dying':
             return True
@@ -359,3 +367,14 @@ class Jogador(AbstractPersonagem):
 
         if not self.__DEFENDENDO:
             self._atualizar_frente(x_movement, y_movement)
+
+    def get_status_dict(self) -> dict:
+        return {
+        'vida': self.vida,
+        'vida_maxima' : self.vida_maxima,
+        'ataque': 5,
+        'defesa': 5,
+        'vel': 3,
+        'vel_ataque': 1,
+        'transpassavel': False
+    }

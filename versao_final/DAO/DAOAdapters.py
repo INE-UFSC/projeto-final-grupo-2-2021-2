@@ -1,6 +1,7 @@
 from copy import copy, deepcopy
 from typing import List, Type
 from Fases.ControladorFases import ControladorFases
+from Itens.AbstractItem import AbstractItem
 from Jogo.Jogo import Jogo
 from Fases.AbstractFase import AbstractFase
 from Personagens.AbstractInimigo import AbstractInimigo
@@ -37,15 +38,17 @@ class JogadorDaoAdapter:
     def add(cls, jogador: Jogador) -> dict:
         jogador_dao = {}
         if isinstance(jogador, Jogador):
+            status_dict = jogador.get_status_dict()
             jogador_dao['hitbox'] = jogador.hitbox
-            jogador_dao['status'] = jogador.status
+            jogador_dao['status'] = status_dict
             return jogador_dao
 
     @classmethod
     def create(cls, jogador_dao: dict) -> Jogador:
-        status: Status = jogador_dao['status']
+        status_dict = jogador_dao['status']
         hitbox: Hitbox = jogador_dao['hitbox']
 
+        status = Status(status_dict)
         jogador = Jogador((0, 0))
         jogador.set_hitbox(hitbox)
         jogador.status = status
