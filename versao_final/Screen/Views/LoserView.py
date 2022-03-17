@@ -13,9 +13,15 @@ class LoserView(AbstractView):
     __IMAGE_PATH = 'Assets/Telas/FundoPause.jfif'
     __IMAGE_LOADED = False
     __IMAGE: Surface = None
+    __POS = (575, 375)
+    __SIZE = (550, 450)
 
     def __init__(self) -> None:
-        super().__init__(LoserView.__STATE)
+        rect = Rect(LoserView.__POS, LoserView.__SIZE)
+        rect.center = rect.topleft
+        position = rect.topleft
+
+        super().__init__(LoserView.__STATE, position, LoserView.__SIZE)
 
         if not LoserView.__IMAGE_LOADED:
             LoserView.__IMAGE = import_single_sprite(LoserView.__IMAGE_PATH, self._views_size)
@@ -25,10 +31,10 @@ class LoserView(AbstractView):
         self.__rect = self.__image.get_rect(topleft=self._position)
 
         self.__texts: List[Text] = [
-            Text((575, 270), 45, 'You Lost ;-;'),
+            Text((575, 350), 45, 'You Lost ;-;'),
         ]
         self.__buttons: List[Button] = [
-            MenuButton('LEAVE', (575, 400), States.RESET),
+            MenuButton('LEAVE', (575, 480), States.RESET),
         ]
 
     @property

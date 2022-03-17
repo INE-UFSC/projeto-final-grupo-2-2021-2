@@ -31,10 +31,10 @@ class WinnerView(AbstractView):
         self.__rect = self.__image.get_rect(topleft=self._position)
 
         self.__texts: List[Text] = [
-            Text((575, 270), 45, 'You Win :3')
+            Text((575, 350), 45, 'You Win :3')
         ]
         self.__buttons: List[Button] = [
-            MenuButton('LEAVE', (575, 400), States.RESET),
+            MenuButton('LEAVE', (575, 480), States.RESET),
         ]
 
     @property

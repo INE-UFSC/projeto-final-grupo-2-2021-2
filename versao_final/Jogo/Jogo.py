@@ -10,7 +10,6 @@ from Sounds.MusicHandler import MusicHandler
 
 class Jogo:
     def __init__(self, save_name: str):
-        print('Jogo sendo criado')
         self.__save_name = save_name
         self.__music = MusicHandler()
         self.__opcoes = Opcoes()

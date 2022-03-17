@@ -42,7 +42,6 @@ class StateMachine:
     def __set_next_state(self, state: States) -> None:
         if state == States.SAME:
             return None
-        print(state)
 
         if state == States.RESET:
             self.__states = self.__create_states()

@@ -17,12 +17,10 @@ class ControllerJogo(Singleton):
         self.__dao.add(self.__current_game)
 
     def create_new_game(self) -> None:
-        print('Criando novo')
         self.__current_game = Jogo(self.__new_game_name)
         self.__current_game_save = self.__new_game_name
 
     def load_game(self) -> None:
-        print('Carregando')
         self.__current_game = self.__dao.get(self.__load_game_name)
         self.__current_game_save = self.__load_game_name
 
