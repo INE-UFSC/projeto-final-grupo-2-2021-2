@@ -1,7 +1,4 @@
-from typing import List
-from Config.TelaJogo import TelaJogo
 import pygame
-from pygame import Rect, font, draw, MOUSEBUTTONDOWN, KEYDOWN, K_BACKSPACE, event
 from Config.Enums import Dificuldade
 from Config.Opcoes import Opcoes
 from Utils.Hitbox import Hitbox

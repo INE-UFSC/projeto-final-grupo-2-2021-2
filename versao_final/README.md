@@ -1,6 +1,11 @@
-Nesse diretório estará o código final do Jogo
+The Binding of Isaac
 
-Para executar o jogo é necessário executar o comando
-python jogo.py
+Como rodar:
+- Instale as dependências que estão em requirements.txt
+- Abre o projeto com a root na pasta versao_final
+- Execute o main.py
 
-Atualmente, o jogo possui se resume a inimigos seguindo você e tentando te matar, você pode usar o botão J para fazer um ataque para frente. Existem 3 fases e se você terminar de matar os inimigos das 3 fases você ganha o jogo :3
+Como jogar:
+- Entre na tela Guide
+- Leia
+- Divirta-se

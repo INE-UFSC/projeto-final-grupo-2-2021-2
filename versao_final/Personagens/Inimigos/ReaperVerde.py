@@ -1,6 +1,6 @@
 from Personagens.InimigoTipo1 import InimigoTipo1
 from Mapas.AbstractMapa import AbstractMapa
-from random import choice
+from random import choice, random
 
 
 class ReaperVerde(InimigoTipo1):
@@ -61,6 +61,8 @@ class ReaperVerde(InimigoTipo1):
 
     @property
     def hurt_sound_path(self) -> str:
+        if random() < 0.4:
+            return ''
         end = choice(ReaperVerde.__HURT_SOUND_END_PATHS)
         path = ReaperVerde.__HURT_SOUNDS_PATH_BASE + end
         return path
