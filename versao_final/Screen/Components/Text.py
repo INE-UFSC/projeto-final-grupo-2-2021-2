@@ -14,7 +14,7 @@ class Text:
         self.__text_rect = self.__text.get_rect(center=posicao)
 
     def desenhar(self, tela):
-        pygame.draw.rect(tela.janela, (0, 0, 0), self.__text_rect)
+        # pygame.draw.rect(tela.janela, (0, 0, 0), self.__text_rect)
         tela.janela.blit(self.__text, self.__text_rect)
 
     @property

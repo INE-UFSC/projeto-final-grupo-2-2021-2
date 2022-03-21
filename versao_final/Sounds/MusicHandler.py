@@ -28,6 +28,7 @@ class MusicHandler(Singleton):
             mixer.music.load(music_path)
             mixer.music.play(-1)
             self.__PLAYING_MUSIC = True
+            mixer.music.set_volume(0.3)
         except Exception as e:
             print(f'Error Playing Music: {e}')
 
@@ -41,6 +42,7 @@ class MusicHandler(Singleton):
             self.__current_music_path = music_path
             mixer.music.load(music_path)
             mixer.music.play(1)
+            mixer.music.set_volume(0.3)
             self.__PLAYING_MUSIC = True
         except Exception as e:
             print(f'Error Playing Music: {e}')
@@ -50,6 +52,7 @@ class MusicHandler(Singleton):
             return
         try:
             sound = mixer.Sound(sound_path)
+            sound.set_volume(0.3)
             sound.play()
         except Exception as e:
             print(f'Error Playing Music: {e}')
