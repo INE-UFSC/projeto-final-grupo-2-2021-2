@@ -1,5 +1,6 @@
 from typing import List, Tuple
 from pygame import Rect, Surface, event
+from Config.Folder import Folder
 from Config.TelaJogo import TelaJogo
 from Jogo.ControllerJogo import ControllerJogo
 from Screen.Components.Buttons import Button, MenuButton, MusicImageButton, SaveButton
@@ -11,7 +12,8 @@ from Screen.Views.AbstractView import AbstractView
 
 class PauseView(AbstractView):
     __STATE = States.PLAYING
-    __IMAGE_PATH = 'Assets/Telas/FundoPause.jfif'
+    folder = Folder()
+    __IMAGE_PATH = folder.create_assets_path(['Telas'], 'FundoPause.jfif')
     __POS = (575, 375)
     __SIZE = (550, 450)
     __SIZE_SOM = (60, 60)

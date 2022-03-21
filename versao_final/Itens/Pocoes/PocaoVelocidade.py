@@ -1,10 +1,12 @@
+from Config.Folder import Folder
 from Itens.Pocoes.PocaoGenerica import PocaoGenerica
 from Personagens.Status import Status
 from pygame import Rect, Surface
 
 
 class PocaoVelocidade(PocaoGenerica):
-    __PATH = 'Assets/pocoes/pocao_velocidade.png'
+    folder = Folder()
+    __PATH = folder.create_assets_path(['pocoes'], 'pocao_velocidade.png')
     __SIZE = (30, 30)
 
     def __init__(self, position=(0, 0)) -> None:

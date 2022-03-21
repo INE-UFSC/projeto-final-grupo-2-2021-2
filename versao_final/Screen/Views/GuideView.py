@@ -1,6 +1,7 @@
 from typing import List
 from pygame import Rect, Surface, event
 from pygame import Rect, Surface
+from Config.Folder import Folder
 from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
 from Config.Enums import States
@@ -10,7 +11,8 @@ from Screen.Views.AbstractView import AbstractView
 
 class GuideView(AbstractView):
     __STATE = States.MENU
-    __IMAGE_PATH = 'Assets/Telas/Guide.png'
+    folder = Folder()
+    __IMAGE_PATH = folder.create_assets_path(['Telas'], 'Guide.png')
     __IMAGE_LOADED = False
     __IMAGE: Surface = None
 

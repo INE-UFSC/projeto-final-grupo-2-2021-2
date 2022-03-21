@@ -1,6 +1,8 @@
+import os
 from random import choice
 from typing import List
 import pygame
+from Config.Folder import Folder
 from Itens.Escudos.AbstractEscudo import AbstractEscudo
 from Itens.Escudos.EscudoMadeira import EscudoMadeira
 from Personagens.AbstractPersonagem import AbstractPersonagem
@@ -12,12 +14,16 @@ from Utils.Hitbox import Hitbox
 
 
 class Jogador(AbstractPersonagem):
-    __BASE_PATH = 'Assets/Player/{}/{}'
+    folder = Folder()
+    sep = os.sep
+    base = folder.assets
+    __BASE_PATH = base + sep + 'Player' + sep + '{}' + sep + '{}'
     __ANIMACOES_IMPORTADAS = False
     __IMAGE_SIZE = (60, 65)
-    __HURT_SOUND_END_PATHS = ['hit1', 'hit2', 'hit3', 'hit4', 'hit5']
-    __DYING_SOUND_PATH = 'Sounds/sounds/Player/die1.mp3'
-    __SOUND_PATH_BASE = 'Sounds/sounds/Player/{}.mp3'
+    __HURT_SOUND_END_PATHS = ['hit1.mp3', 'hit2.mp3', 'hit3.mp3', 'hit4.mp3', 'hit5.mp3']
+    folder = Folder()
+    __DYING_SOUND_PATH = folder.create_sounds_path(['musics', 'Player'], 'die1.mp3')
+    __SOUND_PATH_BASE = folder.create_sounds_path(['sounds', 'Player'])
     __STATS = {
         'vida': 50,
         'ataque': 5,
@@ -250,7 +256,7 @@ class Jogador(AbstractPersonagem):
     @property
     def hurt_sound_path(self) -> str:
         end = choice(Jogador.__HURT_SOUND_END_PATHS)
-        path = Jogador.__SOUND_PATH_BASE.format(end)
+        path = Jogador.__SOUND_PATH_BASE + end
         return path
 
     @property
@@ -370,11 +376,11 @@ class Jogador(AbstractPersonagem):
 
     def get_status_dict(self) -> dict:
         return {
-        'vida': self.vida,
-        'vida_maxima' : self.vida_maxima,
-        'ataque': 5,
-        'defesa': 5,
-        'vel': 3,
-        'vel_ataque': 1,
-        'transpassavel': False
-    }
+            'vida': self.vida,
+            'vida_maxima': self.vida_maxima,
+            'ataque': 5,
+            'defesa': 5,
+            'vel': 3,
+            'vel_ataque': 1,
+            'transpassavel': False
+        }

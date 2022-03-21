@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, List
+from Config.Folder import Folder
 from Config.Opcoes import Opcoes
 from Config.Enums import Dificuldade, States
 from Jogo.ControllerJogo import ControllerJogo
@@ -190,7 +191,8 @@ class SaveButton(MenuButton):
 
 class ImageTextButton(ImageButton):
     def __init__(self, position, size, path, scale, next_state: States) -> None:
-        path = 'Assets/Telas/botao.png'
+        folder = Folder()
+        path = folder.create_assets_path(['Telas'], 'botao.png')
         scale = (100, 35)
         super().__init__(position, size, path, scale, next_state)
         TextButton.__init__(self, 'Test', position, size, next_state)
@@ -234,8 +236,9 @@ class MusicButton(TextButton):
 
 
 class MusicImageButton(ImageButton):
-    __MUTED_PATH = 'Assets/Telas/mutado.png'
-    __NOT_MUTED_PATH = 'Assets/Telas/som.png'
+    folder = Folder()
+    __MUTED_PATH = folder.create_assets_path(['Telas'], 'mutado.png')
+    __NOT_MUTED_PATH = folder.create_assets_path(['Telas'], 'som.png')
 
     def __init__(self, position, size, scale, next_state: States) -> None:
         self.__music = MusicHandler()

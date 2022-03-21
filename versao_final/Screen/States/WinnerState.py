@@ -1,5 +1,6 @@
-from random import choice, randint
+from random import randint
 from typing import List
+from Config.Folder import Folder
 from Jogo.ControllerJogo import ControllerJogo
 from Screen.States.AbstractState import AbstractState
 from Screen.Views.PlayingView import PlayingView
@@ -13,7 +14,9 @@ from Sounds.MusicHandler import MusicHandler
 
 class WinnerState(AbstractState):
     __STATE = States.WINNER
-    __MUSIC_PATH_BASE = 'Sounds/musics/win/win_music_{}.mp3'
+    folder = Folder()
+    path = folder.create_sounds_path(['musics', 'win'])
+    __MUSIC_PATH_BASE = path + 'win_music_{}.mp3'
 
     def __init__(self) -> None:
         view = PlayingView()

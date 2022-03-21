@@ -1,3 +1,4 @@
+from Config.Folder import Folder
 from Screen.States.AbstractState import AbstractState
 from Screen.Views.MenuView import MenuView
 from Config.Enums import States
@@ -8,7 +9,8 @@ from typing import List
 
 class MenuState(AbstractState):
     __STATE = States.MENU
-    __TELAS_MUSIC_PATH = 'Sounds/musics/som_menu.mp3'
+    folder = Folder()
+    __TELAS_MUSIC_PATH = folder.create_sounds_path(['musics'], 'som_menu.mp3')
 
     def __init__(self) -> None:
         view = MenuView()

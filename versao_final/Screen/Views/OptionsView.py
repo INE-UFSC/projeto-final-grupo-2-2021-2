@@ -1,3 +1,4 @@
+from Config.Folder import Folder
 from Screen.Components.Text import DifficultyText, Text
 from typing import List
 from pygame import Rect, Surface, event
@@ -11,7 +12,8 @@ from Screen.Views.AbstractView import AbstractView
 
 class OptionsView(AbstractView):
     __STATE = States.MENU
-    __IMAGE_PATH = 'Assets/Telas/3.1.jpg'
+    folder = Folder()
+    __IMAGE_PATH = folder.create_assets_path(['Telas'], '3.1.jpg')
     __IMAGE_LOADED = False
     __IMAGE: Surface = None
 

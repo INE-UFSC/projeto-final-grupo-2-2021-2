@@ -1,11 +1,16 @@
+import os
 import pickle
 from typing import Any
 from Config.Singleton import Singleton
+from Config.Folder import Folder
 
 
 class DAO(Singleton):
-    def __init__(self, path='DAO/saves/saves') -> None:
+    def __init__(self, path=None) -> None:
         if not super().created:
+            if path is None:
+                folder = Folder()
+                path = f'{folder.base}DAO{os.sep}saves{os.sep}saves'
             self.__connected = False
             self.__path = path
             self.__cache = {}

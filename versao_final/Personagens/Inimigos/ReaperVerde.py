@@ -1,3 +1,4 @@
+from Config.Folder import Folder
 from Personagens.InimigoTipo1 import InimigoTipo1
 from Mapas.AbstractMapa import AbstractMapa
 from random import choice, random
@@ -6,10 +7,11 @@ from random import choice, random
 class ReaperVerde(InimigoTipo1):
     __TAMANHO_IMAGEM = (80, 80)
     __TAMANHO = (35, 45)
-    __SPRITE_PATH = 'Assets/Personagens/Reaper/ReaperVerde/'
+    folder = Folder()
+    __SPRITE_PATH = folder.create_assets_path(['Personagens', 'Reaper', 'ReaperVerde'])
+    __DYING_SOUND_PATH = folder.create_sounds_path(['sounds', 'Monsters', 'Die'], 'ogre2.wav')
+    __HURT_SOUNDS_PATH_BASE = folder.create_sounds_path(['sounds', 'Monsters', 'Hurt'])
     __HURT_SOUND_END_PATHS = ['ogre1.wav', 'ogre2.wav', 'ogre3.wav', 'ogre4.wav', 'ogre5.wav']
-    __DYING_SOUND_PATH = 'Sounds/sounds/Monsters/Die/ogre2.wav'
-    __HURT_SOUNDS_PATH_BASE = 'Sounds/sounds/Monsters/Hurt/'
     __STATS_FACIL = {'vida': 15, 'ataque': 4, 'defesa': 3, 'vel': 2, 'vel_ataque': 1,
                      'view_distance': 150, 'transpassavel': False}
     __STATS_MEDIO = {'vida': 20, 'ataque': 5, 'defesa': 4, 'vel': 2, 'vel_ataque': 1,

@@ -1,5 +1,6 @@
 from typing import List
 from pygame import Rect, Surface, event
+from Config.Folder import Folder
 from Config.TelaJogo import TelaJogo
 from Utils.Folder import import_single_sprite
 from Config.Enums import States
@@ -10,7 +11,8 @@ from Screen.Components.Text import Text
 
 class LoserView(AbstractView):
     __STATE = States.LOSER
-    __IMAGE_PATH = 'Assets/Telas/FundoPause.jfif'
+    folder = Folder()
+    __IMAGE_PATH = folder.create_assets_path(['Telas'], 'FundoPause.jfif')
     __IMAGE_LOADED = False
     __IMAGE: Surface = None
     __POS = (575, 375)

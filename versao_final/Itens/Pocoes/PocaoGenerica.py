@@ -1,3 +1,4 @@
+from Config.Folder import Folder
 from Itens.AbstractItem import AbstractItem
 from pygame import Surface
 from Utils.Folder import import_single_sprite
@@ -6,7 +7,8 @@ from Utils.Folder import import_single_sprite
 class PocaoGenerica(AbstractItem):
     __PATH_TO_SPRITE = {}
     __SIZE_TO_SPRITE = {}
-    __GENERIC_POTION_SOUND_PATH = 'Sounds/sounds/potions.wav'
+    folder = Folder()
+    __GENERIC_POTION_SOUND_PATH = folder.create_sounds_path(['sounds'], 'potions.wav')
 
     def __init__(self, path: str, size: tuple) -> None:
         if path not in PocaoGenerica.__PATH_TO_SPRITE or size not in PocaoGenerica.__SIZE_TO_SPRITE:

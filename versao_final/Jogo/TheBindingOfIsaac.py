@@ -1,3 +1,4 @@
+from Config.Folder import Folder
 from Config.TelaJogo import TelaJogo
 from Sounds.MusicHandler import MusicHandler
 from Screen.States.MachineState import StateMachine
@@ -5,7 +6,8 @@ import pygame
 
 
 class TheBindingOfIsaac:
-    __TELAS_MUSIC_PATH = 'Sounds/musics/som_menu.mp3'
+    folder = Folder()
+    __TELAS_MUSIC_PATH = folder.create_sounds_path(['musics'], 'som_menu.mp3')
 
     def __init__(self) -> None:
         pygame.init()

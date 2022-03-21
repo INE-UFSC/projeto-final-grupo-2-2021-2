@@ -1,5 +1,6 @@
 from pygame import Rect, Surface, draw, font
 from copy import deepcopy
+from Config.Folder import Folder
 from Config.Opcoes import Opcoes
 from Config.TelaJogo import TelaJogo
 from Itens.Escudos.EscudoMadeira import AbstractEscudo
@@ -9,7 +10,8 @@ from Utils.Folder import import_single_sprite
 
 
 class HUD:
-    __PATH = 'Assets/HUD/Fundo.png'
+    folder = Folder()
+    __PATH = folder.create_assets_path(['HUD'], 'Fundo.png')
     __SIZE = Opcoes().TAMANHO_HUD
     __DEFENSE_POS = (530, 32)
     __STRENGTH_POS = (530, 70)
@@ -24,8 +26,8 @@ class HUD:
     __SHIELD_BAR_POS = (131, 75)
     __SHIELD_BAR_SIZE = (300, 28)
 
-    __ARROW_UP_PATH = 'Assets/HUD/ArrowUp.png'
-    __ARROW_DOWN_PATH = 'Assets/HUD/ArrowDown.png'
+    __ARROW_UP_PATH = folder.create_assets_path(['HUD'], 'ArrowUp.png')
+    __ARROW_DOWN_PATH = folder.create_assets_path(['HUD'], 'ArrowDown.png')
     __ARROW_SIZE = (16, 15)
 
     __DEFENSE_ARROW_POS = (508, 23)

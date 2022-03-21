@@ -1,3 +1,4 @@
+from Config.Folder import Folder
 from DAO.JogoDAO import JogoDAO
 from Jogo.ControllerJogo import ControllerJogo
 from Screen.Components.Text import Text
@@ -13,7 +14,8 @@ from Screen.Views.AbstractView import AbstractView
 
 class LoadGameView(AbstractView):
     __STATE = States.LOAD
-    __IMAGE_PATH = 'Assets/Telas/3.1.jpg'
+    folder = Folder()
+    __IMAGE_PATH = folder.create_assets_path(['Telas'], '3.1.jpg')
     __IMAGE_LOADED = False
     __IMAGE: Surface = None
 

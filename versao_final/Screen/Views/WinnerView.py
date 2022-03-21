@@ -1,3 +1,4 @@
+from Config.Folder import Folder
 from Screen.Components.Buttons import MenuButton, Button
 from Screen.Components.Text import Text
 from typing import List
@@ -10,7 +11,8 @@ from Screen.Views.AbstractView import AbstractView
 
 class WinnerView(AbstractView):
     __STATE = States.WINNER
-    __IMAGE_PATH = 'Assets/Telas/FundoPause.jfif'
+    folder = Folder()
+    __IMAGE_PATH = folder.create_assets_path(['Telas'], 'FundoPause.jfif')
     __IMAGE_LOADED = False
     __IMAGE: Surface = None
     __POS = (575, 375)

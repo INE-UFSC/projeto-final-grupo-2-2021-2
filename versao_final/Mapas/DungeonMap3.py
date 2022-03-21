@@ -1,5 +1,6 @@
 from typing import List, Type
 from pygame import K_e, Rect, Surface, key
+from Config.Folder import Folder
 from Personagens.AbstractInimigo import AbstractInimigo
 from Itens.AbstractItem import AbstractItem
 from Mapas.AbstractMapa import AbstractMapa
@@ -43,8 +44,9 @@ class DungeonMap3(AbstractMapa):
         'PP           000             PPP             PP',
         'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
         'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP']
-    __SPRITE_PATH = 'Assets/Mapas/Dungeon/sala3.png'
-    __MUSIC_PATH = 'Sounds/musics/som_ambiente3.wav'
+    folder = Folder()
+    __SPRITE_PATH = folder.create_assets_path(['Mapas', 'Dungeon'], 'sala3.png')
+    __MUSIC_PATH = folder.create_sounds_path(['musics'], 'som_ambiente3.wav')
 
     def __init__(self, jogador: Jogador, enemies: List[AbstractInimigo] = None):
         super().__init__(jogador, enemies)

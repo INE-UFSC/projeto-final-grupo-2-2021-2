@@ -1,16 +1,18 @@
 import pygame
+from Config.Folder import Folder
 from Config.Opcoes import Opcoes
-
-BACKGROUND_PATH = 'Assets/Telas/3.jpg'
 
 
 class TelaJogo():
+    folder = Folder()
+    __BACKGROUND_PATH = folder.create_assets_path(['Telas'], '3.jpg')
+
     def __init__(self) -> None:
         opcoes = Opcoes()
         self.__tamanho = opcoes.TAMANHO_TELA
         self.__janela = pygame.display.set_mode(self.__tamanho)
 
-        imagem_fundo = pygame.image.load(BACKGROUND_PATH)
+        imagem_fundo = pygame.image.load(TelaJogo.__BACKGROUND_PATH)
         self.__plano_fundo = pygame.transform.scale(imagem_fundo, self.__tamanho)
 
         pygame.display.set_caption(opcoes.GAME_TITLE)

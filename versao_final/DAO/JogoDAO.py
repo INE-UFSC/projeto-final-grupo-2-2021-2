@@ -5,7 +5,7 @@ from DAO.DAOAdapters import JogoDaoAdapter
 
 class JogoDAO(DAO):
     def __init__(self) -> None:
-        super().__init__('DAO/saves/saves')
+        super().__init__()
 
     def add(self, jogo: Jogo) -> None:
         if isinstance(jogo, Jogo):
